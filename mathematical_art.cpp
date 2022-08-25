@@ -13,6 +13,8 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints);
 
 void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool is_horizontal);
 
+int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
+
 
 
 int main(){
@@ -34,8 +36,12 @@ int main(){
 	// vector<int> L = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10};
 	// string D = "RLRLRLRLRLRLRLRLR";
 
-	vector<int> L = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10};
-	string D = "UDUDUDUDUDUDUDUDU";
+	// vector<int> L = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10};
+	// string D = "UDUDUDUDUDUDUDUDU";
+
+	vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
+	string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+
 
 
 	getPlusSignCount(N, L, D);
@@ -145,13 +151,16 @@ long long getPlusSignCount(int N, vector<int> L, string D) {
 
 	// } 
 
+	int count = count_plus_signs(horizontal_lines, vertical_lines, h_endpoints, v_endpoints);
+	cout << "==================================" << endl; 
+	cout << "count = " << count;
 
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
-//							merge lines
+//							function for merge lines
 // merge the adjacent lines found in lines vector, using the endpoints vector.
 //		remove the merged lines from the vectors. So this function modifies the original
 //		parameters.
@@ -188,8 +197,8 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints) {
 		auto ln_it_2 = ln_it + 1;
 		while(ln_it_2 != lines.cend()) {
 			did_merge_happen_inner = false;
-			cout << *ln_it << " --- " << *ln_it_2 << endl;
-			cout << "-----------------------------" << endl;
+			// cout << *ln_it << " --- " << *ln_it_2 << endl;
+			// cout << "-----------------------------" << endl;
 			// if the lines are on the same y-coordinate
 			if (*ln_it == *ln_it_2) {
 				// check if the lines should be merged
@@ -206,7 +215,7 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints) {
 							// case 2:
 							//			_________
 							//	________
-							cout << "******" << *ln_it << endl;
+							// cout << "******" << *ln_it << endl;
 							new_left_coord = endpoints[ln_inner][0];
 							new_right_coord = endpoints[ln_outer][1];
 							did_merge_happen = true;
@@ -277,7 +286,6 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints) {
 				ln_it_2++;
 			}
 		}
-		cout << "************************************" << endl;
 
 		
 
@@ -302,7 +310,7 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints) {
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
-//									display lines (with endpoints)
+//							function for displaying lines (with endpoints)
 // display the lines in the following format:
 //	for horizontal lines:
 //			y-axis: (left_endpoint, right_endpoint)
@@ -326,3 +334,106 @@ void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool
 		row_counter++;
 	}	
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+//						function for counting plus signs
+// @return the number of plus signs present on the graph represented by the parameters
+//		lines and endpoints.
+// @parameters
+//		h_lines = a vector containing the y_axis of the horizontal lines
+//		v_lines = a vector containing the x_axis of the vertical lines
+//		h_endpoints = a vector of 2-element arrays containing the left and right endpoints 
+//			of the horizontal lines represented by h_lines
+//		v_endpoints = a vector of 2-element arrays containing the bottom and top endpoints
+//			of the vertical lines represented by v_lines
+int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints) {
+	// initialize outer and inner (horizontal and vertical, respectively) line iterators
+	auto h_ln_it = h_lines.begin();
+	auto v_ln_it = v_lines.begin();
+
+	// initialize counters for endpoints
+	int h_index = 0;
+	int v_index = 0;
+
+	// declare left and right endpoints for the horizontal lines to be used in the loops.
+	int h_left_endpoint;
+	int h_right_endpoint;
+
+
+	// declare left and right endpoints for the vertical lines to be used in the loops.
+	int v_bottom_endpoint;
+	int v_top_endpoint;
+
+	// declare the y_axis varialbe for horizontal lines
+	int h_y_axis;
+
+	// declare the x_axis varialbe for vertical lines
+	int v_x_axis;
+
+	// running total of the number of plus signs found
+	int total_plus_signs = 0;
+
+
+
+	// iterate over the horizontal lines
+	while(h_ln_it != h_lines.cend()) {
+		v_ln_it = v_lines.begin();
+		v_index = 0;
+
+		// set the left and right endpoint variables using the horizontal endpoint vector
+		//		for readability
+		h_left_endpoint = h_endpoints[h_index][0];
+		h_right_endpoint = h_endpoints[h_index][1];
+
+		// set the y-axis of the horizontal line (to make the if statements more
+		//		readable)
+		h_y_axis = *h_ln_it;
+
+		while(v_ln_it != v_lines.cend()) {
+			// set the bottom and top endpoint variables using the vertical endpoint vector
+			//		for readability			
+			v_bottom_endpoint = v_endpoints[v_index][0];
+			v_top_endpoint = v_endpoints[v_index][1];
+
+			// set the x-axis of the vertical line (to make the if statements more
+			//		readable)
+			v_x_axis = *v_ln_it;
+			
+			if(v_x_axis > h_left_endpoint && v_x_axis < h_right_endpoint) {
+				if(h_y_axis > v_bottom_endpoint && h_y_axis < v_top_endpoint) {
+					cout << "plus is at (" << v_x_axis << "," << h_y_axis << ")" << endl;
+					total_plus_signs++;
+				}
+			}
+
+			v_ln_it++;
+			v_index++;
+		}
+
+		h_ln_it++;
+		h_index++;
+	}
+
+	return total_plus_signs;
+}
+
+// !!! different implementation
+//	count the pluses while drawing the lines. then remove duplicate pluses.
+
+
+// !!! generate random L and D (large number of them) and use them to run the program
+//			and see it's performance on larger values.
+///////////////////////////////////////////////////////////////////////////////////////
+//							random D generator
+
+///////////////////////////////////////////////////////////////////////////////////////
+//							random L generator
+
+
+// !!! if both versions of the program yield the same result for randomly generated
+//		sets, and if they also work correctly for smaller ones, then they most likely
+//		work.
+
+
