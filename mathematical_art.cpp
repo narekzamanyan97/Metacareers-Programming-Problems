@@ -15,9 +15,14 @@ void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool
 
 int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
 
+string generate_directions(int length);
+
+char digit_to_dir_conv(int digit);
 
 
 int main(){
+	generate_directions(10);
+
 	int N = 10;
 	
 	//vector<int> L = {6, 3, 4, 5, 1, 6, 3, 3, 4};
@@ -44,7 +49,7 @@ int main(){
 
 
 
-	getPlusSignCount(N, L, D);
+	// getPlusSignCount(N, L, D);
 
 	return 0;
 }
@@ -427,6 +432,40 @@ int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array
 //			and see it's performance on larger values.
 ///////////////////////////////////////////////////////////////////////////////////////
 //							random D generator
+string generate_directions(int length) {
+	srand((unsigned) time(NULL));
+
+	int random;
+	char dir;
+
+	string direction_string = "";
+
+	for(int i = 0; i < 10; i++) {
+		random = rand() % 4;
+		
+		dir = digit_to_dir_conv(random);
+
+		direction_string += dir;
+
+		cout << random << ": " << dir << endl;
+	}
+}
+
+char digit_to_dir_conv(int digit) {
+	if(digit == 0) {
+		return 'U';
+	} else if(digit == 1) {
+		return 'R';
+	} else if(digit == 2) {
+		return 'D';
+	} else if(digit == 3) {
+		return 'L';
+	} else {
+		cout << "Wrong digit." << endl;
+		return 'W';
+	}
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //							random L generator
