@@ -1,13 +1,28 @@
 #include <bits/stdc++.h>
 #include <iostream>
 #include <string>
+#include <random>
+#include <chrono>
 using namespace std;
 
 #define HORIZONTAL true
 #define VERTICAL false
 
+// structures to represent horizontal and vertical lines.
+//						horizontal lines --------------- vertical lines
+//		coord =		 		y_coord 		 				coord
+//		min_endpoint =		left_endpoint                   bottom_endpoint
+//		max_endpoint = 		right_endpoint 					top_endpoint
+struct line{
+	int coord;
+	int min_endpoint;
+	int max_endpoint;
+};
+
 // declare the functions used in this program
 long long getPlusSignCount(int, vector<int>, string);
+
+long long getPlusSignCount2(int, vector<int>, string);
 
 void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints);
 
@@ -15,17 +30,29 @@ void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool
 
 int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
 
-string generate_directions(int length);
+string generate_directions(int number_of_moves);
 
 char digit_to_dir_conv(int digit);
 
+vector<int> generate_lengths(int number_of_moves, int max_move_size);
+
+int* find_index(bool is_vertical, vector<int>& lines, int coord);
+
+
+
+
 
 int main(){
-	generate_directions(10);
+	int N = 100;
+	int L_i = 2;
 
-	int N = 10;
-	
-	//vector<int> L = {6, 3, 4, 5, 1, 6, 3, 3, 4};
+	// string D;
+	// vector<int> L;
+	// L = generate_lengths(N, L_i);
+	// D = generate_directions(N);
+	// cout << D.size() << endl;;
+
+	// vector<int> L = {6, 3, 4, 5, 1, 6, 3, 3, 4};
 	// string D = "ULDRULURD";
 
 	// vector<int> L = {6, 4, 5, 6, 2, 4, 3, 3, 3, 3, 3, 2, 1, 7, 2, 2};
@@ -44,14 +71,820 @@ int main(){
 	// vector<int> L = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10};
 	// string D = "UDUDUDUDUDUDUDUDU";
 
-	vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
-	string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+	// vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
+	// string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+
+	// vector<int> L = {8, 4, 4, 4, 2, 8, 2, 4, 10, 2, 4, 1, 2};
+	// string D = "RLULURDLRUDUR";
+
+	// vector<int> L = {4,4,4,4,4,4,4,8,4,8,6,2,1,2,3,2};
+	// string D = "RUDRULLRDLURDUDL";
+	vector<int> L = {1,2,3,1,2,1,2,1,1,1,2,1,1,2,1,2};
+	string D = "RURLULDLURURDULR";
 
 
+	int coordinate;
+	int* index_and_type;
+	int index;
+	vector<int> lines;
 
-	// getPlusSignCount(N, L, D);
 
+	for(int i = 0; i < 10; i++) {
+		cout << "Type a coordinate: ";
+		cin >> coordinate;
+		cout << endl;
+		index_and_type = find_index(true, lines, coordinate);
+		cout << index_and_type[0] << ", " << index_and_type[1] << endl;
+		if(index_and_type[1] == -2) {
+			lines.insert(lines.begin(), coordinate);
+			cout << "0" << endl;
+		} else if (index_and_type[1] == -1) {
+			cout << "1" << endl;
+			lines.insert(lines.begin(), coordinate);
+		} else if(index_and_type[1] == 0) {
+			cout << "2" << endl;
+			lines.insert(lines.begin() + index_and_type[0], coordinate);
+		} else if(index_and_type[1] == 1) {
+			cout << "3" << endl;
+			lines.insert(lines.begin() + index_and_type[0], coordinate);
+		} else {
+			cout << "4" << endl;
+			lines.push_back(coordinate);
+		}
+
+		for(auto it = lines.begin(); it != lines.cend(); it++) {
+			cout << *it << ", ";
+		}
+		cout << endl;
+	}
+
+	// lines.at(index) = 1;
+
+	// getPlusSignCount2(N, L, D);
+
+	// delete the dynamic array
+	// delete [] array_of_lengths;
 	return 0;
+}
+
+long long getPlusSignCount3(int N, vector<int> L, string D) {
+	// keeps track of the running total of the number of pluses
+	int number_of_pluses = 0;
+
+	// declare vectors to store horizontal and vertical line structures.
+	// 		since lines that overlap and are along the same line are merged, it suffices
+	//		to create vectors of size only half of N 
+	vector<line> horizontal_linesssss(N/2);
+	vector<line> vertical_linessss(N/2);
+
+	// vector<int, vector<int>>
+
+	// keeps track of the current coordinate of the brush, [x, y]
+	int current_coordinate[2] = {0, 0};
+
+	// keeps track of the previous coordinate of the brush, [x, y], before moving it
+	//		by L
+	int previous_coordinate[2] = {0, 0};
+
+
+	// keeps all the y-coordinates of horizontal lines
+	vector<int> horizontal_lines;
+	// the left and right (on x-axis) endpoints of horizontal lines
+	vector<std::array<int, 2>> h_endpoints;
+
+	// keeps all the x-coordinates of vertical lines
+	vector<int> vertical_lines;
+	// the top and bottom (on y-axis) endpoints of horizontal lines
+	vector<std::array<int, 2>> v_endpoints;
+
+	// count the index to be used to access elements of D while iterating over the 
+	//		elements of L
+	int  index = 0;
+
+	// stores the direction of the move
+	char direction;
+
+	// keep track of the previous direction.
+	char previous_direction;
+
+	// added for readability
+	int left_endpoint = 0;
+	int right_endpoint = 0;
+	int top_endpoint = 0;
+	int bottom_endpoint = 0;
+
+	for(auto it = L.begin(); it != L.cend(); it++) {
+		direction = D.at(index);
+
+		previous_coordinate[0] = current_coordinate[0];
+		previous_coordinate[1] = current_coordinate[1];
+
+		switch(direction) {
+			case 'L':
+				// update the current cooridnate after moving the brush
+				current_coordinate[0] -= *it;
+
+					
+				// set the variables to be used later
+				left_endpoint = current_coordinate[0];
+				right_endpoint = previous_coordinate[0];
+
+				// if the previous direction was along the same line, then
+				//		merge it with this line
+				if (previous_direction == 'L' || previous_direction == 'R') {
+					// update the left endpoint of the merged line if it is less than
+					//		the left endpoint of the previous line.
+					if(h_endpoints.back()[0] > left_endpoint) {
+						h_endpoints.back()[0] = left_endpoint;
+					}
+				} else {
+					// find the index to insert the new line at.
+
+					// add a horizontal line, i.e. its y-coordinate
+					// !!! remove duplicates from horizontal_lines
+					horizontal_lines.push_back(current_coordinate[1]);
+
+					// add the two endpoints (left and right) of the newly drawn line to
+					//		the h_endpoints
+					h_endpoints.push_back({left_endpoint, right_endpoint});					
+				}
+
+				break;
+			case 'R':
+				current_coordinate[0] += *it;
+
+				left_endpoint = previous_coordinate[0];
+				right_endpoint = current_coordinate[0];
+
+				// if the most recent line is identical to the previous line.
+				if(previous_direction == 'L' || previous_direction == 'R') {
+					// check if the new right_endpoint is larger than the previous right
+					//		endpoint 
+					if(h_endpoints.back()[1] < right_endpoint) {
+						h_endpoints.back()[1] = right_endpoint;
+					}
+				} else {
+					horizontal_lines.push_back(current_coordinate[1]);
+					h_endpoints.push_back({left_endpoint, right_endpoint});
+				}
+
+				break;
+			case 'U':
+				// update the current cooridnate after moving the brush
+				current_coordinate[1] += *it;
+
+				top_endpoint = current_coordinate[1];
+				bottom_endpoint = previous_coordinate[1];
+		
+				// if the previous direction was along the same line, then
+				//		merge it with this line
+				if(previous_direction == 'U' || previous_direction == 'D') {
+					// update the top endpoint of the previous line, if it is less than
+					//		the new top endpoint
+					if(v_endpoints.back()[1] < top_endpoint) {
+						v_endpoints.back()[1] = top_endpoint;
+					}
+				} else {
+					// add the two endpoints (bottom and top) of the newly drawn line to
+					//		the v_endpoints
+					v_endpoints.push_back({bottom_endpoint, top_endpoint});
+
+					// add a vertical line, i.e. its x-coordinate
+					// !!! remove duplicates from vertical_lines
+					vertical_lines.push_back(current_coordinate[0]);					
+				}
+
+
+				break;
+			case 'D':
+				current_coordinate[1] -= *it;				
+
+
+				top_endpoint = previous_coordinate[1];
+				bottom_endpoint = current_coordinate[1];
+
+				// if the previous direction was along the same line, then
+				//		merge it with this line
+				if(previous_direction == 'U' || previous_direction == 'D') {
+					// update the bottom endpoint of the previous line, if it is greater
+					//		than the new bottom endpoint
+					if(v_endpoints.back()[0] > bottom_endpoint) {
+						v_endpoints.back()[0] = bottom_endpoint;
+					}
+				} else {
+					v_endpoints.push_back({bottom_endpoint, top_endpoint});
+					vertical_lines.push_back(current_coordinate[0]);
+				}
+
+				break;
+		}
+
+		previous_direction = direction;
+		index++;
+	}
+
+}
+
+
+// finds the index of a sorted vector based on the coordinate (coord) of the line.
+// @parameters:
+//		lines = either a vector of horizontal or vertical lines, that hold the structure
+//			horizontal_line or vertical_line, respectively.
+//		coord = either the y_coord or the x_coord of the line represented by the vector
+//			lines.
+//	@return
+//		a 2-element array containing:
+//		current_index = the index at which the vector holds a line with the same coord. 
+//		exact_index_found:
+//		0 = If that line does not exist, and the current_index represents an int between 
+//			the left and right neighboring indices. 
+//		1 = if the coord was found, and current_index represents the exact index where
+//			the coord is found
+//		-1 = coord is not found, and courd < all the other coords in the vector. So it
+//			should be inserted at the front of the vector.
+//		2 =  coord is not found, and coord > all the other coords in the vector. So it
+//			should be inserted at the back of the vector.
+//		-2 = when the vector is empty.
+//	Note: we assume the lines<> vector is already sorted by either y_coord or
+// 		or x_coord, for horizontal or vertical lines, respectively. 
+int* find_index(bool is_vertical, vector<int>& lines, int coord) {
+	int size_of_vector = lines.size();
+
+	// hold the low and high indices, which are used to split the vector, speeding up
+	//		the search. 
+	int low = 0;
+	int high = size_of_vector - 1;
+
+	cout << "low = " << low << endl;
+	cout << "high = " << high << endl;
+
+
+	// we start by splitting the vector and checking the middle element
+	int current_index = (low + high)/2;
+
+	int current_coord;
+
+	if(size_of_vector != 0) {
+		// the value of the x_coord/y_coord of the vertical/horizontal line for the current
+		//		vector element (line) being observer.
+		current_coord = lines.at(current_index);
+	}
+		
+	// true if the index is found, whether the index points to the line with the exact
+	//		coord or to a position in between two other indices.
+	// used to terminate the while loop that searches for the index.
+	bool index_found = false;
+
+	// true if a line with the same coord is found. false otherwise.
+	int exact_index_found;
+
+
+	static int return_arr[2] = {0, 0};
+	
+	// search based on coord, then on min_endpoint.
+	while(!index_found) {
+		// if the vector is empty, return 0
+		if(size_of_vector == 0) {
+			return_arr[0] = 0;
+			return_arr[1] = -2;
+			return return_arr;
+		} else {
+			// sorting by the coord
+			if(current_coord < coord) {
+				// the coord at the current index is < the given coord. shift the index
+				//		to the right
+				low = current_index + 1;
+				cout << "here: low = " << low << "; high = " << high << endl;
+				cout << "size_of_vector = " << size_of_vector << endl;
+				cout << "exact_index_found = " << exact_index_found << endl;
+				if(low > high) {
+					// to get out of the loop
+					index_found = true;
+
+				
+					// set the current_index to be the index of low 
+					current_index = low;
+					cout << "here: low = " << low << "; high = " << high << endl;
+					cout << "size_of_vector = " << size_of_vector << endl;
+					cout << "exact_index_found = " << exact_index_found << endl;
+					
+					// if the coord is larger than all the other coords in the vector
+					if(low >= size_of_vector) {							
+						// set the value of the 2nd element of the return array.
+						// means the coord should be pushed at the back of the vector.
+						exact_index_found = 2;
+						
+					} else {
+						// if the coord is in between two coords in the vector.
+						exact_index_found = 0;
+					}
+
+				} else {
+					// update the current index
+					current_index = (low + high)/2;
+					current_coord = lines.at(current_index);
+				}
+			} else if(current_coord > coord) {
+				// the coord at the current index is > the given coord. So divide the
+				//		vector further, shifting the index to the left, between the
+				//		low and the current_index. the latter becomes the high.
+				high = current_index - 1;
+
+				if(high < low) {
+					// to get out of the loop
+					index_found = true;
+
+					if(high < 0) {
+						// means the coord should be pushed at the front of the vector.
+						exact_index_found = -1;
+						// set the current_index to be the index of the first element in the
+						//		vector.
+						current_index = 0;						
+					} else {
+						// if the coord is in between two coords in the vector
+						current_index = low;
+						exact_index_found = 0;
+					}
+
+				} else {
+					// update the current index
+					current_index = (low + high)/2;
+					current_coord = lines.at(current_index);
+				}
+			} else {
+				// found a line with the same coordinate
+				index_found = true;
+				exact_index_found = 1;
+			}
+		}
+	}
+	// cout << "here: low = " << low << "; high = " << high << endl;
+	// cout << "size_of_vector = " << size_of_vector << endl;
+	// cout << "exact_index_found = " << exact_index_found << endl;
+	return_arr[0] = current_index;
+	return_arr[1] = exact_index_found;
+	return return_arr;
+}
+// look for 4
+	// {0, 3, 6}
+ // 	 ^  ^  ^
+ // 	 	   ^
+ // 	 	   ^
+ // 	 	   ^
+
+ // 	 	^  ^
+ // 	 	h  l 		high > low, return low  		
+// look for 2
+	// {0, 3, 6}
+ // 	 ^  ^  ^
+ // 	 ^
+ // 	 ^
+ // 	 ^
+
+ // 	 ^  ^	
+ // 	 h  l 			low > high, return low 
+// look for -1
+//  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+//   ^			  ^	  			 ^
+//   ^  ^     ^	 
+//   ^   
+// ^ ^		high < low			return high (-1) (high > low), -1
+// ________________________________________________
+// look for 10
+//  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+//   ^           ^              ^    4 < 10
+//                  ^     ^     ^    7 < 10
+//                           ^  ^    current_index = 8     8 < 10
+//                           ^
+
+//                           	 ^
+//                           	 ^
+//                           	 ^	
+//                           	   	    current_index = 9 = low = high    9 < 10
+//                           	 ^ ^ 	return low (10) (low > high), 2
+
+// ________________________________________________
+// look for 3.5
+//  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+//   ^           ^              ^
+//   ^	^     ^
+//         ^  ^
+//         ^						current_index = 2 = low
+        
+//            ^
+//            ^
+//            ^
+//            						current_index = 3 = low = high 
+//            ^ ^					return low (4), 0
+//			  h l
+// ________________________________________________
+// look for 4.5
+//  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+//   ^           ^              ^
+//                  ^     ^     ^
+
+//                  ^  ^
+//                  ^
+
+//               ^  ^				current_index = 4 = high < low (5), 
+//               h  l				return low (4), 0
+// ________________________________________________
+// look for 0.5
+//  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+//   ^           ^              ^		current_index = 4, 4 > 0.5
+//   ^  ^     ^						current_index = 1, 1 > 0.5
+
+//   ^
+//   ^
+//   ^									current_index = 0, 0 < 0.5
+
+//   ^
+//      ^								low = 1 > 0 = high
+//      								return low, 0
+// sorting by the min_endpoint
+// !!! the endpoints should be compared in a different fashion, because
+//		merging lines do not have to have the same min endpoints.
+//	!!! maybe not. the idea above is not true. We just have to insert
+//		the given line at an index so that its min endpoint will be
+//		in between the min endpoints of its next and previous neighbors.
+//		So instead of looking for an equality of min endpoints, we must
+//		find two consecutive lines, the earlier of which has a 
+//		min_endpoint less than the min_endpoint of the given line, and the
+//		later of which has a min_endpoint greater than the min_endpoint of
+//		the given endpoint. 
+int find_endpoint_index() {
+
+}
+
+long long getPlusSignCount2(int N, vector<int> L, string D) {
+	// keeps track of the running total of the number of pluses
+	int number_of_pluses = 0;
+
+	// keeps track of the coordinates of plus signs
+	vector<std::array<int, 2>> plus_sign_coord;
+
+	// keeps all the y-coordinates of horizontal lines
+	vector<int> horizontal_lines;
+	// the left and right (on x-axis) endpoints of horizontal lines
+	vector<std::array<int, 2>> h_endpoints;
+
+	// keeps all the x-coordinates of vertical lines
+	vector<int> vertical_lines;
+	// the top and bottom (on y-axis) endpoints of horizontal lines
+	vector<std::array<int, 2>> v_endpoints;
+
+	// keeps track of the current coordinate of the brush, [x, y]
+	int current_coordinate[2] = {0, 0};
+
+	// keeps track of the previous coordinate of the brush, [x, y], before moving it
+	//		by L
+	int previous_coordinate[2] = {0, 0};
+
+	// count the index to be used to access elements of D while iterating over the 
+	//		elements of L
+	int  index = 0;
+
+	// index for iterating over the horizontal lines and their endpoints.
+	int h_index = 0;
+
+	// index for iterating over vertical lines and their endpoints.
+	int v_index;
+
+
+	// stores the direction of the move
+	char direction;
+
+	// keep track of the previous direction.
+	char previous_direction;
+
+	// added for readability
+	int left_endpoint = 0;
+	int right_endpoint = 0;
+	int top_endpoint = 0;
+	int bottom_endpoint = 0;
+
+	// stores a pending plus sign, like the one shown below
+	// case 1: half_plus
+	//			1.1)
+	//						|
+	//						|
+	//			____________
+	//  	or  1.2)
+	//			____________
+	//						| 
+	//						|
+	//	 	or  1.3)
+	//			|
+	//			|
+	//			 ___________
+	//		or 	1.4)
+	//			 ___________
+	//			|
+	//			|
+	//
+	//	case 2: three_quarter_plus
+	//			2.1)
+	//				|
+	//				|
+	//		________
+	//				|
+	//				|
+	//		or 2.2)
+	//				|
+	//				|
+	//				 _______
+	//				|
+	//				|
+	//		or 2.3)
+	//				|
+	//				|
+	//				|
+	//				|
+	//		________________
+	//		or 2.4)
+	//		________________
+	//				|
+	//				|
+	//				|
+	//				|
+	//	case 3:  plus
+	//				|
+	//				|
+	//				|
+	//		________________
+	//				|
+	//				|
+	//				|
+	// vector<std::array<int, 2>> pending_1;
+
+	// these vectors store the coordinates of partial pluses of type 1.1 - 2.4
+	//		as defined above.
+	vector<std::array<int, 2>> type_1_1;
+	vector<std::array<int, 2>> type_1_2;
+	vector<std::array<int, 2>> type_1_3;
+	vector<std::array<int, 2>> type_1_4;
+	vector<std::array<int, 2>> type_2_1;
+	vector<std::array<int, 2>> type_2_2;
+	vector<std::array<int, 2>> type_2_3;
+	vector<std::array<int, 2>> type_2_4;
+
+	for(auto it = L.begin(); it != L.cend(); it++) {
+		direction = D.at(index);
+
+		previous_coordinate[0] = current_coordinate[0];
+		previous_coordinate[1] = current_coordinate[1];
+
+		switch(direction) {
+			case 'L':
+				// update the current cooridnate after moving the brush
+				current_coordinate[0] -= *it;
+
+					
+				// set the variables to be used later
+				left_endpoint = current_coordinate[0];
+				right_endpoint = previous_coordinate[0];
+
+				// if the previous direction was along the same line, then
+				//		merge it with this line
+				if (previous_direction == 'L' || previous_direction == 'R') {
+					// update the left endpoint of the merged line if it is less than
+					//		the left endpoint of the previous line.
+					if(h_endpoints.back()[0] > left_endpoint) {
+						h_endpoints.back()[0] = left_endpoint;
+					}
+				} else {
+					// add a horizontal line, i.e. its y-coordinate
+					// !!! remove duplicates from horizontal_lines
+					horizontal_lines.push_back(current_coordinate[1]);
+
+					// add the two endpoints (left and right) of the newly drawn line to
+					//		the h_endpoints
+					h_endpoints.push_back({left_endpoint, right_endpoint});					
+				}
+
+				break;
+			case 'R':
+				current_coordinate[0] += *it;
+
+				left_endpoint = previous_coordinate[0];
+				right_endpoint = current_coordinate[0];
+
+				// if the most recent line is identical to the previous line.
+				if(previous_direction == 'L' || previous_direction == 'R') {
+					// check if the new right_endpoint is larger than the previous right
+					//		endpoint 
+					if(h_endpoints.back()[1] < right_endpoint) {
+						h_endpoints.back()[1] = right_endpoint;
+					}
+				} else {
+					horizontal_lines.push_back(current_coordinate[1]);
+					h_endpoints.push_back({left_endpoint, right_endpoint});
+				}
+
+				break;
+			case 'U':
+				// update the current cooridnate after moving the brush
+				current_coordinate[1] += *it;
+
+				top_endpoint = current_coordinate[1];
+				bottom_endpoint = previous_coordinate[1];
+		
+				// if the previous direction was along the same line, then
+				//		merge it with this line
+				if(previous_direction == 'U' || previous_direction == 'D') {
+					// update the top endpoint of the previous line, if it is less than
+					//		the new top endpoint
+					if(v_endpoints.back()[1] < top_endpoint) {
+						v_endpoints.back()[1] = top_endpoint;
+					}
+				} else {
+					// add the two endpoints (bottom and top) of the newly drawn line to
+					//		the v_endpoints
+					v_endpoints.push_back({bottom_endpoint, top_endpoint});
+
+					// add a vertical line, i.e. its x-coordinate
+					// !!! remove duplicates from vertical_lines
+					vertical_lines.push_back(current_coordinate[0]);					
+				}
+
+
+				break;
+			case 'D':
+				current_coordinate[1] -= *it;				
+
+
+				top_endpoint = previous_coordinate[1];
+				bottom_endpoint = current_coordinate[1];
+
+				// if the previous direction was along the same line, then
+				//		merge it with this line
+				if(previous_direction == 'U' || previous_direction == 'D') {
+					// update the bottom endpoint of the previous line, if it is greater
+					//		than the new bottom endpoint
+					if(v_endpoints.back()[0] > bottom_endpoint) {
+						v_endpoints.back()[0] = bottom_endpoint;
+					}
+				} else {
+					v_endpoints.push_back({bottom_endpoint, top_endpoint});
+					vertical_lines.push_back(current_coordinate[0]);
+				}
+
+				break;
+		}
+
+
+
+
+		// if movement is sideways, iterate over the vertical lines and look for 
+		//		crossings (pluses)
+		if (direction == 'L' || direction == 'R') {
+			// cout << "(" << current_coordinate[0] << "," << current_coordinate[1] << ")" << endl;
+
+			v_index = 0;
+
+			// iterate over the vertical lines
+			for(auto x_coord_it_v = vertical_lines.begin(); x_coord_it_v != vertical_lines.cend(); x_coord_it_v++) {
+				// Note: current_coordinate[1] == the y_coord of the h_line
+				if(*x_coord_it_v > left_endpoint && *x_coord_it_v < right_endpoint) {
+					if(v_endpoints.at(v_index)[0] < current_coordinate[1] && v_endpoints.at(v_index)[1] > current_coordinate[1]) {
+						// case 3
+						// we found a plus sign. increment the running total of plus signs
+						number_of_pluses++;
+						cout << "plus at: ("; 
+					} else if (v_endpoints.at(v_index)[0] == current_coordinate[1]) {
+						// case 2.3
+						cout << "case 2.3 at (";
+					} else if(v_endpoints.at(v_index)[1] == current_coordinate[1]) {
+						// cases 2.4
+						cout << "case 2.4 at (";
+					}
+				} else if(*x_coord_it_v == left_endpoint || *x_coord_it_v == right_endpoint) {
+					// a partial plus sign is being formed. 
+					if(v_endpoints.at(v_index)[0] < current_coordinate[1] && v_endpoints.at(v_index)[1] > current_coordinate[1]) {
+						// cases 2.1 || 2.2
+						if(*x_coord_it_v == right_endpoint) {
+							// case 2.1
+							cout << "case 2.1 at (";
+						} else {
+							// case 2.2
+							cout << "case 2.2 at (";
+						}
+					} else if(v_endpoints.at(v_index)[0] == current_coordinate[1] || v_endpoints.at(v_index)[1] == current_coordinate[1]) {
+						// cases 1.1 || 1.2 || 1.3 || 1.4
+						if(v_endpoints.at(v_index)[0] == current_coordinate[1]) {
+							if(*x_coord_it_v == right_endpoint) {
+								//case 1.1
+								cout << "case 1.1 at (";
+							} else {
+								// case 1.3
+								cout << "case 1.3 at (";
+							}
+						} else if(v_endpoints.at(v_index)[1] == current_coordinate[1]) {
+							if(*x_coord_it_v == right_endpoint) {
+								// case 1.2
+								cout << "case 1.2 at (";
+							} else {
+								// case 1.4
+								cout << "case 1.4 at (";
+							}
+						}
+					}
+				}
+
+				cout  << *x_coord_it_v << "," << current_coordinate[1] << ")" << endl;
+
+				// increment the v_index
+				v_index++;
+
+			}
+
+		}
+		// else if the movement is up and down, iterate over the horizontal lines looking
+		// 		for crossings (pluses)
+		// dir == 'U' || dir == 'D'
+		else {
+			h_index = 0;
+
+			// iterate over the horizontal lines
+			for(auto y_coord_it_h = horizontal_lines.begin(); y_coord_it_h != horizontal_lines.cend(); y_coord_it_h++) {
+				// Note: current_coordinate[0] == the x_coord of the v_line
+
+				// for readability
+				left_endpoint = h_endpoints.at(h_index)[0];
+				right_endpoint = h_endpoints.at(h_index)[1];
+
+				if(*y_coord_it_h > bottom_endpoint && *y_coord_it_h < top_endpoint) {
+					if(left_endpoint < current_coordinate[0] && right_endpoint > current_coordinate[0]) {
+						// case 3
+						// we found a plus sign. increment the running total of plus signs
+						number_of_pluses++;
+						cout << "plus at: ("; 
+					} else if (right_endpoint == current_coordinate[0]) {
+						// case 2.1
+						cout << "case 2.1 at (";
+					} else if(left_endpoint == current_coordinate[0]) {
+						// cases 2.2
+						cout << "case 2.2 at (";
+					}
+				} else if(*y_coord_it_h == bottom_endpoint || *y_coord_it_h == top_endpoint) {
+					// a partial plus sign is being formed. 
+					if(left_endpoint < current_coordinate[0] && right_endpoint > current_coordinate[0]) {
+						// cases 2.3 || 2.4
+						if(*y_coord_it_h == bottom_endpoint) {
+							// case 2.3
+							cout << "case 2.3 at (";
+						} else {
+							// case 2.4
+							cout << "case 2.4 at (";
+						}
+					} else if(left_endpoint == current_coordinate[0] || right_endpoint == current_coordinate[1]) {
+						// cases 1.1 || 1.2 || 1.3 || 1.4
+						if(right_endpoint == current_coordinate[0]) {
+							if(*y_coord_it_h == bottom_endpoint) {
+								//case 1.1
+								cout << "case 1.1 at (";
+							} else {
+								// case 1.2
+								cout << "case 1.2 at (";
+							}
+						} else if(left_endpoint == current_coordinate[0]) {
+							if(*y_coord_it_h == bottom_endpoint) {
+								// case 1.3
+								cout << "case 1.3 at (";
+							} else {
+								// case 1.4
+								cout << "case 1.4 at (";
+							}
+						}
+					}
+				}
+
+				cout << current_coordinate[0] << "," << *y_coord_it_h << ")" << endl;
+
+				// increment the v_index
+				v_index++;
+
+			}
+		}
+
+		previous_direction = direction;
+		index++;
+	}
+	cout << endl << endl;
+
+	cout << "***************************************************************";
+	cout << horizontal_lines.size() + vertical_lines.size() << endl;
+	int temp_index = 0;
+	// for(auto it = horizontal_lines.begin(); it != horizontal_lines.cend(); it++) {
+	// 	cout << *it << ": (" << h_endpoints.at(temp_index)[0] << "," << h_endpoints.at(temp_index)[1] << ")" << endl;
+	// 	temp_index++;
+	// }
+	// cout << "***************************************************************";
+	// temp_index = 0;
+	// for(auto it = vertical_lines.begin(); it != vertical_lines.cend(); it++) {
+	// 	cout << *it << ": (" << v_endpoints.at(temp_index)[0] << "," << v_endpoints.at(temp_index)[1] << ")" << endl;
+	// 	temp_index++;
+	// }
 }
 
 long long getPlusSignCount(int N, vector<int> L, string D) {
@@ -80,9 +913,11 @@ long long getPlusSignCount(int N, vector<int> L, string D) {
 
 	int counter = 0;
 
+	char dir;
+
 	// iterate over the line segments
 	for(auto i = L.begin(); i != L.cend(); i++) {
-		char dir = D.at(counter);
+		dir = D.at(counter);
 
 		previous_coordinate[0] = current_coordinate[0];
 		previous_coordinate[1] = current_coordinate[1];
@@ -123,24 +958,26 @@ long long getPlusSignCount(int N, vector<int> L, string D) {
 				v_endpoints.push_back({current_coordinate[1], previous_coordinate[1]});
 				break;
 		}
-		cout << D.at(counter) << " ";
-		cout << endl;
+		// cout << D.at(counter) << " ";
+		// cout << endl;
 		counter++;
 	}
 
 
-	// display horizontal and vertical lines
-	display_lines(vertical_lines, v_endpoints, VERTICAL);
-	display_lines(horizontal_lines, h_endpoints, HORIZONTAL);
+	// uncomment the following lines
+	// // display horizontal and vertical lines
+	// display_lines(vertical_lines, v_endpoints, VERTICAL);
+	// display_lines(horizontal_lines, h_endpoints, HORIZONTAL);
 
-	// merge lines
-	merge_lines(horizontal_lines, h_endpoints);
-	merge_lines(vertical_lines, v_endpoints);
+	// // merge lines
+	// merge_lines(horizontal_lines, h_endpoints);
+	// merge_lines(vertical_lines, v_endpoints);
 
-	// display merged lines
-	display_lines(vertical_lines, v_endpoints, VERTICAL);
+	// // display merged lines
+	// display_lines(vertical_lines, v_endpoints, VERTICAL);
+	// display_lines(horizontal_lines, h_endpoints, HORIZONTAL);
 
-	display_lines(horizontal_lines, h_endpoints, HORIZONTAL);
+
 
 	////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////
@@ -313,6 +1150,10 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints) {
 
 }
 
+// !!! first of all, merge consecutive moves if they have the same direction
+//		e.g. if D contains "RRUDLL", then the first two Rs and the last two Ls can be
+//		merged without iterating over the entire vector.
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 //							function for displaying lines (with endpoints)
@@ -408,7 +1249,7 @@ int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array
 			
 			if(v_x_axis > h_left_endpoint && v_x_axis < h_right_endpoint) {
 				if(h_y_axis > v_bottom_endpoint && h_y_axis < v_top_endpoint) {
-					cout << "plus is at (" << v_x_axis << "," << h_y_axis << ")" << endl;
+					// cout << "plus is at (" << v_x_axis << "," << h_y_axis << ")" << endl;
 					total_plus_signs++;
 				}
 			}
@@ -432,7 +1273,10 @@ int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array
 //			and see it's performance on larger values.
 ///////////////////////////////////////////////////////////////////////////////////////
 //							random D generator
-string generate_directions(int length) {
+// randomly generates a string of direction characters with length equal to 
+//		number_of_moves. The chars in the string can be U, R, D, or L.
+// 2 <= number_of_moves <= 2,000,000
+string generate_directions(int number_of_moves) {
 	srand((unsigned) time(NULL));
 
 	int random;
@@ -440,17 +1284,23 @@ string generate_directions(int length) {
 
 	string direction_string = "";
 
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < number_of_moves; i++) {
 		random = rand() % 4;
 		
 		dir = digit_to_dir_conv(random);
 
 		direction_string += dir;
 
-		cout << random << ": " << dir << endl;
+		cout << dir;
 	}
+
+	// cout << direction_string << endl;
+	return direction_string;
 }
 
+// helper function to convert a number representing one of four directions (Up Right Down 
+//		and Left) to its respective character (0 == Up == U, 1 == Right == R,
+//		2 == Down == D, 3 == Left = L)
 char digit_to_dir_conv(int digit) {
 	if(digit == 0) {
 		return 'U';
@@ -464,12 +1314,32 @@ char digit_to_dir_conv(int digit) {
 		cout << "Wrong digit." << endl;
 		return 'W';
 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //							random L generator
+// 1 <= Li <= 1,000,000,000
+// generate an array of integers, with a size of number_of_moves. The integers can be
+//	from 1 to 1,000,000,000
+vector<int> generate_lengths(int number_of_moves, int max_move_size) {
+	int random_int;
 
+	// int *array_of_lengths = new int(number_of_moves);
+	vector<int> vector_of_lengths;
+
+	// will be used to obtain a seed for the random number engine	
+	std::mt19937 generator(time(NULL));
+	std::uniform_int_distribution<int> distribution(1, max_move_size);
+
+	for(int i = 0; i < number_of_moves; i++) {
+		random_int = distribution(generator);
+
+		vector_of_lengths.push_back(random_int);
+		// cout << vector_of_lengths.at(i) << endl;
+	}
+
+	return vector_of_lengths;
+} 
 
 // !!! if both versions of the program yield the same result for randomly generated
 //		sets, and if they also work correctly for smaller ones, then they most likely
