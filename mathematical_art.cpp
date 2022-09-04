@@ -168,44 +168,44 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 		int max_endpoint;
 		bool merge = false;
 
-		for(auto it = endpoints.begin(); it != endpoints.cend(); it++) {
-			min_endpoint = (*it)[0];
-			max_endpoint = (*it)[1];
+	    auto it = endpoints.begin() + index;
+		min_endpoint = (*it)[0];
+		max_endpoint = (*it)[1];
 
-			cout << "*****************" << min_max_endpoints[0] << endl;
-			cout << "*****************" << min_max_endpoints[1] << endl;
-			cout << "*****************" << (*it)[0] << endl;
-			cout << "*****************" << (*it)[1] << endl;
-			// !!! see if the lines overlap
-			// min1/max1 = min_max_endpoints[0]/[1] refer to the new endpoints 
-			// min2/max2 = min_/max_endpoint refer to the endpoints being iterated
-			// case 1: min1 <= min 2 && max1 >= min2
-			if(min_max_endpoints[0] <= min_endpoint && min_max_endpoints[1] >= min_endpoint) {
-				merge = true;
-				if(min_max_endpoints[1] > max_endpoint) {
-					(*it)[0] = min_max_endpoints[0];
-					(*it)[1] = min_max_endpoints[1];
-				} else {
-					(*it)[0] = min_max_endpoints[0];
-				}
+		cout << "*****************" << min_max_endpoints[0] << endl;
+		cout << "*****************" << min_max_endpoints[1] << endl;
+		cout << "*****************" << (*it)[0] << endl;
+		cout << "*****************" << (*it)[1] << endl;
+		// !!! see if the lines overlap
+		// min1/max1 = min_max_endpoints[0]/[1] refer to the new endpoints 
+		// min2/max2 = min_/max_endpoint refer to the endpoints being iterated
+		// case 1: min1 <= min 2 && max1 >= min2
+		if(min_max_endpoints[0] <= min_endpoint && min_max_endpoints[1] >= min_endpoint) {
+			merge = true;
+			if(min_max_endpoints[1] > max_endpoint) {
+				(*it)[0] = min_max_endpoints[0];
+				(*it)[1] = min_max_endpoints[1];
+			} else {
+				(*it)[0] = min_max_endpoints[0];
 			}
-			// case 2: max1 >= max2 && min1 <= max2 
-			else if(min_max_endpoints[1] >= max_endpoint && min_max_endpoints[0] <= max_endpoint) {
-				merge = true;
-				if(min_max_endpoints[0] < min_endpoint) {
-					(*it)[0] = min_max_endpoints[0];
-					(*it)[1] = min_max_endpoints[1];
-				} else {
-					(*it)[1] = min_max_endpoints[1];
-				}
-			}
-			// case 3: min1 >= min2 && max1 <= max2
-			else if(min_max_endpoints[0] >= min_endpoint && min_max_endpoints[1] <= max_endpoint) {
-				merge = true;
-				// do not need to modify the endpoints
-			}
-
 		}
+		// case 2: max1 >= max2 && min1 <= max2 
+		else if(min_max_endpoints[1] >= max_endpoint && min_max_endpoints[0] <= max_endpoint) {
+			merge = true;
+			if(min_max_endpoints[0] < min_endpoint) {
+				(*it)[0] = min_max_endpoints[0];
+				(*it)[1] = min_max_endpoints[1];
+			} else {
+				(*it)[1] = min_max_endpoints[1];
+			}
+		}
+		// case 3: min1 >= min2 && max1 <= max2
+		else if(min_max_endpoints[0] >= min_endpoint && min_max_endpoints[1] <= max_endpoint) {
+			merge = true;
+			// do not need to modify the endpoints
+		}
+
+		
 		cout << "3" << endl;
 		// do not insert unless merge happens
 		if(!merge) {
