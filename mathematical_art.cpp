@@ -38,6 +38,7 @@ vector<int> generate_lengths(int number_of_moves, int max_move_size);
 
 int* find_index(bool is_vertical, vector<int>& lines, int coord);
 
+void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints);
 
 
 
@@ -86,34 +87,51 @@ int main(){
 	int coordinate;
 	int* index_and_type;
 	int index;
+	int min_endpoint;
+	int max_endpoint;
+	int min_max_endpoints[2] = {0, 0};
 	vector<int> lines;
+	vector<std::array<int, 2>> endpoints;
 
 
 	for(int i = 0; i < 10; i++) {
 		cout << "Type a coordinate: ";
 		cin >> coordinate;
 		cout << endl;
+		cout << "Type a min endpoint: ";
+		cin >> min_endpoint;
+		cout << "Type a max endpoint: ";
+		cin >> max_endpoint;
+		min_max_endpoints[0] = min_endpoint;
+		min_max_endpoints[1] = max_endpoint;
 		index_and_type = find_index(true, lines, coordinate);
 		cout << index_and_type[0] << ", " << index_and_type[1] << endl;
-		if(index_and_type[1] == -2) {
-			lines.insert(lines.begin(), coordinate);
-			cout << "0" << endl;
-		} else if (index_and_type[1] == -1) {
-			cout << "1" << endl;
-			lines.insert(lines.begin(), coordinate);
-		} else if(index_and_type[1] == 0) {
-			cout << "2" << endl;
-			lines.insert(lines.begin() + index_and_type[0], coordinate);
-		} else if(index_and_type[1] == 1) {
-			cout << "3" << endl;
-			lines.insert(lines.begin() + index_and_type[0], coordinate);
-		} else {
-			cout << "4" << endl;
-			lines.push_back(coordinate);
-		}
+
+		// insert_coord_and_endpoints(int index, 			int type,		 vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints) {
+
+		insert_coord_and_endpoints(index_and_type[0], index_and_type[1], lines, endpoints, coordinate, min_max_endpoints);
+		// if(index_and_type[1] == -2) {
+		// 	lines.insert(lines.begin(), coordinate);
+		// 	cout << "0" << endl;
+		// } else if (index_and_type[1] == -1) {
+		// 	cout << "1" << endl;
+		// 	lines.insert(lines.begin(), coordinate);
+		// } else if(index_and_type[1] == 0) {
+		// 	cout << "2" << endl;
+		// 	lines.insert(lines.begin() + index_and_type[0], coordinate);
+		// } else if(index_and_type[1] == 1) {
+		// 	cout << "3" << endl;
+		// 	lines.insert(lines.begin() + index_and_type[0], coordinate);
+		// } else {
+		// 	cout << "4" << endl;
+		// 	lines.push_back(coordinate);
+		// }
+
+		int index = 0;
 
 		for(auto it = lines.begin(); it != lines.cend(); it++) {
-			cout << *it << ", ";
+			cout << *it << ": [" << endpoints.at(index)[0] << "," << endpoints.at(index)[1] << "]" << endl;
+			index++;
 		}
 		cout << endl;
 	}
@@ -126,6 +144,102 @@ int main(){
 	// delete [] array_of_lengths;
 	return 0;
 }
+
+// inserts the coordinate at the appropriate index in a vector.
+//		the index and type parameters are returned from find_index() function
+//void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints) {
+void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints) {
+	if(type == -2) {
+		lines.insert(lines.begin(), coordinate);
+		endpoints.insert(endpoints.begin(), {min_max_endpoints[0], min_max_endpoints[1]});
+		cout << "0" << endl;
+	} else if (type == -1) {
+		cout << "1" << endl;
+		lines.insert(lines.begin(), coordinate);
+		endpoints.insert(endpoints.begin(), {min_max_endpoints[0], min_max_endpoints[1]});
+	} else if(type == 0) {
+		cout << "2" << endl;
+		lines.insert(lines.begin() + index, coordinate);
+		endpoints.insert(endpoints.begin() + index, {min_max_endpoints[0], min_max_endpoints[1]});
+	} else if(type == 1) {
+		// !!! this is an exact match. Merge this line with an already existing line if 
+		//		possible		
+		int min_endpoint;
+		int max_endpoint;
+		bool merge = false;
+
+		for(auto it = endpoints.begin(); it != endpoints.cend(); it++) {
+			min_endpoint = (*it)[0];
+			max_endpoint = (*it)[1];
+
+			cout << "*****************" << min_max_endpoints[0] << endl;
+			cout << "*****************" << min_max_endpoints[1] << endl;
+			cout << "*****************" << (*it)[0] << endl;
+			cout << "*****************" << (*it)[1] << endl;
+			// !!! see if the lines overlap
+			// min1/max1 = min_max_endpoints[0]/[1] refer to the new endpoints 
+			// min2/max2 = min_/max_endpoint refer to the endpoints being iterated
+			// case 1: min1 <= min 2 && max1 >= min2
+			if(min_max_endpoints[0] <= min_endpoint && min_max_endpoints[1] >= min_endpoint) {
+				merge = true;
+				if(min_max_endpoints[1] > max_endpoint) {
+					(*it)[0] = min_max_endpoints[0];
+					(*it)[1] = min_max_endpoints[1];
+				} else {
+					(*it)[0] = min_max_endpoints[0];
+				}
+			}
+			// case 2: max1 >= max2 && min1 <= max2 
+			else if(min_max_endpoints[1] >= max_endpoint && min_max_endpoints[0] <= max_endpoint) {
+				merge = true;
+				if(min_max_endpoints[0] < min_endpoint) {
+					(*it)[0] = min_max_endpoints[0];
+					(*it)[1] = min_max_endpoints[1];
+				} else {
+					(*it)[1] = min_max_endpoints[1];
+				}
+			}
+			// case 3: min1 >= min2 && max1 <= max2
+			else if(min_max_endpoints[0] >= min_endpoint && min_max_endpoints[1] <= max_endpoint) {
+				merge = true;
+				// do not need to modify the endpoints
+			}
+
+		}
+		cout << "3" << endl;
+		// do not insert unless merge happens
+		if(!merge) {
+			lines.insert(lines.begin() + index, coordinate);
+			endpoints.insert(endpoints.begin() + index, {min_max_endpoints[0], min_max_endpoints[1]});			
+		}
+
+	} else {
+		cout << "4" << endl;
+		lines.push_back(coordinate);
+		endpoints.push_back({min_max_endpoints[0], min_max_endpoints[1]});
+	}
+}
+
+// // inserts the coordinate at the appropriate index in a vector.
+// //		the index and type parameters are returned from find_index() function
+// void insert_endpoints(int index, int type, vector<int>& endpoints, int* endpoints) {
+// 	if(type == -2) {
+// 		lines.insert(lines.begin(), coordinate);
+// 		cout << "0" << endl;
+// 	} else if (type == -1) {
+// 		cout << "1" << endl;
+// 		lines.insert(lines.begin(), coordinate);
+// 	} else if(type == 0) {
+// 		cout << "2" << endl;
+// 		lines.insert(lines.begin() + index, coordinate);
+// 	} else if(type == 1) {
+// 		cout << "3" << endl;
+// 		lines.insert(lines.begin() + index, coordinate);
+// 	} else {
+// 		cout << "4" << endl;
+// 		lines.push_back(coordinate);
+// 	}
+// }
 
 long long getPlusSignCount3(int N, vector<int> L, string D) {
 	// keeps track of the running total of the number of pluses
