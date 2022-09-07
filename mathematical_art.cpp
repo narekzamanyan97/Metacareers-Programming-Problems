@@ -87,64 +87,64 @@ int main(){
 	// string D = "RURLULDLURURDULR";
 
 
-	int coordinate;
-	int* index_and_type;
-	int index;
-	int min_endpoint;
-	int max_endpoint;
-	int min_max_endpoints[2] = {0, 0};
-	vector<int> lines;
-	vector<vector<std::array<int, 2>>> endpoints;
+	// int coordinate;
+	// int* index_and_type;
+	// int index;
+	// int min_endpoint;
+	// int max_endpoint;
+	// int min_max_endpoints[2] = {0, 0};
+	// vector<int> lines;
+	// vector<vector<std::array<int, 2>>> endpoints;
 
 
-	for(int i = 0; i < 10; i++) {
-		cout << "Type a coordinate: ";
-		cin >> coordinate;
-		cout << endl;
-		cout << "Type a min endpoint: ";
-		cin >> min_endpoint;
-		cout << "Type a max endpoint: ";
-		cin >> max_endpoint;
-		min_max_endpoints[0] = min_endpoint;
-		min_max_endpoints[1] = max_endpoint;
-		index_and_type = find_index(true, lines, coordinate);
-		cout << index_and_type[0] << ", " << index_and_type[1] << endl;
+	// for(int i = 0; i < 10; i++) {
+	// 	cout << "Type a coordinate: ";
+	// 	cin >> coordinate;
+	// 	cout << endl;
+	// 	cout << "Type a min endpoint: ";
+	// 	cin >> min_endpoint;
+	// 	cout << "Type a max endpoint: ";
+	// 	cin >> max_endpoint;
+	// 	min_max_endpoints[0] = min_endpoint;
+	// 	min_max_endpoints[1] = max_endpoint;
+	// 	index_and_type = find_index(true, lines, coordinate);
+	// 	cout << index_and_type[0] << ", " << index_and_type[1] << endl;
 
-		// insert_coord_and_endpoints(int index, 			int type,		 vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints) {
+	// 	// insert_coord_and_endpoints(int index, 			int type,		 vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints) {
 
-		insert_coord_and_endpoints(index_and_type[0], index_and_type[1], lines, endpoints, coordinate, min_max_endpoints);
-		// if(index_and_type[1] == -2) {
-		// 	lines.insert(lines.begin(), coordinate);
-		// 	cout << "0" << endl;
-		// } else if (index_and_type[1] == -1) {
-		// 	cout << "1" << endl;
-		// 	lines.insert(lines.begin(), coordinate);
-		// } else if(index_and_type[1] == 0) {
-		// 	cout << "2" << endl;
-		// 	lines.insert(lines.begin() + index_and_type[0], coordinate);
-		// } else if(index_and_type[1] == 1) {
-		// 	cout << "3" << endl;
-		// 	lines.insert(lines.begin() + index_and_type[0], coordinate);
-		// } else {
-		// 	cout << "4" << endl;
-		// 	lines.push_back(coordinate);
-		// }
+	// 	insert_coord_and_endpoints(index_and_type[0], index_and_type[1], lines, endpoints, coordinate, min_max_endpoints);
+	// 	// if(index_and_type[1] == -2) {
+	// 	// 	lines.insert(lines.begin(), coordinate);
+	// 	// 	cout << "0" << endl;
+	// 	// } else if (index_and_type[1] == -1) {
+	// 	// 	cout << "1" << endl;
+	// 	// 	lines.insert(lines.begin(), coordinate);
+	// 	// } else if(index_and_type[1] == 0) {
+	// 	// 	cout << "2" << endl;
+	// 	// 	lines.insert(lines.begin() + index_and_type[0], coordinate);
+	// 	// } else if(index_and_type[1] == 1) {
+	// 	// 	cout << "3" << endl;
+	// 	// 	lines.insert(lines.begin() + index_and_type[0], coordinate);
+	// 	// } else {
+	// 	// 	cout << "4" << endl;
+	// 	// 	lines.push_back(coordinate);
+	// 	// }
 
-		int ix = 0;
-		for(auto it = lines.begin(); it != lines.cend(); it++) {
-			cout << *it << "     " << endpoints.at(ix).size();;
-			for(auto inner_it = endpoints.at(ix).begin(); inner_it != endpoints.at(ix).cend(); inner_it++) {
-				cout << "[" << (*inner_it)[0] << "," << (*inner_it)[1] << "],  ";
-			}
-			cout << endl;
-			ix++;
-		}
-		cout << "**********************" << endl;
-	}
+	// 	int ix = 0;
+	// 	for(auto it = lines.begin(); it != lines.cend(); it++) {
+	// 		cout << *it << "     " << endpoints.at(ix).size();;
+	// 		for(auto inner_it = endpoints.at(ix).begin(); inner_it != endpoints.at(ix).cend(); inner_it++) {
+	// 			cout << "[" << (*inner_it)[0] << "," << (*inner_it)[1] << "],  ";
+	// 		}
+	// 		cout << endl;
+	// 		ix++;
+	// 	}
+	// 	cout << "**********************" << endl;
+	// }
 
 	// lines.at(index) = 1;
 
-	// getPlusSignCount3(N, L, D);
+	getPlusSignCount3(N, L, D);
 
 	// delete the dynamic array
 	// delete [] array_of_lengths;
@@ -153,7 +153,8 @@ int main(){
 
 // inserts the coordinate at the appropriate index in a vector.
 //		the index and type parameters are returned from find_index() function
-//void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<std::array<int, 2>>& endpoints, int coordinate, int* min_max_endpoints) {
+// @parameters
+//	!!!
 void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<vector<std::array<int, 2>>>& endpoints, int coordinate, int* min_max_endpoints) {
 	// will encapsulate the endpoint array in case the line is not found.
 	vector<std::array<int, 2>> new_entry; 
@@ -171,7 +172,7 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
 		endpoints.insert(endpoints.begin() + index, new_entry);
 	} else if(type == 1) {
-		// !!! this is an exact match. Merge this line with an already existing line if 
+		//  this is an exact match. Merge this line with an already existing line if 
 		//		possible		
 		int min_endpoint;
 		int max_endpoint;
@@ -180,20 +181,13 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 		// it holds the inner vector that corresponds to the given coordinate
 	    auto it = endpoints.begin() + index;
 
-		// cout << "size = " <<  (*it).size();
+
 		// iterate over the inner vector holding the lines with the same coord.
 	    for(auto inner_it = (*it).begin(); inner_it != (*it).cend(); inner_it++) {
 	    	min_endpoint = (*inner_it)[0];
 			max_endpoint = (*inner_it)[1];
-			
-			// cout << "*********************" << endl;
-			// cout << min_max_endpoints[0] << ", " << min_max_endpoints[1] << endl;
-			// cout << (*inner_it)[0] << ", " << (*inner_it)[1] << endl;
-			// cout << "*********************" << endl;
 
-			// !!! see if the lines overlap
-			// min1/max1 = min_max_endpoints[0]/[1] refer to the new endpoints 
-			// min2/max2 = min_/max_endpoint refer to the endpoints being iterated
+			// see if the lines overlap
 			// case 1: min1 <= min 2 && max1 >= min2
 			if(min_max_endpoints[0] <= min_endpoint && min_max_endpoints[1] >= min_endpoint) {
 				merge = true;
@@ -220,8 +214,7 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 				// do not need to modify the endpoints
 			}
 
-	    }
-
+		}
 
 	    // an iterator pointing to the inner vector that holds the endpoints for the 
 	    //		given coord.
@@ -229,15 +222,9 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
     	// do not insert unless merge does not happen
 		if(!merge) {
 		    cout << "no merge" << endl;
-			// lines.insert(lines.begin() + index, coordinate);
-			// new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
-
 			(*it).push_back({min_max_endpoints[0], min_max_endpoints[1]});
-			// endpoints.insert((endpoints.begin() + index).begin(), new_entry.back());	
-		} else {
-			// // reset merge to be used inside the loops below
-			// merge = false;
 
+		} else {
 			// merge the endpoints inside the inner vector one by one, as one merge 
 			//		might connect multiple lines along the same coordinate.
 			auto inner_it = (*it).begin();
@@ -299,26 +286,6 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 	}
 }
 
-// // inserts the coordinate at the appropriate index in a vector.
-// //		the index and type parameters are returned from find_index() function
-// void insert_endpoints(int index, int type, vector<int>& endpoints, int* endpoints) {
-// 	if(type == -2) {
-// 		lines.insert(lines.begin(), coordinate);
-// 		cout << "0" << endl;
-// 	} else if (type == -1) {
-// 		cout << "1" << endl;
-// 		lines.insert(lines.begin(), coordinate);
-// 	} else if(type == 0) {
-// 		cout << "2" << endl;
-// 		lines.insert(lines.begin() + index, coordinate);
-// 	} else if(type == 1) {
-// 		cout << "3" << endl;
-// 		lines.insert(lines.begin() + index, coordinate);
-// 	} else {
-// 		cout << "4" << endl;
-// 		lines.push_back(coordinate);
-// 	}
-// }
 
 long long getPlusSignCount3(int N, vector<int> L, string D) {
 	// keeps track of the running total of the number of pluses
@@ -346,6 +313,8 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 	//		elements of L
 	int  index = 0;
 
+	int ix;
+
 	// stores the direction of the move
 	char direction;
 
@@ -364,6 +333,10 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 	// will hold the array returned by find_index function
 	int* index_and_type;
 
+	// will hold the array returned by find_index function in the previous iteration
+	//		to be used along with the previous_coordinate array
+	int* prev_index_and_type;
+
 	for(auto it = L.begin(); it != L.cend(); it++) {
 		direction = D.at(index);
 
@@ -375,40 +348,35 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 				// update the current cooridnate after moving the brush
 				current_coordinate[0] -= *it;
 
-					
 				// set the variables to be used later
 				left_endpoint = current_coordinate[0];
 				right_endpoint = previous_coordinate[0];
 
-				if(current_coordinate[1] == 5) {
-					cout << left_endpoint << ", " << right_endpoint << endl;
+				if(current_coordinate[1] == 3) {
+					cout << "=================================" << left_endpoint << ", " << right_endpoint << endl;
+					cout << index_and_type[0] << endl;
 				}
 
-				// if the previous direction was along the same line, then
-				//		merge it with this line
+				min_max_endpoints[0] = left_endpoint;
+				min_max_endpoints[1] = right_endpoint;
+
+				// if the previous direction was along the same line, then no need to
+				//		call find_index function. Use the index of the previous line.
 				if (previous_direction == 'L' || previous_direction == 'R') {
-					// update the left endpoint of the merged line if it is less than
-					//		the left endpoint of the previous line.
-					if(h_endpoints.back().back()[0] > left_endpoint) {
-						h_endpoints.back().back()[0] = left_endpoint;
-					}
+					// reset the type to 1, because now the line can be found, as the
+					//		line was inserted into the vector in the previous iteration.
+					// here, index_and_type represents the data for the previously added
+					//		line in the previous iteration.
+					index_and_type[1] = 1;
+					cout << "yes" << endl;
+
+					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], horizontal_lines, h_endpoints, current_coordinate[1], min_max_endpoints);
 				} else {
 					// find the index to insert the new line at.
 
-
-					min_max_endpoints[0] = left_endpoint;
-					min_max_endpoints[1] = right_endpoint;
 					index_and_type = find_index(true, horizontal_lines, current_coordinate[1]);
 
-					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], horizontal_lines, h_endpoints, current_coordinate[1], min_max_endpoints);
-				
-					// // add a horizontal line, i.e. its y-coordinate
-					// // !!! remove duplicates from horizontal_lines
-					// horizontal_lines.push_back(current_coordinate[1]);
-
-					// // add the two endpoints (left and right) of the newly drawn line to
-					// //		the h_endpoints
-					// h_endpoints.push_back({left_endpoint, right_endpoint});					
+					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], horizontal_lines, h_endpoints, current_coordinate[1], min_max_endpoints);			
 				}
 
 				break;
@@ -423,23 +391,20 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 					cout << left_endpoint << ", " << right_endpoint << endl;
 				}
 
+
+				min_max_endpoints[0] = left_endpoint;
+				min_max_endpoints[1] = right_endpoint;
+
 				// if the most recent line is identical to the previous line.
 				if(previous_direction == 'L' || previous_direction == 'R') {
-					// check if the new right_endpoint is larger than the previous right
-					//		endpoint 
-					if(h_endpoints.back().back()[1] < right_endpoint) {
-						h_endpoints.back().back()[1] = right_endpoint;
-					}
+					index_and_type[1] = 1;
+
+					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], horizontal_lines, h_endpoints, current_coordinate[1], min_max_endpoints);
 				} else {
 
-					min_max_endpoints[0] = left_endpoint;
-					min_max_endpoints[1] = right_endpoint;
 					index_and_type = find_index(true, horizontal_lines, current_coordinate[1]);
 
 					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], horizontal_lines, h_endpoints, current_coordinate[1], min_max_endpoints);
-
-					// horizontal_lines.push_back(current_coordinate[1]);
-					// h_endpoints.push_back({left_endpoint, right_endpoint});
 				}
 
 				break;
@@ -450,28 +415,19 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 				top_endpoint = current_coordinate[1];
 				bottom_endpoint = previous_coordinate[1];
 		
+				min_max_endpoints[0] = bottom_endpoint;
+				min_max_endpoints[1] = top_endpoint;
+
 				// if the previous direction was along the same line, then
 				//		merge it with this line
 				if(previous_direction == 'U' || previous_direction == 'D') {
-					// update the top endpoint of the previous line, if it is less than
-					//		the new top endpoint
-					if(v_endpoints.back().back()[1] < top_endpoint) {
-						v_endpoints.back().back()[1] = top_endpoint;
-					}
-				} else {
+					index_and_type[1] = 1;
 
-					min_max_endpoints[0] = bottom_endpoint;
-					min_max_endpoints[1] = top_endpoint;
+					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], vertical_lines, v_endpoints, current_coordinate[0], min_max_endpoints);
+				} else {
 					index_and_type = find_index(true, vertical_lines, current_coordinate[0]);
 
-					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], vertical_lines, v_endpoints, current_coordinate[0], min_max_endpoints);					
-					// // add the two endpoints (bottom and top) of the newly drawn line to
-					// //		the v_endpoints
-					// v_endpoints.push_back({bottom_endpoint, top_endpoint});
-
-					// // add a vertical line, i.e. its x-coordinate
-					// // !!! remove duplicates from vertical_lines
-					// vertical_lines.push_back(current_coordinate[0]);					
+					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], vertical_lines, v_endpoints, current_coordinate[0], min_max_endpoints);									
 				}
 
 
@@ -483,23 +439,20 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 				top_endpoint = previous_coordinate[1];
 				bottom_endpoint = current_coordinate[1];
 
+				min_max_endpoints[0] = bottom_endpoint;
+				min_max_endpoints[1] = top_endpoint;
+
 				// if the previous direction was along the same line, then
 				//		merge it with this line
 				if(previous_direction == 'U' || previous_direction == 'D') {
-					// update the bottom endpoint of the previous line, if it is greater
-					//		than the new bottom endpoint
-					if(v_endpoints.back().back()[0] > bottom_endpoint) {
-						v_endpoints.back().back()[0] = bottom_endpoint;
-					}
+					index_and_type[1] = 1;
+
+					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], vertical_lines, v_endpoints, current_coordinate[0], min_max_endpoints);
 				} else {
-					min_max_endpoints[0] = bottom_endpoint;
-					min_max_endpoints[1] = top_endpoint;
+
 					index_and_type = find_index(true, vertical_lines, current_coordinate[0]);
 
 					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], vertical_lines, v_endpoints, current_coordinate[0], min_max_endpoints);	
-
-					// v_endpoints.push_back({bottom_endpoint, top_endpoint});
-					// vertical_lines.push_back(current_coordinate[0]);
 				}
 
 				break;
@@ -507,37 +460,53 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 
 
 		previous_direction = direction;
+		prev_index_and_type = index_and_type;
 		index++;
-		int ix = 0;
-		for(auto it = horizontal_lines.begin(); it != horizontal_lines.cend(); it++) {
-			cout << *it << "     ";
-			for(auto inner_it = h_endpoints.at(ix).begin(); inner_it != h_endpoints.at(ix).cend(); inner_it++) {
-				cout << "[" << (*inner_it)[0] << "," << (*inner_it)[1] << "],  ";
-			}
-			cout << endl;
-			ix++;
-		}
-		cout << "**********************" << endl;
+		ix = 0;
+
+
+
 	}
 
-	// index = 0;
-	// cout << "**********************";
+		auto it_coord = horizontal_lines.begin();
+		auto it_end = h_endpoints.begin();
+		auto it_end_inner = (*it_end).begin();
 
-	// for(auto it = horizontal_lines.begin(); it != horizontal_lines.cend(); it++) {
-	// 	cout << *it << endl;
-	// 	for(auto inner_it = h_endpoints.at(index).begin(); inner_it != h_endpoints.at(index).cend(); inner_it++) {
-	// 		cout << ": [" << (*inner_it)[0] << "," << (*inner_it)[1] << "],  ";
-	// 	}
-	// 	cout << endl;
-	// 	index++;
-	// }
-	// cout << endl;
+		cout << "**************************" << endl; 
+		cout << "Horizontal Lines" << endl;
+		while(it_coord != horizontal_lines.cend()) {
+			cout << *it_coord;
+			it_end_inner = (*it_end).begin();
+			while (it_end_inner != (*it_end).cend()) {
+				cout << ": [" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], " << endl;
 
-	// index = 0;
-	// for(auto it = vertical_lines.begin(); it != vertical_lines.cend(); it++) {
-	// 	cout << *it << ": [" << v_endpoints.at(index)[0] << "," << v_endpoints.at(index)[1] << "]" << endl;
-	// 	index++;
-	// }
+				it_end_inner++;
+			}
+			it_coord++;
+			it_end++;
+
+		}
+		cout << "**************************" << endl; 
+
+		it_coord = vertical_lines.begin();
+		it_end = v_endpoints.begin();
+		it_end_inner = (*it_end).begin();
+
+		cout << "**************************" << endl; 
+		cout << "Vertical Lines" << endl;
+		while(it_coord != vertical_lines.cend()) {
+			cout << *it_coord;
+			it_end_inner = (*it_end).begin();
+			while (it_end_inner != (*it_end).cend()) {
+				cout << ": [" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], " << endl;
+
+				it_end_inner++;
+			}
+			it_coord++;
+			it_end++;
+
+		}
+		cout << "**************************" << endl; 
 }
 
 
