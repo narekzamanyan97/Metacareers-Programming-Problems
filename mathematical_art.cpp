@@ -3,6 +3,7 @@
 #include <string>
 #include <random>
 #include <chrono>
+#include <ctime>
 using namespace std;
 
 #define HORIZONTAL true
@@ -32,6 +33,8 @@ void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool
 
 int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
 
+int count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints);
+
 string generate_directions(int number_of_moves);
 
 char digit_to_dir_conv(int digit);
@@ -46,15 +49,16 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 
 
 int main(){
-	int N = 100;
+	int N = 2000000;
 	int L_i = 2;
 
-	// string D;
-	// vector<int> L;
-	// L = generate_lengths(N, L_i);
-	// D = generate_directions(N);
+	string D;
+	vector<int> L;
+	L = generate_lengths(N, L_i);
+	D = generate_directions(N);
 	// cout << D.size() << endl;;
 
+	// Sample Test Case #1
 	// vector<int> L = {6, 3, 4, 5, 1, 6, 3, 3, 4};
 	// string D = "ULDRULURD";
 
@@ -62,8 +66,14 @@ int main(){
 	// string D = "RULDRURULDLURRDL";
 
 
+	// Sample Test Case #2
 	// vector<int> L = {1, 1, 1, 1, 1, 1, 1, 1};
 	// string D = "RDLUULDR";
+
+
+	// Sample Test Case #3
+	// vector<int> L = {1,2,2,1,1,2,2,1};
+	// string D = "UDUDLRLR";
 
 	// vector<int> L = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 2, 1};
 	// string D = "RURDRDLULDRLURRD";
@@ -74,8 +84,11 @@ int main(){
 	// vector<int> L = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10};
 	// string D = "UDUDUDUDUDUDUDUDU";
 
-	vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
-	string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+	// #1 (see notebook)
+	// vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
+	// string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+
+
 
 	// vector<int> L = {8, 4, 4, 4, 2, 8, 2, 4, 10, 2, 4, 1, 2};
 	// string D = "RLULURDLRUDUR";
@@ -86,6 +99,9 @@ int main(){
 	// vector<int> L = {1,2,3,1,2,1,2,1,1,1,2,1,1,2,1,2};
 	// string D = "RURLULDLURURDULR";
 
+	// #2 (see notebook)
+	// vector<int> L = {2,4,1,3,1,1,1,2,1,2,1,1,1,3,2,1,2,1,3,2,6,2,2,3,6,1,3,3,3,2,2,1,1,4,1,2,2,1,7,4,3,2,4,1,2,5,8,2,3,5};
+	// string D = "DUDRURDRDLULDLLURLDRULDRDRRULDRULDLURDLURDLULURULD";
 
 	// int coordinate;
 	// int* index_and_type;
@@ -144,13 +160,35 @@ int main(){
 
 	// lines.at(index) = 1;
 
+	// auto start_time = std::chrono::steady_clock::now();
+
+	// getPlusSignCount(N, L, D);
+
+
+	auto end_time_1 = std::chrono::steady_clock::now();
+	// std::chrono::duration<double> elapsed_seconds_1 = end_time_1 - start_time;
+
+	cout << endl << "*********************************" << endl;
 	getPlusSignCount3(N, L, D);
+	int time_3 = time(NULL);
+
+	auto end_time_2 = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds_2 = end_time_2 - end_time_1;
+
+	// cout << "performance 1: " << elapsed_seconds_1.count() << "sec" << endl;
+	cout << "performance 2: " << elapsed_seconds_2.count() << "sec" << endl;
+	// cout << "performance gain (1/2): " << elapsed_seconds_1.count() / elapsed_seconds_2.count() << "x" << endl;
 
 	// delete the dynamic array
 	// delete [] array_of_lengths;
 	return 0;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+//					Function for inserting lines (with their coordinates and min and
+//						max endpoints) into horizontal_lines/vertical_lines and 
+//						h_endpoints/vertical_lines vectors
 // inserts the coordinate at the appropriate index in a vector.
 //		the index and type parameters are returned from find_index() function
 // @parameters
@@ -221,7 +259,6 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 	    it = endpoints.begin() + index;
     	// do not insert unless merge does not happen
 		if(!merge) {
-		    cout << "no merge" << endl;
 			(*it).push_back({min_max_endpoints[0], min_max_endpoints[1]});
 
 		} else {
@@ -232,11 +269,6 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 			while(inner_it != (*it).cend()) {
 				inner_it_2 = inner_it + 1;
 				while(inner_it_2 != (*it).cend()) {
-					// cout << inner_it[0] << endl; 
-					cout << "=================================================\n";
-					cout << "[" << (*inner_it)[0] << ", " << (*inner_it)[1] << "]" << endl; 
-					cout << "[" << (*inner_it_2)[0] << ", " << (*inner_it_2)[1] << "]" << endl; 
-					cout << "=================================================\n";
 					// case 1 (see notebook)
 					if((*inner_it)[0] <= (*inner_it_2)[0] && (*inner_it)[1] >= (*inner_it_2)[0]) {
 						if((*inner_it)[1] < (*inner_it_2)[1]) {
@@ -247,7 +279,6 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 						// remove the 2nd inner line from the vector
 						inner_it_2 = (*it).erase(inner_it_2);
 
-						cout << "erase" << endl;
 					// case 2 (see notebook)
 					} else if((*inner_it)[1] >= (*inner_it_2)[1] && (*inner_it)[0] <= (*inner_it_2)[1]) {
 						if((*inner_it)[0] > (*inner_it_2)[0]) {
@@ -257,7 +288,6 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 						// remove the 2nd inner line from the vector
 						inner_it_2 = (*it).erase(inner_it_2);
 
-						cout << "erase" << endl;
 					} else if((*inner_it)[0] >= (*inner_it_2)[0] && (*inner_it)[1] <= (*inner_it_2)[1]){ 
 						if((*inner_it)[0] > (*inner_it_2)[0]) {
 							(*inner_it)[0] = (*inner_it_2)[0];
@@ -269,7 +299,6 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 						// remove the 2nd inner line from the vector
 						inner_it_2 = (*it).erase(inner_it_2);
 
-						cout << "erase" << endl;
 					}
 					else {
 						inner_it_2++;
@@ -288,6 +317,8 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 
 
 long long getPlusSignCount3(int N, vector<int> L, string D) {
+	// auto start_time = std::chrono::steady_clock::now();
+
 	// keeps track of the running total of the number of pluses
 	int number_of_pluses = 0;
 
@@ -338,6 +369,11 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 	int* prev_index_and_type;
 
 	for(auto it = L.begin(); it != L.cend(); it++) {
+		if(index % 10000 == 0) {
+			cout << index << endl;
+		}
+
+
 		direction = D.at(index);
 
 		previous_coordinate[0] = current_coordinate[0];
@@ -352,11 +388,6 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 				left_endpoint = current_coordinate[0];
 				right_endpoint = previous_coordinate[0];
 
-				if(current_coordinate[1] == 3) {
-					cout << "=================================" << left_endpoint << ", " << right_endpoint << endl;
-					cout << index_and_type[0] << endl;
-				}
-
 				min_max_endpoints[0] = left_endpoint;
 				min_max_endpoints[1] = right_endpoint;
 
@@ -368,7 +399,6 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 					// here, index_and_type represents the data for the previously added
 					//		line in the previous iteration.
 					index_and_type[1] = 1;
-					cout << "yes" << endl;
 
 					insert_coord_and_endpoints(index_and_type[0], index_and_type[1], horizontal_lines, h_endpoints, current_coordinate[1], min_max_endpoints);
 				} else {
@@ -385,11 +415,6 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 
 				left_endpoint = previous_coordinate[0];
 				right_endpoint = current_coordinate[0];
-
-
-				if(current_coordinate[1] == 5) {
-					cout << left_endpoint << ", " << right_endpoint << endl;
-				}
 
 
 				min_max_endpoints[0] = left_endpoint;
@@ -468,48 +493,61 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 
 	}
 
-		auto it_coord = horizontal_lines.begin();
-		auto it_end = h_endpoints.begin();
-		auto it_end_inner = (*it_end).begin();
+	// auto it_coord = horizontal_lines.begin();
+	// auto it_end = h_endpoints.begin();
+	// auto it_end_inner = (*it_end).begin();
 
-		cout << "**************************" << endl; 
-		cout << "Horizontal Lines" << endl;
-		while(it_coord != horizontal_lines.cend()) {
-			cout << *it_coord;
-			it_end_inner = (*it_end).begin();
-			while (it_end_inner != (*it_end).cend()) {
-				cout << ": [" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], " << endl;
+	// cout << "**************************" << endl; 
+	// cout << "Horizontal Lines" << endl;
+	// while(it_coord != horizontal_lines.cend()) {
+	// 	cout << *it_coord << ": ";
+	// 	it_end_inner = (*it_end).begin();
+	// 	while (it_end_inner != (*it_end).cend()) {
+	// 		cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
 
-				it_end_inner++;
-			}
-			it_coord++;
-			it_end++;
+	// 		it_end_inner++;
+	// 	}
+	// 	it_coord++;
+	// 	it_end++;
+	// 	cout << endl;
+	// }
+	// cout << "**************************" << endl; 
 
-		}
-		cout << "**************************" << endl; 
+	// it_coord = vertical_lines.begin();
+	// it_end = v_endpoints.begin();
+	// it_end_inner = (*it_end).begin();
 
-		it_coord = vertical_lines.begin();
-		it_end = v_endpoints.begin();
-		it_end_inner = (*it_end).begin();
+	// cout << "**************************" << endl; 
+	// cout << "Vertical Lines" << endl;
+	// while(it_coord != vertical_lines.cend()) {
+	// 	cout << *it_coord << ": ";
+	// 	it_end_inner = (*it_end).begin();
+	// 	while (it_end_inner != (*it_end).cend()) {
+	// 		cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
 
-		cout << "**************************" << endl; 
-		cout << "Vertical Lines" << endl;
-		while(it_coord != vertical_lines.cend()) {
-			cout << *it_coord;
-			it_end_inner = (*it_end).begin();
-			while (it_end_inner != (*it_end).cend()) {
-				cout << ": [" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], " << endl;
+	// 		it_end_inner++;
+	// 	}
+	// 	it_coord++;
+	// 	it_end++;
 
-				it_end_inner++;
-			}
-			it_coord++;
-			it_end++;
+	// 	cout << endl;
 
-		}
-		cout << "**************************" << endl; 
+	// }
+	// cout << "**************************" << endl; 
+
+	count_plus_sign3(horizontal_lines, vertical_lines, h_endpoints, v_endpoints);
+
+
+	// auto end_time = std::chrono::steady_clock::now();
+
+
+	// std::chrono::duration<double> elapsed_seconds = end_time - start_time;
+	// cout << elapsed_seconds.count() << endl;
 }
 
-
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//						Function for finding the index (divide and conquer approach)
 // finds the index of a sorted vector based on the coordinate (coord) of the line.
 // @parameters:
 //		lines = either a vector of horizontal or vertical lines, that hold the structure
@@ -1100,6 +1138,8 @@ long long getPlusSignCount2(int N, vector<int> L, string D) {
 }
 
 long long getPlusSignCount(int N, vector<int> L, string D) {
+	int start_time = time(NULL);
+
 	// keeps track of the running total of the number of pluses
 	int number_of_pluses = 0;
 
@@ -1182,8 +1222,8 @@ long long getPlusSignCount(int N, vector<int> L, string D) {
 	// display_lines(horizontal_lines, h_endpoints, HORIZONTAL);
 
 	// // merge lines
-	// merge_lines(horizontal_lines, h_endpoints);
-	// merge_lines(vertical_lines, v_endpoints);
+	merge_lines(horizontal_lines, h_endpoints);
+	merge_lines(vertical_lines, v_endpoints);
 
 	// // display merged lines
 	// display_lines(vertical_lines, v_endpoints, VERTICAL);
@@ -1209,6 +1249,10 @@ long long getPlusSignCount(int N, vector<int> L, string D) {
 	cout << "==================================" << endl; 
 	cout << "count = " << count;
 
+
+	int end_time = time(NULL);
+
+	cout << "elapsed time 1: " << (start_time - end_time)/1000 << endl;
 	return 0;
 }
 
@@ -1406,6 +1450,12 @@ void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool
 //			of the horizontal lines represented by h_lines
 //		v_endpoints = a vector of 2-element arrays containing the bottom and top endpoints
 //			of the vertical lines represented by v_lines
+// !!! use the find_index to get the indices of the vertical lines having coordinates
+//		of min and max endpoints of each horizontal lines. Then use those two indices
+//		to traverse the vector of vertical lines. That is, rather than traversing all
+//		the lines in the vector, we find the two appropriate indices that can potentially
+//		form a plus sign with the given horizontal line, then we traverse from the low
+//		index to the high index.
 int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints) {
 	// initialize outer and inner (horizontal and vertical, respectively) line iterators
 	auto h_ln_it = h_lines.begin();
@@ -1477,6 +1527,130 @@ int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array
 	return total_plus_signs;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+//						function for counting plus signs designed for getPlusSignCount3
+// @return the number of plus signs present on the graph represented by the parameters
+//		lines and endpoints.
+// @parameters
+//		h_lines = a vector containing the y_axis of the horizontal lines
+//		v_lines = a vector containing the x_axis of the vertical lines
+//		h_endpoints = a vector of 2-element arrays containing the left and right endpoints 
+//			of the horizontal lines represented by h_lines
+//		v_endpoints = a vector of 2-element arrays containing the bottom and top endpoints
+//			of the vertical lines represented by v_lines
+// !!! use the find_index to get the indices of the vertical lines having coordinates
+//		of min and max endpoints of each horizontal lines. Then use those two indices
+//		to traverse the vector of vertical lines. That is, rather than traversing all
+//		the lines in the vector, we find the two appropriate indices that can potentially
+//		form a plus sign with the given horizontal line, then we traverse from the low
+//		index to the high index.
+int count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints) {
+	// initialize outer and inner horizontal line iterators
+	// Note: the outer iterator for vertical lines is declared and initialized in the
+	//		for loop. 
+	auto h_ln_it_outer = h_lines.begin();
+	vector<std::array<int, 2>>::iterator h_ln_it_inner;
+	vector<std::array<int, 2>>::iterator v_ln_it_inner;
+
+
+	// initialize counters for endpoints, used to synchronize the iterations of the
+	//		horizontal/vertical_lines and h/v_endpoints.
+	int h_index = 0;
+	int v_index = 0;
+
+	// declare left and right endpoints for the horizontal lines to be used in the loops.
+	int h_left_endpoint;
+	int h_right_endpoint;
+
+
+	// declare left and right endpoints for the vertical lines to be used in the loops.
+	int v_bottom_endpoint;
+	int v_top_endpoint;
+
+	// declare the y_axis varialbe for horizontal lines
+	int h_y_axis;
+
+	// declare the x_axis varialbe for vertical lines
+	int v_x_axis;
+
+	// running total of the number of plus signs found
+	int total_plus_signs = 0;
+
+	// these pair of variables hold the indices that correspond to the left and right
+	//		endpoints being the coordinates of the two vertical lines that set 
+	//		boundaries for traversing the vertical lines.
+	int low_index;
+	int high_index;
+
+	// iterate over the horizontal lines
+	while(h_ln_it_outer != h_lines.cend()) {
+		h_y_axis = *h_ln_it_outer;
+
+		// set the left and right endpoint variables using the horizontal endpoint vector
+		//		for readability
+
+		// set the inner horizontal endpoints iterator
+		h_ln_it_inner = h_endpoints.at(h_index).begin();
+		
+		// !!! iterate over the inner vectors of h_endpoints.
+		while(h_ln_it_inner != h_endpoints.at(h_index).cend()) {
+			h_left_endpoint = (*h_ln_it_inner)[0];
+			h_right_endpoint = (*h_ln_it_inner)[1];
+
+			// cout << "----------------------------------------------------" << endl;
+			// cout << "horizontal lines" << endl;
+			// cout << h_y_axis << ": [" << h_left_endpoint << ", " << h_right_endpoint << "]" << endl;
+
+			low_index = find_index(true, v_lines, h_left_endpoint + 1)[0];
+			high_index = find_index(true, v_lines, h_right_endpoint)[0];
+
+			// set the v_index to access the right element in the v_endpoints
+			v_index = low_index;
+
+			// cout << "vertical lines" << endl;
+			// iterate over the outer vectors of v_endpoints
+			for(auto v_ln_it_outer = v_endpoints.begin() + low_index; v_ln_it_outer != v_endpoints.begin() + high_index; v_ln_it_outer++) {
+				v_x_axis = v_lines.at(v_index);
+
+				// set the inner vertical endpoints iterator
+				v_ln_it_inner = v_endpoints.at(v_index).begin();
+
+				//iterate over the inner vectors of v_endpoints
+				while(v_ln_it_inner != v_endpoints.at(v_index).cend()) {
+					// cout << v_x_axis << ": [" << (*v_ln_it_inner)[0] << ", " << (*v_ln_it_inner)[1] << "]" << endl;
+					
+					// determine if the given horizontal and vertical lines form a plus
+					//		sign
+					if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
+						total_plus_signs++;
+					}
+
+					// increment the iterator for the inner v_endpoints vector.
+					v_ln_it_inner++;
+				}
+
+				// increment the index for v_endpoints
+				v_index++;
+			}
+
+			// increment the iterator for the inner h_endpoints vector
+			h_ln_it_inner++;
+		}
+
+
+
+		// increment the index for h_endpoints and the iterator for h_lines.
+		h_index++;
+		h_ln_it_outer++;
+
+	}
+
+	cout << "total plus signs = " << total_plus_signs << endl;
+	return total_plus_signs;
+}
+
 // !!! different implementation
 //	count the pluses while drawing the lines. then remove duplicate pluses.
 
@@ -1503,7 +1677,7 @@ string generate_directions(int number_of_moves) {
 
 		direction_string += dir;
 
-		cout << dir;
+		// cout << dir;
 	}
 
 	// cout << direction_string << endl;
