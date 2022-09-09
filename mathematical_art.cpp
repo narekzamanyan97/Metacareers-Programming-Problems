@@ -4,58 +4,89 @@
 #include <random>
 #include <chrono>
 #include <ctime>
+#include <unordered_map>
 using namespace std;
 
 #define HORIZONTAL true
 #define VERTICAL false
 
-// structures to represent horizontal and vertical lines.
-//						horizontal lines --------------- vertical lines
-//		coord =		 		y_coord 		 				coord
-//		min_endpoint =		left_endpoint                   bottom_endpoint
-//		max_endpoint = 		right_endpoint 					top_endpoint
-struct line{
-	int coord;
-	int min_endpoint;
-	int max_endpoint;
-};
+// // structures to represent horizontal and vertical lines.
+// //						horizontal lines --------------- vertical lines
+// //		coord =		 		y_coord 		 				coord
+// //		min_endpoint =		left_endpoint                   bottom_endpoint
+// //		max_endpoint = 		right_endpoint 					top_endpoint
+// struct line{
+// 	int coord;
+// 	int min_endpoint;
+// 	int max_endpoint;
+// };
 
 // declare the functions used in this program
-long long getPlusSignCount(int, vector<int>, string);
-
-long long getPlusSignCount2(int, vector<int>, string);
-
-long long getPlusSignCount3(int, vector<int>, string);
-
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//						Approach 1: Straightforward Implemention: O(n^2)
+//						traversing every vertical line for every horizontal line to
+//						find pluses.
 void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints);
 
 void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool is_horizontal);
 
 int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
 
+long long getPlusSignCount(int, vector<int>, string);
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//						Approach 2: Using Divide and Conquer 
+//						Sort while Creating the vector of lines and then use the sorted
+//						vectors to searching particular lines with divide and conquer 
+//						search.
+int* find_index(bool is_vertical, vector<int>& lines, int coord);
+
+void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<vector<std::array<int, 2>>>& endpoints, int coordinate, int* min_max_endpoints);
+
 int count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints);
 
+long long getPlusSignCount3(int, vector<int>, string);
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//						Approach 3: Using Hash Map
+void merge_lines_hash(vector<std::array<int, 2>>& inner_vector, int* min_max_endpoints);
+
+long long getPlusSignCountHash(int N, vector<int> L, string D);
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//						Helper Functions
 string generate_directions(int number_of_moves);
 
 char digit_to_dir_conv(int digit);
 
 vector<int> generate_lengths(int number_of_moves, int max_move_size);
 
-int* find_index(bool is_vertical, vector<int>& lines, int coord);
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//						Another Approach. Not promising
+long long getPlusSignCount2(int, vector<int>, string);
 
-void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<vector<std::array<int, 2>>>& endpoints, int coordinate, int* min_max_endpoints);
 
 
 
 
 int main(){
-	int N = 2000000;
-	int L_i = 2;
+	int N = 2000;
+	// int L_i = 2000;
+	// string D;
+	// vector<int> L;
+	// L = generate_lengths(N, L_i);
+	// D = generate_directions(N);
+	
 
-	string D;
-	vector<int> L;
-	L = generate_lengths(N, L_i);
-	D = generate_directions(N);
+
+
 	// cout << D.size() << endl;;
 
 	// Sample Test Case #1
@@ -85,8 +116,8 @@ int main(){
 	// string D = "UDUDUDUDUDUDUDUDU";
 
 	// #1 (see notebook)
-	// vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
-	// string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+	vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
+	string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
 
 
 
@@ -169,7 +200,7 @@ int main(){
 	// std::chrono::duration<double> elapsed_seconds_1 = end_time_1 - start_time;
 
 	cout << endl << "*********************************" << endl;
-	getPlusSignCount3(N, L, D);
+	// getPlusSignCount3(N, L, D);
 	int time_3 = time(NULL);
 
 	auto end_time_2 = std::chrono::steady_clock::now();
@@ -179,6 +210,7 @@ int main(){
 	cout << "performance 2: " << elapsed_seconds_2.count() << "sec" << endl;
 	// cout << "performance gain (1/2): " << elapsed_seconds_1.count() / elapsed_seconds_2.count() << "x" << endl;
 
+	getPlusSignCountHash(N, L, D);
 	// delete the dynamic array
 	// delete [] array_of_lengths;
 	return 0;
@@ -191,8 +223,10 @@ int main(){
 //						h_endpoints/vertical_lines vectors
 // inserts the coordinate at the appropriate index in a vector.
 //		the index and type parameters are returned from find_index() function
+//	Also, merges lines on the same coordinate that overlap.
 // @parameters
 //	!!!
+//	!!! use the merge_coord_hash function
 void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<vector<std::array<int, 2>>>& endpoints, int coordinate, int* min_max_endpoints) {
 	// will encapsulate the endpoint array in case the line is not found.
 	vector<std::array<int, 2>> new_entry; 
@@ -315,6 +349,10 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+//					Function that forms the lines and their respective endpoints using
+//					a vector of lengths L and a string D of directions
 
 long long getPlusSignCount3(int N, vector<int> L, string D) {
 	// auto start_time = std::chrono::steady_clock::now();
@@ -369,9 +407,9 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 	int* prev_index_and_type;
 
 	for(auto it = L.begin(); it != L.cend(); it++) {
-		if(index % 10000 == 0) {
-			cout << index << endl;
-		}
+		// if(index % 10000 == 0) {
+		// 	cout << index << endl;
+		// }
 
 
 		direction = D.at(index);
@@ -493,47 +531,47 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 
 	}
 
-	// auto it_coord = horizontal_lines.begin();
-	// auto it_end = h_endpoints.begin();
-	// auto it_end_inner = (*it_end).begin();
+	auto it_coord = horizontal_lines.begin();
+	auto it_end = h_endpoints.begin();
+	auto it_end_inner = (*it_end).begin();
 
-	// cout << "**************************" << endl; 
-	// cout << "Horizontal Lines" << endl;
-	// while(it_coord != horizontal_lines.cend()) {
-	// 	cout << *it_coord << ": ";
-	// 	it_end_inner = (*it_end).begin();
-	// 	while (it_end_inner != (*it_end).cend()) {
-	// 		cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
+	cout << "**************************" << endl; 
+	cout << "Horizontal Lines" << endl;
+	while(it_coord != horizontal_lines.cend()) {
+		cout << *it_coord << ": ";
+		it_end_inner = (*it_end).begin();
+		while (it_end_inner != (*it_end).cend()) {
+			cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
 
-	// 		it_end_inner++;
-	// 	}
-	// 	it_coord++;
-	// 	it_end++;
-	// 	cout << endl;
-	// }
-	// cout << "**************************" << endl; 
+			it_end_inner++;
+		}
+		it_coord++;
+		it_end++;
+		cout << endl;
+	}
+	cout << "**************************" << endl; 
 
-	// it_coord = vertical_lines.begin();
-	// it_end = v_endpoints.begin();
-	// it_end_inner = (*it_end).begin();
+	it_coord = vertical_lines.begin();
+	it_end = v_endpoints.begin();
+	it_end_inner = (*it_end).begin();
 
-	// cout << "**************************" << endl; 
-	// cout << "Vertical Lines" << endl;
-	// while(it_coord != vertical_lines.cend()) {
-	// 	cout << *it_coord << ": ";
-	// 	it_end_inner = (*it_end).begin();
-	// 	while (it_end_inner != (*it_end).cend()) {
-	// 		cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
+	cout << "**************************" << endl; 
+	cout << "Vertical Lines" << endl;
+	while(it_coord != vertical_lines.cend()) {
+		cout << *it_coord << ": ";
+		it_end_inner = (*it_end).begin();
+		while (it_end_inner != (*it_end).cend()) {
+			cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
 
-	// 		it_end_inner++;
-	// 	}
-	// 	it_coord++;
-	// 	it_end++;
+			it_end_inner++;
+		}
+		it_coord++;
+		it_end++;
 
-	// 	cout << endl;
+		cout << endl;
 
-	// }
-	// cout << "**************************" << endl; 
+	}
+	cout << "**************************" << endl; 
 
 	count_plus_sign3(horizontal_lines, vertical_lines, h_endpoints, v_endpoints);
 
@@ -1650,6 +1688,321 @@ int count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std
 	cout << "total plus signs = " << total_plus_signs << endl;
 	return total_plus_signs;
 }
+
+
+// ///////////////////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////////////////
+// //							Using Unordered Hash Map 
+long long getPlusSignCountHash(int N, vector<int> L, string D) {
+	// auto start_time = std::chrono::steady_clock::now();
+
+	// keeps track of the running total of the number of pluses
+	int number_of_pluses = 0;
+
+	// keeps track of the current coordinate of the brush, [x, y]
+	int current_coordinate[2] = {0, 0};
+
+	// keeps track of the previous coordinate of the brush, [x, y], before moving it
+	//		by L
+	int previous_coordinate[2] = {0, 0};
+
+
+	// keeps all the y-coordinates of horizontal lines
+	// the key is the coordinate of the line. The value is a vector of arrays of 
+	//		low and high endpoints corresponding to the line
+	unordered_map<int, vector<std::array<int, 2>>> horizontal_lines;
+
+	// // the left and right (on x-axis) endpoints of horizontal lines
+	// unordered_map<int, std::array<int, 2>> h_endpoints;
+
+	// keeps all the x-coordinates of vertical lines
+	unordered_map<int, vector<std::array<int, 2>>> vertical_lines;
+
+	// // the top and bottom (on y-axis) endpoints of horizontal lines
+	// vector<vector<std::array<int, 2>>> v_endpoints;
+
+	// count the index to be used to access elements of D while iterating over the 
+	//		elements of L
+	int  index = 0;
+
+	int ix;
+
+	// stores the direction of the move
+	char direction;
+
+	// keep track of the previous direction.
+	char previous_direction;
+
+	// added for readability
+	int left_endpoint = 0;
+	int right_endpoint = 0;
+	int top_endpoint = 0;
+	int bottom_endpoint = 0;
+
+	// will hold the given min and max endpoints
+	int min_max_endpoints[2] = {0, 0};
+
+	// will hold the array returned by find_index function
+	int* index_and_type;
+
+	// will hold the array returned by find_index function in the previous iteration
+	//		to be used along with the previous_coordinate array
+	int* prev_index_and_type;
+
+	vector<std::array<int, 2>> temp_vector;
+	temp_vector.push_back({0, 0});
+
+	for(auto it = L.begin(); it != L.cend(); it++) {
+		direction = D.at(index);
+
+		previous_coordinate[0] = current_coordinate[0];
+		previous_coordinate[1] = current_coordinate[1];
+
+		switch(direction) {
+			case 'L':
+				// update the current cooridnate after moving the brush
+				current_coordinate[0] -= *it;
+
+				// set the variables to be used later
+				left_endpoint = current_coordinate[0];
+				right_endpoint = previous_coordinate[0];
+
+				min_max_endpoints[0] = left_endpoint;
+				min_max_endpoints[1] = right_endpoint;
+
+				// if the previous direction was along the same line, then no need to
+				//		call find_index function. Use the index of the previous line.
+				if (previous_direction == 'L' || previous_direction == 'R') {
+					merge_lines_hash(horizontal_lines[current_coordinate[1]], min_max_endpoints);
+				} else {
+					// if a line with the current coordinate does not exist in the hash
+					//		map, then add that coordinate (key) into the map, with the
+					//		value being a vector of low and high endpoints.
+					if (horizontal_lines.find(current_coordinate[1]) == horizontal_lines.end()) {
+						temp_vector.at(0) = {left_endpoint, right_endpoint};
+						horizontal_lines[current_coordinate[1]] = temp_vector;
+					} else {
+						merge_lines_hash(horizontal_lines[current_coordinate[1]], min_max_endpoints);
+					}
+				}
+
+				break;
+			case 'R':
+				current_coordinate[0] += *it;
+
+				left_endpoint = previous_coordinate[0];
+				right_endpoint = current_coordinate[0];
+
+
+				min_max_endpoints[0] = left_endpoint;
+				min_max_endpoints[1] = right_endpoint;
+
+				// if the previous direction was along the same line, then no need to
+				//		call find_index function. Use the index of the previous line.
+				if (previous_direction == 'L' || previous_direction == 'R') {
+					merge_lines_hash(horizontal_lines[current_coordinate[1]], min_max_endpoints);
+				} else {
+					// if a line with the current coordinate does not exist in the hash
+					//		map, then add that coordinate (key) into the map, with the
+					//		value being a vector of low and high endpoints.
+					if (horizontal_lines.find(current_coordinate[1]) == horizontal_lines.end()) {
+						temp_vector.at(0) = {left_endpoint, right_endpoint};
+						horizontal_lines[current_coordinate[1]] = temp_vector;
+					} else {
+						merge_lines_hash(horizontal_lines[current_coordinate[1]], min_max_endpoints);
+					}
+				}
+
+				break;
+			case 'U':
+				// update the current cooridnate after moving the brush
+				current_coordinate[1] += *it;
+
+				top_endpoint = current_coordinate[1];
+				bottom_endpoint = previous_coordinate[1];
+		
+				min_max_endpoints[0] = bottom_endpoint;
+				min_max_endpoints[1] = top_endpoint;
+
+		
+				// if the previous direction was along the same line, then no need to
+				//		call find_index function. Use the index of the previous line.
+				if (previous_direction == 'U' || previous_direction == 'D') {
+					merge_lines_hash(vertical_lines[current_coordinate[0]], min_max_endpoints);
+				} else {
+					// if a line with the current coordinate does not exist in the hash
+					//		map, then add that coordinate (key) into the map, with the
+					//		value being a vector of low and high endpoints.
+					if (vertical_lines.find(current_coordinate[0]) == vertical_lines.end()) {
+						temp_vector.at(0) = {left_endpoint, right_endpoint};
+						vertical_lines[current_coordinate[0]] = temp_vector;
+					} else {
+						merge_lines_hash(vertical_lines[current_coordinate[0]], min_max_endpoints);
+					}
+				}
+
+				break;
+			case 'D':
+				current_coordinate[1] -= *it;				
+
+
+				top_endpoint = previous_coordinate[1];
+				bottom_endpoint = current_coordinate[1];
+
+				min_max_endpoints[0] = bottom_endpoint;
+				min_max_endpoints[1] = top_endpoint;
+
+				// if the previous direction was along the same line, then no need to
+				//		call find_index function. Use the index of the previous line.
+				if (previous_direction == 'U' || previous_direction == 'D') {
+					merge_lines_hash(vertical_lines[current_coordinate[0]], min_max_endpoints);
+				} else {
+					// if a line with the current coordinate does not exist in the hash
+					//		map, then add that coordinate (key) into the map, with the
+					//		value being a vector of low and high endpoints.
+					if (vertical_lines.find(current_coordinate[0]) == vertical_lines.end()) {
+						temp_vector.at(0) = {left_endpoint, right_endpoint};
+						vertical_lines[current_coordinate[0]] = temp_vector;
+					} else {
+						merge_lines_hash(vertical_lines[current_coordinate[0]], min_max_endpoints);
+					}
+				}
+
+				break;
+		}
+
+
+		previous_direction = direction;
+		prev_index_and_type = index_and_type;
+		index++;
+		ix = 0;
+
+
+
+	}
+
+	for(auto i : horizontal_lines) {
+		cout << i.first << ":    ";
+		for(auto it = i.second.begin(); it != i.second.cend(); it++) {
+			cout << "[" << (*it)[0] << "," << (*it)[1] << "], ";
+		}
+		cout << endl;
+	}
+
+	// !!! implement count_plus_sign_hash
+	// count_plus_sign3(horizontal_lines, vertical_lines, h_endpoints, v_endpoints);
+
+
+	// auto end_time = std::chrono::steady_clock::now();
+
+
+	// std::chrono::duration<double> elapsed_seconds = end_time - start_time;
+	// cout << elapsed_seconds.count() << endl;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+//							Helper function for the getPlusSignCountHash
+// @parameters:
+//		inner_vector = stores the min and max endpoints for a line. The coordinate of
+//			the line is not relevant for this function.
+void merge_lines_hash(vector<std::array<int, 2>>& inner_vector, int* min_max_endpoints) {
+	//  this is an exact match. Merge this line with an already existing line if 
+	//		possible		
+	int min_endpoint;
+	int max_endpoint;
+	bool merge = false;
+
+
+	// iterate over the inner vector holding the lines with the same coord.
+    for(auto inner_it = inner_vector.begin(); inner_it != inner_vector.cend(); inner_it++) {
+    	min_endpoint = (*inner_it)[0];
+		max_endpoint = (*inner_it)[1];
+
+		// see if the lines overlap
+		// case 1: min1 <= min 2 && max1 >= min2
+		if(min_max_endpoints[0] <= min_endpoint && min_max_endpoints[1] >= min_endpoint) {
+			merge = true;
+			if(min_max_endpoints[1] > max_endpoint) {
+				(*inner_it)[0] = min_max_endpoints[0];
+				(*inner_it)[1] = min_max_endpoints[1];
+			} else {
+				(*inner_it)[0] = min_max_endpoints[0];
+			}
+		}
+		// case 2: max1 >= max2 && min1 <= max2 
+		else if(min_max_endpoints[1] >= max_endpoint && min_max_endpoints[0] <= max_endpoint) {
+			merge = true;
+			if(min_max_endpoints[0] < min_endpoint) {
+				(*inner_it)[0] = min_max_endpoints[0];
+				(*inner_it)[1] = min_max_endpoints[1];
+			} else {
+				(*inner_it)[1] = min_max_endpoints[1];
+			}
+		}
+		// case 3: min1 >= min2 && max1 <= max2
+		else if(min_max_endpoints[0] >= min_endpoint && min_max_endpoints[1] <= max_endpoint) {
+			merge = true;
+			// do not need to modify the endpoints
+		}
+	}
+
+
+	// do not insert unless merge does not happen
+	if(!merge) {
+		inner_vector.push_back({min_max_endpoints[0], min_max_endpoints[1]});
+	} else {
+		// merge the endpoints inside the inner vector one by one, as one merge 
+		//		might connect multiple lines along the same coordinate.
+		auto inner_it = inner_vector.begin();
+		auto inner_it_2 = inner_it;
+		while(inner_it != inner_vector.cend()) {
+			inner_it_2 = inner_it + 1;
+			while(inner_it_2 != inner_vector.cend()) {
+				// case 1 (see notebook)
+				if((*inner_it)[0] <= (*inner_it_2)[0] && (*inner_it)[1] >= (*inner_it_2)[0]) {
+					if((*inner_it)[1] < (*inner_it_2)[1]) {
+						// merge the lines
+						(*inner_it)[1] = (*inner_it_2)[1];
+					}
+
+					// remove the 2nd inner line from the vector
+					inner_it_2 = inner_vector.erase(inner_it_2);
+
+				// case 2 (see notebook)
+				} else if((*inner_it)[1] >= (*inner_it_2)[1] && (*inner_it)[0] <= (*inner_it_2)[1]) {
+					if((*inner_it)[0] > (*inner_it_2)[0]) {
+						(*inner_it)[0] = (*inner_it_2)[0];
+					}
+
+					// remove the 2nd inner line from the vector
+					inner_it_2 = inner_vector.erase(inner_it_2);
+
+				} else if((*inner_it)[0] >= (*inner_it_2)[0] && (*inner_it)[1] <= (*inner_it_2)[1]){ 
+					if((*inner_it)[0] > (*inner_it_2)[0]) {
+						(*inner_it)[0] = (*inner_it_2)[0];
+					}
+					if((*inner_it)[1] < (*inner_it_2)[1]) {
+						(*inner_it)[1] = (*inner_it_2)[1];
+					}
+
+					// remove the 2nd inner line from the vector
+					inner_it_2 = inner_vector.erase(inner_it_2);
+
+				}
+				else {
+					inner_it_2++;
+				}
+			}
+			inner_it++;
+		}
+	}
+
+}
+
+
+
 
 // !!! different implementation
 //	count the pluses while drawing the lines. then remove duplicate pluses.
