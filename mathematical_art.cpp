@@ -31,7 +31,7 @@ void merge_lines(vector<int>& lines, vector<std::array<int, 2>>& endpoints);
 
 void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool is_horizontal);
 
-int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
+long long count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints);
 
 long long getPlusSignCount(int, vector<int>, string);
 
@@ -46,7 +46,7 @@ int* find_index(bool is_vertical, vector<int>& lines, int coord);
 
 void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<vector<std::array<int, 2>>>& endpoints, int coordinate, int* min_max_endpoints);
 
-int count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints);
+long long count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints);
 
 long long getPlusSignCount3(int, vector<int>, string);
 
@@ -56,6 +56,8 @@ long long getPlusSignCount3(int, vector<int>, string);
 void merge_lines_hash(vector<std::array<int, 2>>& inner_vector, int* min_max_endpoints);
 
 long long getPlusSignCountHash(int N, vector<int> L, string D);
+
+long long count_plus_sign_hash(unordered_map<int, vector<std::array<int, 2>>>& h_lines, unordered_map<int, vector<std::array<int, 2>>>& v_lines);
 
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -77,12 +79,12 @@ long long getPlusSignCount2(int, vector<int>, string);
 
 
 int main(){
-	int N = 2000;
-	// int L_i = 2000;
-	// string D;
-	// vector<int> L;
-	// L = generate_lengths(N, L_i);
-	// D = generate_directions(N);
+	int N = 50000;
+	int L_i = 50000;
+	string D;
+	vector<int> L;
+	L = generate_lengths(N, L_i);
+	D = generate_directions(N);
 	
 
 
@@ -116,8 +118,8 @@ int main(){
 	// string D = "UDUDUDUDUDUDUDUDU";
 
 	// #1 (see notebook)
-	vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
-	string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+	// vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
+	// string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
 
 
 
@@ -191,28 +193,30 @@ int main(){
 
 	// lines.at(index) = 1;
 
-	// auto start_time = std::chrono::steady_clock::now();
 
 	// getPlusSignCount(N, L, D);
 
 
-	auto end_time_1 = std::chrono::steady_clock::now();
-	// std::chrono::duration<double> elapsed_seconds_1 = end_time_1 - start_time;
+	auto start_time = std::chrono::steady_clock::now();
 
 	cout << endl << "*********************************" << endl;
-	// getPlusSignCount3(N, L, D);
+	getPlusSignCount3(N, L, D);
 	int time_3 = time(NULL);
+
+	auto end_time_1 = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds_1 = end_time_1 - start_time;
+	cout << "performance 1: " << elapsed_seconds_1.count() << "sec" << endl;
+
+	getPlusSignCountHash(N, L, D);
 
 	auto end_time_2 = std::chrono::steady_clock::now();
 	std::chrono::duration<double> elapsed_seconds_2 = end_time_2 - end_time_1;
-
-	// cout << "performance 1: " << elapsed_seconds_1.count() << "sec" << endl;
 	cout << "performance 2: " << elapsed_seconds_2.count() << "sec" << endl;
-	// cout << "performance gain (1/2): " << elapsed_seconds_1.count() / elapsed_seconds_2.count() << "x" << endl;
 
-	getPlusSignCountHash(N, L, D);
-	// delete the dynamic array
-	// delete [] array_of_lengths;
+
+	cout << "performance gain (1/2): " << elapsed_seconds_1.count() / elapsed_seconds_2.count() << "x" << endl;
+
+
 	return 0;
 }
 
@@ -231,19 +235,15 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 	// will encapsulate the endpoint array in case the line is not found.
 	vector<std::array<int, 2>> new_entry; 
 
-	if(type == -2) {
-		lines.insert(lines.begin(), coordinate);
-		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
-		endpoints.insert(endpoints.begin(), new_entry);
-	} else if (type == -1) {
-		lines.insert(lines.begin(), coordinate);
-		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
-		endpoints.insert(endpoints.begin(), new_entry);
-	} else if(type == 0) {
+	if(type == 0) {
 		lines.insert(lines.begin() + index, coordinate);
 		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
 		endpoints.insert(endpoints.begin() + index, new_entry);
 	} else if(type == 1) {
+		// !!! replace the block of code in this else if block with merge_lines_hash
+		//		function. The latter does not work with hash maps anyways.
+
+
 		//  this is an exact match. Merge this line with an already existing line if 
 		//		possible		
 		int min_endpoint;
@@ -342,10 +342,18 @@ void insert_coord_and_endpoints(int index, int type, vector<int>& lines, vector<
 			}
 		}
 
-	} else {
+	} else if (type == -1) {
+		lines.insert(lines.begin(), coordinate);
+		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
+		endpoints.insert(endpoints.begin(), new_entry);
+	} else if(type == 2) {
 		lines.push_back(coordinate);
 		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
 		endpoints.push_back(new_entry);
+	} else {
+		lines.insert(lines.begin(), coordinate);
+		new_entry.push_back({min_max_endpoints[0], min_max_endpoints[1]});
+		endpoints.insert(endpoints.begin(), new_entry);
 	}
 }
 
@@ -531,47 +539,47 @@ long long getPlusSignCount3(int N, vector<int> L, string D) {
 
 	}
 
-	auto it_coord = horizontal_lines.begin();
-	auto it_end = h_endpoints.begin();
-	auto it_end_inner = (*it_end).begin();
+	// auto it_coord = horizontal_lines.begin();
+	// auto it_end = h_endpoints.begin();
+	// auto it_end_inner = (*it_end).begin();
 
-	cout << "**************************" << endl; 
-	cout << "Horizontal Lines" << endl;
-	while(it_coord != horizontal_lines.cend()) {
-		cout << *it_coord << ": ";
-		it_end_inner = (*it_end).begin();
-		while (it_end_inner != (*it_end).cend()) {
-			cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
+	// cout << "**************************" << endl; 
+	// cout << "Horizontal Lines" << endl;
+	// while(it_coord != horizontal_lines.cend()) {
+	// 	cout << *it_coord << ": ";
+	// 	it_end_inner = (*it_end).begin();
+	// 	while (it_end_inner != (*it_end).cend()) {
+	// 		cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
 
-			it_end_inner++;
-		}
-		it_coord++;
-		it_end++;
-		cout << endl;
-	}
-	cout << "**************************" << endl; 
+	// 		it_end_inner++;
+	// 	}
+	// 	it_coord++;
+	// 	it_end++;
+	// 	cout << endl;
+	// }
+	// cout << "**************************" << endl; 
 
-	it_coord = vertical_lines.begin();
-	it_end = v_endpoints.begin();
-	it_end_inner = (*it_end).begin();
+	// it_coord = vertical_lines.begin();
+	// it_end = v_endpoints.begin();
+	// it_end_inner = (*it_end).begin();
 
-	cout << "**************************" << endl; 
-	cout << "Vertical Lines" << endl;
-	while(it_coord != vertical_lines.cend()) {
-		cout << *it_coord << ": ";
-		it_end_inner = (*it_end).begin();
-		while (it_end_inner != (*it_end).cend()) {
-			cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
+	// cout << "**************************" << endl; 
+	// cout << "Vertical Lines" << endl;
+	// while(it_coord != vertical_lines.cend()) {
+	// 	cout << *it_coord << ": ";
+	// 	it_end_inner = (*it_end).begin();
+	// 	while (it_end_inner != (*it_end).cend()) {
+	// 		cout << "[" << (*it_end_inner)[0] << "," << (*it_end_inner)[1] << "], ";
 
-			it_end_inner++;
-		}
-		it_coord++;
-		it_end++;
+	// 		it_end_inner++;
+	// 	}
+	// 	it_coord++;
+	// 	it_end++;
 
-		cout << endl;
+	// 	cout << endl;
 
-	}
-	cout << "**************************" << endl; 
+	// }
+	// cout << "**************************" << endl; 
 
 	count_plus_sign3(horizontal_lines, vertical_lines, h_endpoints, v_endpoints);
 
@@ -1494,7 +1502,7 @@ void display_lines(vector<int> lines, vector<std::array<int, 2>> endpoints, bool
 //		the lines in the vector, we find the two appropriate indices that can potentially
 //		form a plus sign with the given horizontal line, then we traverse from the low
 //		index to the high index.
-int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints) {
+long long count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array<int, 2>> h_endpoints, vector<std::array<int, 2>> v_endpoints) {
 	// initialize outer and inner (horizontal and vertical, respectively) line iterators
 	auto h_ln_it = h_lines.begin();
 	auto v_ln_it = v_lines.begin();
@@ -1584,7 +1592,7 @@ int count_plus_signs(vector<int> h_lines, vector<int> v_lines, vector<std::array
 //		the lines in the vector, we find the two appropriate indices that can potentially
 //		form a plus sign with the given horizontal line, then we traverse from the low
 //		index to the high index.
-int count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints) {
+long long count_plus_sign3(vector<int> h_lines, vector<int> v_lines, vector<vector<std::array<int, 2>>> h_endpoints, vector<vector<std::array<int, 2>>> v_endpoints) {
 	// initialize outer and inner horizontal line iterators
 	// Note: the outer iterator for vertical lines is declared and initialized in the
 	//		for loop. 
@@ -1713,7 +1721,7 @@ long long getPlusSignCountHash(int N, vector<int> L, string D) {
 	unordered_map<int, vector<std::array<int, 2>>> horizontal_lines;
 
 	// // the left and right (on x-axis) endpoints of horizontal lines
-	// unordered_map<int, std::array<int, 2>> h_endpoints;
+	// map<int, std::array<int, 2>> h_endpoints;
 
 	// keeps all the x-coordinates of vertical lines
 	unordered_map<int, vector<std::array<int, 2>>> vertical_lines;
@@ -1834,7 +1842,7 @@ long long getPlusSignCountHash(int N, vector<int> L, string D) {
 					//		map, then add that coordinate (key) into the map, with the
 					//		value being a vector of low and high endpoints.
 					if (vertical_lines.find(current_coordinate[0]) == vertical_lines.end()) {
-						temp_vector.at(0) = {left_endpoint, right_endpoint};
+						temp_vector.at(0) = {bottom_endpoint, top_endpoint};
 						vertical_lines[current_coordinate[0]] = temp_vector;
 					} else {
 						merge_lines_hash(vertical_lines[current_coordinate[0]], min_max_endpoints);
@@ -1861,7 +1869,7 @@ long long getPlusSignCountHash(int N, vector<int> L, string D) {
 					//		map, then add that coordinate (key) into the map, with the
 					//		value being a vector of low and high endpoints.
 					if (vertical_lines.find(current_coordinate[0]) == vertical_lines.end()) {
-						temp_vector.at(0) = {left_endpoint, right_endpoint};
+						temp_vector.at(0) = {bottom_endpoint, top_endpoint};
 						vertical_lines[current_coordinate[0]] = temp_vector;
 					} else {
 						merge_lines_hash(vertical_lines[current_coordinate[0]], min_max_endpoints);
@@ -1881,18 +1889,28 @@ long long getPlusSignCountHash(int N, vector<int> L, string D) {
 
 	}
 
-	for(auto i : horizontal_lines) {
-		cout << i.first << ":    ";
-		for(auto it = i.second.begin(); it != i.second.cend(); it++) {
-			cout << "[" << (*it)[0] << "," << (*it)[1] << "], ";
-		}
-		cout << endl;
-	}
+	// for(auto i : horizontal_lines) {
+	// 	cout << i.first << ":    ";
+	// 	for(auto it = i.second.begin(); it != i.second.cend(); it++) {
+	// 		cout << "[" << (*it)[0] << "," << (*it)[1] << "], ";
+	// 	}
+	// 	cout << endl;
+	// }
+
+	// cout << "**************************************\n";
+
+	// for(auto j : vertical_lines) {
+	// 	cout << j.first << ":    ";
+	// 	for(auto it_2 = j.second.begin(); it_2 != j.second.cend(); it_2++) {
+	// 		cout << "[" << (*it_2)[0] << "," << (*it_2)[1] << "], ";
+	// 	}
+	// 	cout << endl;
+	// }
 
 	// !!! implement count_plus_sign_hash
 	// count_plus_sign3(horizontal_lines, vertical_lines, h_endpoints, v_endpoints);
 
-
+	count_plus_sign_hash(horizontal_lines, vertical_lines);
 	// auto end_time = std::chrono::steady_clock::now();
 
 
@@ -1907,6 +1925,8 @@ long long getPlusSignCountHash(int N, vector<int> L, string D) {
 // @parameters:
 //		inner_vector = stores the min and max endpoints for a line. The coordinate of
 //			the line is not relevant for this function.
+//		min_max_endpoints = an array, with element[0] = min endpoint, element[1] =
+//			max_endpoint. 
 void merge_lines_hash(vector<std::array<int, 2>>& inner_vector, int* min_max_endpoints) {
 	//  this is an exact match. Merge this line with an already existing line if 
 	//		possible		
@@ -2001,7 +2021,68 @@ void merge_lines_hash(vector<std::array<int, 2>>& inner_vector, int* min_max_end
 
 }
 
+// !!! implement this
+long long count_plus_sign_hash(unordered_map<int, vector<std::array<int, 2>>>& h_lines, unordered_map<int, vector<std::array<int, 2>>>& v_lines) {
+	// variables to temporarily store endpoint info in the loops
+	int left_endpoint;
+	int right_endpoint;
+	int bottom_endpoint;
+	int top_endpoint;
 
+	// holds the running total of plus signs
+	int total_plus_signs = 0;
+
+	// a vector to temporarily store the endpoint vector in the map for each
+	//		vertical line
+	auto v_endpoint_vector = v_lines.find(0);
+
+	// an iterator for the vector of the vertical endpoints to be used later 
+	//		inside the loops. Will iterate over the v_endpoint_vector
+	vector<std::array<int, 2>>::iterator v_endpoint_it;
+
+	// temp variable to store the y_coordinate of each horizontal line in the loops
+	int y_coord;
+
+	// iterate over the outer h_lines map, which is the vector of arrays
+	for(auto h_line : h_lines) {
+		y_coord = h_line.first;
+
+		// iterate over the inner h_lines map, which are the endpoints of the line
+		//		having h_coord
+		for(auto h_endpoint_it = h_line.second.begin(); h_endpoint_it != h_line.second.cend(); h_endpoint_it++) {
+			left_endpoint = (*h_endpoint_it)[0];
+			right_endpoint = (*h_endpoint_it)[1];
+
+			// iterate over the relevant vertical lines for the current horizontal,
+			//		using the latter's left and right endpoints to weed out the vertical
+			//		lines that will not contribute to the process of plus sign count 
+			for(int x_coord = left_endpoint + 1; x_coord < right_endpoint; x_coord++) {
+				v_endpoint_vector = v_lines.find(x_coord);
+
+				// if a vertical line with a given x_coord exists, then proceed with the
+				//		calculation. else, move on to the next x_coord.
+				if(v_endpoint_vector != v_lines.end()) {
+					
+					// iterate over the endpoint arrays in the vector of vertical lines
+					for(v_endpoint_it = (*v_endpoint_vector).second.begin(); v_endpoint_it != (*v_endpoint_vector).second.cend(); v_endpoint_it++) {
+						bottom_endpoint = (*v_endpoint_it)[0];
+						top_endpoint = (*v_endpoint_it)[1];
+
+						// check for a plus
+						if(bottom_endpoint < y_coord && top_endpoint > y_coord) {
+							total_plus_signs++;
+						}
+
+					}
+
+				}
+
+			}
+		}
+	}
+
+	cout << "total plus signs = " << total_plus_signs << endl;
+}
 
 
 // !!! different implementation
