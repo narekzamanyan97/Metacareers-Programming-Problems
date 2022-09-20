@@ -2282,7 +2282,7 @@ long long getPlusSignCountHash(int N, vector<int> L, string D) {
 //		inner_vector = stores the min and max endpoints for a line. The coordinate of
 //			the line is not relevant for this function.
 //		min_max_endpoints = an array, with element[0] = min endpoint, element[1] =
-//			max_endpoint. 
+//			max_endpoint of the newly added line.
 void merge_lines_hash(vector<std::array<int, 2>>& inner_vector, int* min_max_endpoints) {
 	//  this is an exact match. Merge this line with an already existing line if 
 	//		possible		

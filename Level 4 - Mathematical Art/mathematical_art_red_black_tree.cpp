@@ -56,6 +56,8 @@ void RL_rotation(line_node*& root, line_node* new_node);
 
 void display_tree(line_node* root);
 
+void merge_lines(line_node* node, int low_endpoint, int high_endpoint);
+
 
 //						Sort using red-black tree.
 int* findNode(line_node* root, int coord);
@@ -99,12 +101,12 @@ int main(){
 		cout << "Type a coordinate: ";
 		cin >> coordinate;
 		cout << endl;
-		// cout << "Type a min endpoint: ";
-		// cin >> min_endpoint;
-		// cout << endl;
-		// cout << "Type a max endpoint: ";
-		// cin >> max_endpoint;
-		// cout << endl;
+		cout << "Type a min endpoint: ";
+		cin >> min_endpoint;
+		cout << endl;
+		cout << "Type a max endpoint: ";
+		cin >> max_endpoint;
+		cout << endl;
 
 		insertIntoTree(root, coordinate, min_endpoint, max_endpoint);
 		// !!! the root changes in the RR rotation (when we do 5, 10, 15). reset the root.
@@ -116,7 +118,14 @@ int main(){
 	return 0;
 }
 
-// insert into red-black BST
+// implementation of insert into red-black BST (with helper functions)
+// @parameters:
+//		root = a reference to a pointer for the root of the tree, which can change
+//			during rotation. helce, a reference is provided so that the function can
+//			change it when necessary.
+//		new_line_coord = the coordinate of the line being added to the tree
+//		low_endpoint = the min endpoint of the added line
+//		high_endpoint = the max endpoint of the added line
 void insertIntoTree(line_node*& root, int new_line_coord, int low_endpoint, int high_endopint) {
 	// Case 1
 	// if the tree is empty (root node is NIL), create new node as root with color black
@@ -178,7 +187,8 @@ void insertIntoTree(line_node*& root, int new_line_coord, int low_endpoint, int 
 				found = true;
 				// if the line is found, insert its endpoints into the vector of
 				//		the existing line node
-				current_node->same_coord_lines.push_back({low_endpoint, high_endopint});
+				// !!! merge if necessary
+				merge_lines(current_node, low_endpoint, high_endopint);
 			}
 		}
 		// adding new_node as a leaf node
@@ -561,11 +571,18 @@ void display_tree(line_node* root) {
 				if(node->parent != NULL) {
 					cout << "("  << node->which_child << " " << node->parent->line_coord << ")    ";
 				}
+
+				for(auto it = node->same_coord_lines.begin(); it != node->same_coord_lines.cend(); it++) {
+					cout << "[" << (*it)[0] << "," << (*it)[1] << "], ";
+				}
 			}
 			else {
 				cout << node->line_coord << "B";
 				if(node->parent != NULL) {
 					cout << "("  << node->which_child << " " << node->parent->line_coord << ")    ";
+				}
+				for(auto it = node->same_coord_lines.begin(); it != node->same_coord_lines.cend(); it++) {
+					cout << "[" << (*it)[0] << "," << (*it)[1] << "], ";
 				}
 			}
 			q.pop();
@@ -578,6 +595,114 @@ void display_tree(line_node* root) {
 			nodeCount--;
 		}
 		cout << endl;
+	}
+}
+
+// merge overlapping lines.
+// if the low and high endpoints overlap with any of the lines in the node's vector
+//		attribute (same_coord_lines)
+// @parameters:
+//		node = the node that has a line_coord matching the line_coord of the newly added
+//			line
+//		low_endpoint = the min endpoint of the line
+//		high_endpoint = the max endpoint of the line
+void merge_lines(line_node* node, int low_endpoint, int high_endpoint) {
+	auto it = node->same_coord_lines.begin();
+
+	// temporary variables that will hold each of the low and high endpoints of the
+	//		same_coord_lines vector's endpoints.
+	int min_endpoint;
+	int max_endpoint;
+
+	// set it true in the following while loop if a merge occurs. leave it false 
+	//		otherwise. Will be used in the last loop.
+	bool merge = false;
+
+	// iterate over the endpoints in the same_coord_lines vector, and merge the newly
+	//		added line with one overlapping line in the vector, if possible
+	while(it != node->same_coord_lines.cend()) {
+		min_endpoint = (*it)[0];
+		max_endpoint = (*it)[1];
+
+		// see if the lines overlap
+		// case 1: min1 <= min 2 && max1 >= min2
+		if(low_endpoint <= min_endpoint && high_endpoint >= min_endpoint) {
+			merge = true;
+			if(high_endpoint > max_endpoint) {
+				(*it)[0] = low_endpoint;
+				(*it)[1] = high_endpoint;
+			} else {
+				(*it)[0] = low_endpoint;
+			}
+		}
+		// case 2: max1 >= max2 && min1 <= max2 
+		else if(high_endpoint >= max_endpoint && low_endpoint <= max_endpoint) {
+			merge = true;
+			if(low_endpoint < min_endpoint) {
+				(*it)[0] = low_endpoint;
+				(*it)[1] = high_endpoint;
+			} else {
+				(*it)[1] = high_endpoint;
+			}
+		}
+		// case 3: min1 >= min2 && max1 <= max2
+		else if(low_endpoint >= min_endpoint && high_endpoint <= max_endpoint) {
+			merge = true;
+			// do not need to modify the endpoints
+		}
+
+		it++;
+	}
+
+
+	// do not insert unless merge does not happen
+	if(!merge) {
+		node->same_coord_lines.push_back({low_endpoint, high_endpoint});
+	} else {
+		// merge the endpoints inside the inner vector one by one, as one merge 
+		//		might connect multiple lines along the same coordinate.
+		auto it = node->same_coord_lines.begin();
+		auto it_2 = it;
+		while(it != node->same_coord_lines.cend()) {
+			it_2 = it + 1;
+			while(it_2 != node->same_coord_lines.cend()) {
+				// case 1 (see notebook)
+				if((*it)[0] <= (*it_2)[0] && (*it)[1] >= (*it_2)[0]) {
+					if((*it)[1] < (*it_2)[1]) {
+						// merge the lines
+						(*it)[1] = (*it_2)[1];
+					}
+
+					// remove the 2nd inner line from the vector
+					it_2 = node->same_coord_lines.erase(it_2);
+
+				// case 2 (see notebook)
+				} else if((*it)[1] >= (*it_2)[1] && (*it)[0] <= (*it_2)[1]) {
+					if((*it)[0] > (*it_2)[0]) {
+						(*it)[0] = (*it_2)[0];
+					}
+
+					// remove the 2nd inner line from the vector
+					it_2 = node->same_coord_lines.erase(it_2);
+
+				} else if((*it)[0] >= (*it_2)[0] && (*it)[1] <= (*it_2)[1]){ 
+					if((*it)[0] > (*it_2)[0]) {
+						(*it)[0] = (*it_2)[0];
+					}
+					if((*it)[1] < (*it_2)[1]) {
+						(*it)[1] = (*it_2)[1];
+					}
+
+					// remove the 2nd inner line from the vector
+					it_2 = node->same_coord_lines.erase(it_2);
+
+				}
+				else {
+					it_2++;
+				}
+			}
+			it++;
+		}
 	}
 }
 
