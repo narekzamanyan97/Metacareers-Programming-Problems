@@ -59,7 +59,7 @@ void display_tree(line_node* root);
 
 void merge_lines(line_node* node, int low_endpoint, int high_endpoint);
 
-void flatten_tree(line_node* root, vector<line_node>& flattened_tree);
+void flatten_tree(line_node* root, vector<line_node*>& flattened_tree);
 
 
 //						Sort using red-black tree.
@@ -103,7 +103,7 @@ int main(){
 	int line_coordinates[21] = {20, 5, 30, 40, 50, 35, 6, 9, 3, 60, 33, 1, 34, 0, 70, 32,
 							2, -1, 37, 65, 38};
 
-	vector<line_node> flattened_tree;
+	vector<line_node*> flattened_tree;
 
 	for(int i = 0; i < 21; i++) {
 		// cout << "Type a coordinate: ";
@@ -126,7 +126,7 @@ int main(){
 	flatten_tree(root, flattened_tree);
 
 	for(auto it = flattened_tree.begin(); it != flattened_tree.cend(); it++) {
-		cout << (*it).line_coord << ", ";
+		cout << (*it)->line_coord << ", ";
 	}
 
 	return 0;
@@ -720,15 +720,17 @@ void merge_lines(line_node* node, int low_endpoint, int high_endpoint) {
 	}
 }
 
-// !!! flatten the tree for the vertical lines into a vector so that we can make the
+// flatten the tree for the vertical lines into a vector so that we can make the
 //		search for min and max endpoints of horizontal lines faster using divide and
 //		conquer.
 //	use depth-first traversal to push nodes into the flattened_tree from left to right
 //		(in ascending order)
 // @parameters:
 //		root = the root of the tree to be traversed
-//		flattened_tree = the flattened version of the tree
-void flatten_tree(line_node* root, vector<line_node>& flattened_tree){
+//		flattened_tree = the flattened version of the tree. pass by reference so that we
+//			can add nodes to the vector while recursively traversing the tree.
+//			The vector holds not line_node objects, but pointers to those objects
+void flatten_tree(line_node* root, vector<line_node*>& flattened_tree){
 	// if the root is not NIL, proceed
 	if(root != NULL) {
 		// go to the left of the tree, if left_child is not NULL
@@ -736,7 +738,7 @@ void flatten_tree(line_node* root, vector<line_node>& flattened_tree){
 			flatten_tree(root->left_child, flattened_tree);
 		}
 		// push the current node into the tree
-		flattened_tree.push_back(*root);
+		flattened_tree.push_back(root);
 		// go to the right of the tree, if right_child is not NULL
 		if(root->right_child != NULL) {
 			flatten_tree(root->right_child, flattened_tree);
@@ -748,7 +750,7 @@ void flatten_tree(line_node* root, vector<line_node>& flattened_tree){
 // @return
 //		the pointer to the node to which the new node has to be added (either to the
 //		left as a left child or to the right as a right child)
-int* findNode(line_node* root, int coord) {
+int* findNodeIndex(line_node* root, int coord) {
 	return 0;
 }
 
