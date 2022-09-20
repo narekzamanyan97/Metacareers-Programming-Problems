@@ -571,7 +571,9 @@ void RL_rotation(line_node*& root, line_node* new_node) {
 	delete parents_parent_node;
 }
 
-// iterative implementation of breadth first traversal of red-black tree
+// iterative implementation of breadth first traversal of red-black tree.
+//		store all the nodes in a given level using queue and a nodeCount to keep track
+//			of level changes. 
 // @parameters
 //		root = a pointer to the root of the tree.
 void display_tree(line_node* root) {
@@ -874,7 +876,120 @@ int* findNodeIndex(vector<line_node*> flattened_tree, int coord) {
 	return return_arr;
 }
 
+// count the number of plus signs formed by vertical and horizontal lines
+// @parameters:
+//		h_flattened_tree = a vector holding pointers to horizontal line struct objects.
+//			the objects contain all the details for a given coordinate, including an
+//			internal vector called same_coord_lines that hold the non-overlapping 
+//			endpoints on a given coordinate.
+//		v_flattened_tree = the counterpart of h_flattened_tree for vertical lines
+//	@return:
+//		total_pluses = the number of plus signs formed by crossing horizontal and vertical
+//			lines 
+long long count_plus_sign_tree(vector<line_node*> h_flattened_tree, vector<line_node*> v_flattened_tree) {
+	// initialize outer and inner horizontal line iterators
+	// Note: the outer iterator for vertical lines is declared and initialized in the
+	//		for loop. 
+	auto h_ln_it_outer = h_flattened_tree.begin();
+	vector<std::array<int, 2>>::iterator h_ln_it_inner;
+	vector<std::array<int, 2>>::iterator v_ln_it_inner;
 
+
+	// initialize counters for endpoints, used to synchronize the iterations of the
+	//		horizontal/vertical_lines and h/v_endpoints.
+	// int h_index = 0;
+	int v_index = 0;
+
+	// declare left and right endpoints for the horizontal lines to be used in the loops.
+	int h_left_endpoint;
+	int h_right_endpoint;
+
+
+	// declare left and right endpoints for the vertical lines to be used in the loops.
+	int v_bottom_endpoint;
+	int v_top_endpoint;
+
+	// declare the y_axis varialbe for horizontal lines
+	int h_y_axis;
+
+	// declare the x_axis varialbe for vertical lines
+	int v_x_axis;
+
+	// running total of the number of plus signs found
+	int total_plus_signs = 0;
+
+	// these pair of variables hold the indices that correspond to the left and right
+	//		endpoints being the coordinates of the two vertical lines that set 
+	//		boundaries for traversing the vertical lines.
+	int low_index;
+	int high_index;
+
+	// iterate over the horizontal lines
+	while(h_ln_it_outer != h_flattened_tree.cend()) {
+		h_y_axis = (*h_ln_it_outer)->line_coord;
+
+		// set the left and right endpoint variables using the horizontal endpoint vector
+		//		for readability
+
+		// set the inner horizontal endpoints iterator
+		h_ln_it_inner = (*h_ln_it_outer)->same_coord_lines.begin();
+		
+		// !!! iterate over the inner vectors of h_endpoints.
+		while(h_ln_it_inner != (*h_ln_it_outer)->same_coord_lines.cend()) {
+			h_left_endpoint = (*h_ln_it_inner)[0];
+			h_right_endpoint = (*h_ln_it_inner)[1];
+
+			// cout << "----------------------------------------------------" << endl;
+			// cout << "horizontal lines" << endl;
+			// cout << h_y_axis << ": [" << h_left_endpoint << ", " << h_right_endpoint << "]" << endl;
+
+			low_index = findNodeIndex(v_flattened_tree, h_left_endpoint + 1)[0];
+			high_index = findNodeIndex(v_flattened_tree, h_right_endpoint)[0];
+
+			// set the v_index to access the right element in the v_endpoints
+			v_index = low_index;
+
+			// cout << "vertical lines" << endl;
+			// iterate over the outer vectors of v_endpoints
+			for(auto v_ln_it_outer = v_flattened_tree.begin() + low_index; v_ln_it_outer != v_flattened_tree.begin() + high_index; v_ln_it_outer++) {
+				v_x_axis = (*v_ln_it_outer)->line_coord;
+
+				// set the inner vertical endpoints iterator
+				v_ln_it_inner = (*v_ln_it_outer)->same_coord_lines.begin();
+
+				//iterate over the inner vectors of v_endpoints
+				while(v_ln_it_inner != (*v_ln_it_outer)->same_coord_lines.cend()) {
+					// cout << v_x_axis << ": [" << (*v_ln_it_inner)[0] << ", " << (*v_ln_it_inner)[1] << "]" << endl;
+					
+					// determine if the given horizontal and vertical lines form a plus
+					//		sign
+					if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
+						total_plus_signs++;
+					}
+
+					// increment the iterator for the inner v_endpoints vector.
+					v_ln_it_inner++;
+				}
+
+				// increment the index for v_endpoints
+				v_index++;
+			}
+
+			// increment the iterator for the inner h_endpoints vector
+			h_ln_it_inner++;
+		}
+
+
+
+		// increment the index for h_endpoints and the iterator for h_lines.
+		h_index++;
+		h_ln_it_outer++;
+
+	}
+
+	cout << "total plus signs = " << total_plus_signs << endl;
+	return total_plus_signs;
+}
 long long getPlusSignCount3(int, vector<int>, string) {
 	return 0;
 }
