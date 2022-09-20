@@ -61,6 +61,7 @@ void merge_lines(line_node* node, int low_endpoint, int high_endpoint);
 
 void flatten_tree(line_node* root, vector<line_node*>& flattened_tree);
 
+int* findNodeIndex(vector<line_node*> flattened_tree, int coord);
 
 //						Sort using red-black tree.
 int* findNode(line_node* root, int coord);
@@ -128,6 +129,20 @@ int main(){
 	for(auto it = flattened_tree.begin(); it != flattened_tree.cend(); it++) {
 		cout << (*it)->line_coord << ", ";
 	}
+
+	char exit = 'c';
+	int coord;
+
+	cout << endl;
+	while(exit != 'e') {
+		cout << "Enter a coord: " << endl;
+		cin >> coord;
+		cout << endl;
+		index = findNodeIndex(flattened_tree, coord)[0];
+		
+		cout << "index = " << index << endl;
+	}
+
 
 	return 0;
 }
@@ -750,8 +765,113 @@ void flatten_tree(line_node* root, vector<line_node*>& flattened_tree){
 // @return
 //		the pointer to the node to which the new node has to be added (either to the
 //		left as a left child or to the right as a right child)
-int* findNodeIndex(line_node* root, int coord) {
-	return 0;
+int* findNodeIndex(vector<line_node*> flattened_tree, int coord) {
+	int size_of_vector = flattened_tree.size();
+
+	// hold the low and high indices, which are used to split the vector, speeding up
+	//		the search. 
+	int low = 0;
+	int high = size_of_vector - 1;
+
+	// we start by splitting the vector and checking the middle element
+	int current_index = (low + high)/2;
+
+	int current_coord;
+
+	if(size_of_vector != 0) {
+		// the value of the x_coord/y_coord of the vertical/horizontal line for the current
+		//		vector element (line) being observer.
+		current_coord = flattened_tree.at(current_index)->line_coord;
+		cout << current_coord << endl;
+	}
+		
+	// true if the index is found, whether the index points to the line with the exact
+	//		coord or to a position in between two other indices.
+	// used to terminate the while loop that searches for the index.
+	bool index_found = false;
+
+	// true if a line with the same coord is found. false otherwise.
+	int exact_index_found;
+
+
+	static int return_arr[2] = {0, 0};
+	
+	// search based on coord, then on min_endpoint.
+	while(!index_found) {
+		cout << current_coord << endl;
+		// if the vector is empty, return 0
+		if(size_of_vector == 0) {
+			return_arr[0] = 0;
+			return_arr[1] = -2;
+			return return_arr;
+		} else {
+			// sorting by the coord
+			if(current_coord < coord) {
+				// the coord at the current index is < the given coord. shift the index
+				//		to the right
+				low = current_index + 1;
+				if(low > high) {
+					// to get out of the loop
+					index_found = true;
+
+				
+					// set the current_index to be the index of low 
+					current_index = low;
+					
+					// if the coord is larger than all the other coords in the vector
+					if(low >= size_of_vector) {							
+						// set the value of the 2nd element of the return array.
+						// means the coord should be pushed at the back of the vector.
+						exact_index_found = 2;
+						
+					} else {
+						// if the coord is in between two coords in the vector.
+						exact_index_found = 0;
+					}
+
+				} else {
+					// update the current index
+					current_index = (low + high)/2;
+					current_coord = flattened_tree.at(current_index)->line_coord;
+				}
+			} else if(current_coord > coord) {
+				// the coord at the current index is > the given coord. So divide the
+				//		vector further, shifting the index to the left, between the
+				//		low and the current_index. the latter becomes the high.
+				high = current_index - 1;
+
+				if(high < low) {
+					// to get out of the loop
+					index_found = true;
+
+					if(high < 0) {
+						// means the coord should be pushed at the front of the vector.
+						exact_index_found = -1;
+						// set the current_index to be the index of the first element in the
+						//		vector.
+						current_index = 0;						
+					} else {
+						// if the coord is in between two coords in the vector
+						current_index = low;
+						exact_index_found = 0;
+					}
+
+				} else {
+					// update the current index
+					current_index = (low + high)/2;
+					current_coord = flattened_tree.at(current_index)->line_coord;
+				}
+			} else {
+				// found a line with the same coordinate
+				index_found = true;
+				exact_index_found = 1;
+			}
+		}
+	}
+
+	return_arr[0] = current_index;
+	return_arr[1] = exact_index_found;
+	return return_arr;
 }
 
 
