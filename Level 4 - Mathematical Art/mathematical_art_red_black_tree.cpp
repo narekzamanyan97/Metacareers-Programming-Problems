@@ -108,8 +108,8 @@ vector<int> generate_lengths(int number_of_moves, int max_move_size, int seed);
 // } NIL;
 
 int main(){
-	int N = 400000;
-	int L_i = 40000;
+	int N = 500000;
+	int L_i = 100000;
 	string D;
 	vector<int> L;
 	L = generate_lengths(N, L_i, 1);
