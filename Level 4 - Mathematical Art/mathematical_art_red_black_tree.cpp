@@ -39,6 +39,15 @@ struct line_node {
 	// the tree will be sorted based on line_coord
 	long long line_coord = 0;
 
+	// is single line.
+	//		true if same_coord_lines contains only one element
+	//		false if it contains more than one element
+	bool is_single_line = false;
+
+	// stores the single line, so that instead of iterating over the vector, we just
+	//		access this variable, saving time.
+	long long single_line_endpoints[2] = {0, 0};
+
 	// a vector that holds all the lines that have the same orientation and coordinate.
 	vector<std::array<long long, 2>> same_coord_lines;
 };
@@ -66,6 +75,7 @@ long long getPlusSignCountTree(int N, vector<int> L, string D);
 
 long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_node*> v_flattened_tree);
 
+long long countPlusSignTreeOld(vector<line_node*> h_flattened_tree, vector<line_node*> v_flattened_tree);
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
@@ -99,11 +109,11 @@ vector<int> generate_lengths(int number_of_moves, int max_move_size, int seed);
 
 int main(){
 	int N = 500000;
-	int L_i = 1000000000;
+	int L_i = 100000;
 	string D;
 	vector<int> L;
-	// L = generate_lengths(N, L_i);
-	// D = generate_directions(N);
+	L = generate_lengths(N, L_i, 1);
+	D = generate_directions(N, 1);
 	
 
 	// initialize variables for the test
@@ -162,16 +172,16 @@ int main(){
 	/////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////
 	// #1 (see notebook)
-	// vector<int> L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
-	// string D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
+	// L ={2,6,1,6,1,6,1,1,1,3,1,4,1,4,1,4,1,4,1,4,6,4,6,3,1,3,2,1,3,10,2,12,1,11,5};
+	// D = "RULDLURRDLDRDLDRDLDRULDULLURDRULURD";
 
 	// #2 (see notebook)
-	// vector<int> L = {2,4,1,3,1,1,1,2,1,2,1,1,1,3,2,1,2,1,3,2,6,2,2,3,6,1,3,3,3,2,2,1,1,4,1,2,2,1,7,4,3,2,4,1,2,5,8,2,3,5};
-	// string D = "DUDRURDRDLULDLLURLDRULDRDRRULDRULDLURDLURDLULURULD";
+	// L = {2,4,1,3,1,1,1,2,1,2,1,1,1,3,2,1,2,1,3,2,6,2,2,3,6,1,3,3,3,2,2,1,1,4,1,2,2,1,7,4,3,2,4,1,2,5,8,2,3,5};
+	// D = "DUDRURDRDLULDLLURLDRULDRDRRULDRULDLURDLURDLULURULD";
 	
 	for(int i = 0; i < 1; i++) {
-		L = generate_lengths(N, L_i, 23);
-		D = generate_directions(N, 23);
+		// L = generate_lengths(N, L_i, 23);
+		// D = generate_directions(N, 23);
 
 		getPlusSignCountTree(N, L, D);
 	}
@@ -212,8 +222,6 @@ int main(){
 // @return
 //		number_of_pluses = the total number of plus signs formed by the lines.
 long long getPlusSignCountTree(int N, vector<int> L, string D) {
-	auto start_time = std::chrono::steady_clock::now();
-
 	// keeps track of the running total of the number of pluses
 	int number_of_pluses = 0;
 
@@ -278,14 +286,11 @@ long long getPlusSignCountTree(int N, vector<int> L, string D) {
 				// update the current cooridnate after moving the brush
 				current_coordinate[0] -= *it;
 				
-				// cout << current_coordinate[1] << endl;
 
 				// set the variables to be used later
 				left_endpoint = current_coordinate[0];
 				right_endpoint = previous_coordinate[0];
 
-				// cout << "direction = " << direction << endl;
-				// cout << "coord = " << current_coordinate[1] << endl;
 
 				// insert the new line into the tree for horizontal lines. insertIntoTree 
 				//		will also merge this line with any existing overlapping lines.
@@ -299,8 +304,6 @@ long long getPlusSignCountTree(int N, vector<int> L, string D) {
 				left_endpoint = previous_coordinate[0];
 				right_endpoint = current_coordinate[0];
 
-				// cout << "direction = " << direction << endl;
-				// cout << "coord = " << current_coordinate[1] << endl;
 				
 				// insert the new line into the tree for horizontal lines. insertIntoTree 
 				//		will also merge this line with any existing overlapping lines.
@@ -363,8 +366,21 @@ long long getPlusSignCountTree(int N, vector<int> L, string D) {
 	// 	}
 	// 	cout << endl;
 	// }
-	cout << "counting " << endl;
+
+	auto start_time = std::chrono::steady_clock::now();
 	countPlusSignTree(h_flattened_tree, v_flattened_tree);
+	auto end_time_1 = std::chrono::steady_clock::now();
+	countPlusSignTreeOld(h_flattened_tree, v_flattened_tree);
+	auto end_time_2 = std::chrono::steady_clock::now();
+
+
+	std::chrono::duration<double> elapsed_seconds_1 = end_time_1 - start_time;
+	std::chrono::duration<double> elapsed_seconds_2 = end_time_2 - end_time_1;
+	
+	cout << "performance new: " << elapsed_seconds_1.count() << "sec" << endl;
+	cout << "performance old: " << elapsed_seconds_2.count() << "sec" << endl;
+	cout << "performance gain (1/2): " << elapsed_seconds_2.count() / elapsed_seconds_1.count() << "x" << endl;
+
 	
 	// delete the root pointers
 	h_root = NULL;
@@ -990,6 +1006,18 @@ void flatten_tree(line_node* root, vector<line_node*>& flattened_tree){
 		if(root->left_child != NULL) {
 			flatten_tree(root->left_child, flattened_tree);
 		}
+
+		// before pushing the node, check if its vector has only 1 element (array of endoints
+		// 		if it does, set is_single_line to true, and set signle_line_endpoints
+		//		with the only element in the vector same_coord_lines.
+		if(root->same_coord_lines.size() == 1) {
+			root->is_single_line = true;
+
+			// set the array single_line_endpoints to be used later
+			root->single_line_endpoints[0] = (*root->same_coord_lines.begin())[0];
+			root->single_line_endpoints[1] = (*root->same_coord_lines.begin())[1];
+		}
+
 		// push the current node into the tree
 		flattened_tree.push_back(root);
 		// go to the right of the tree, if right_child is not NULL
@@ -1149,8 +1177,8 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 	// these pair of variables hold the indices that correspond to the left and right
 	//		endpoints being the coordinates of the two vertical lines that set 
 	//		boundaries for traversing the vertical lines.
-	int low_index;
-	int high_index;
+	int low_index = 0;
+	int high_index = 25;
 
 	int counter = 0;
 	cout << "h size = " << h_flattened_tree.size() << endl;
@@ -1158,57 +1186,127 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 
 	// iterate over the horizontal lines
 	while(h_ln_it_outer != h_flattened_tree.cend()) {
-		counter++;
-
-		if(counter % 1 == 0) {
-			cout << counter << endl;
-		}
 		h_y_axis = (*h_ln_it_outer)->line_coord;
-		cout << h_y_axis << endl;
-		// set the left and right endpoint variables using the horizontal endpoint vector
-		//		for readability
-
-		// set the inner horizontal endpoints iterator
-		h_ln_it_inner = (*h_ln_it_outer)->same_coord_lines.begin();
 		
-		// !!! iterate over the inner vectors of h_endpoints.
-		while(h_ln_it_inner != (*h_ln_it_outer)->same_coord_lines.cend()) {
-			h_left_endpoint = (*h_ln_it_inner)[0];
-			h_right_endpoint = (*h_ln_it_inner)[1];
+		// if same_coord_line has only one element, then no need to iterate over the
+		//		vector. Only use the array single_line_endpoints
+		if((*h_ln_it_outer)->is_single_line) {
+			int successful_checks;
 
+			// set the left and right endpoint variables using the horizontal endpoint vector
+			//		for readability
+			h_left_endpoint = (*h_ln_it_outer)->single_line_endpoints[0];
+			h_right_endpoint = (*h_ln_it_outer)->single_line_endpoints[1];
+
+
+			// !!! uncomment this
 			low_index = findNodeIndex(v_flattened_tree, h_left_endpoint + 1)[0];
 			high_index = findNodeIndex(v_flattened_tree, h_right_endpoint)[0];
+
 
 			// iterate over the outer vectors of v_endpoints
 			for(auto v_ln_it_outer = v_flattened_tree.begin() + low_index; v_ln_it_outer != v_flattened_tree.begin() + high_index; v_ln_it_outer++) {
 				v_x_axis = (*v_ln_it_outer)->line_coord;
 
-				// set the inner vertical endpoints iterator
-				v_ln_it_inner = (*v_ln_it_outer)->same_coord_lines.begin();
-
-				//iterate over the inner vectors of v_endpoints
-				while(v_ln_it_inner != (*v_ln_it_outer)->same_coord_lines.cend()) {
-					
-					// determine if the given horizontal and vertical lines form a plus
-					//		sign
-					if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
-						total_plus_signs++;
-					}
-
-					// increment the iterator for the inner v_endpoints vector.
-					v_ln_it_inner++;
+				// if is_single_line == true, then do not iterate over the same_coord-lines
+				if((*v_ln_it_outer)->is_single_line) {
+						// determine if the given horizontal and vertical lines form a plus
+						//		sign
+						if((*v_ln_it_outer)->single_line_endpoints[0] < h_y_axis && (*v_ln_it_outer)->single_line_endpoints[1] > h_y_axis) {
+							total_plus_signs++;
+							// successful_checks++;
+						}
 				}
+				// else, there are > 1 elements in same_coord_line vector, so we need
+				//		to iterate
+				else {
+					// set the inner vertical endpoints iterator
+					v_ln_it_inner = (*v_ln_it_outer)->same_coord_lines.begin();
+
+					//iterate over the inner vectors of v_endpoints
+					while(v_ln_it_inner != (*v_ln_it_outer)->same_coord_lines.cend()) {
+						
+						// determine if the given horizontal and vertical lines form a plus
+						//		sign
+						if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
+							total_plus_signs++;
+							// successful_checks++;
+						}
+
+						// increment the iterator for the inner v_endpoints vector.
+						v_ln_it_inner++;
+					}
+				}
+				
 			}
-
-			// increment the iterator for the inner h_endpoints vector
-			h_ln_it_inner++;
 		}
+		else {
+			// set the inner horizontal endpoints iterator
+			h_ln_it_inner = (*h_ln_it_outer)->same_coord_lines.begin();
+			
+
+			int successful_checks;
+
+			// !!! iterate over the inner vectors of h_endpoints.
+			while(h_ln_it_inner != (*h_ln_it_outer)->same_coord_lines.cend()) {
+				// successful_checks = 0;
+
+				// set the left and right endpoint variables using the horizontal endpoint vector
+				//		for readability
+				h_left_endpoint = (*h_ln_it_inner)[0];
+				h_right_endpoint = (*h_ln_it_inner)[1];
 
 
+				// !!! uncomment this
+				low_index = findNodeIndex(v_flattened_tree, h_left_endpoint + 1)[0];
+				high_index = findNodeIndex(v_flattened_tree, h_right_endpoint)[0];
 
+
+				// iterate over the outer vectors of v_endpoints
+				for(auto v_ln_it_outer = v_flattened_tree.begin() + low_index; v_ln_it_outer != v_flattened_tree.begin() + high_index; v_ln_it_outer++) {
+					v_x_axis = (*v_ln_it_outer)->line_coord;
+
+					// if is_single_line == true, then do not iterate over the same_coord-lines
+					if((*v_ln_it_outer)->is_single_line) {
+							// determine if the given horizontal and vertical lines form a plus
+							//		sign
+							if((*v_ln_it_outer)->single_line_endpoints[0] < h_y_axis && (*v_ln_it_outer)->single_line_endpoints[1] > h_y_axis) {
+								total_plus_signs++;
+								// successful_checks++;
+							}
+					}
+					// else, there are > 1 elements in same_coord_line vector, so we need
+					//		to iterate
+					else {
+						// set the inner vertical endpoints iterator
+						v_ln_it_inner = (*v_ln_it_outer)->same_coord_lines.begin();
+
+						//iterate over the inner vectors of v_endpoints
+						while(v_ln_it_inner != (*v_ln_it_outer)->same_coord_lines.cend()) {
+							
+							// determine if the given horizontal and vertical lines form a plus
+							//		sign
+							if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
+								total_plus_signs++;
+								// successful_checks++;
+							}
+
+							// increment the iterator for the inner v_endpoints vector.
+							v_ln_it_inner++;
+						}
+					}
+					
+				}
+
+				// cout << successful_checks << endl;
+				// cout << "****************************************" << endl;
+
+				// increment the iterator for the inner h_endpoints vector
+				h_ln_it_inner++;
+			}
+		}
 		// increment the iterator for h_lines.
 		h_ln_it_outer++;
-
 	}
 
 	cout << "total plus signs = " << total_plus_signs << endl;
@@ -1321,3 +1419,95 @@ vector<int> generate_lengths(int number_of_moves, int max_move_size, int seed) {
 
 	return vector_of_lengths;
 } 
+
+
+long long countPlusSignTreeOld(vector<line_node*> h_flattened_tree, vector<line_node*> v_flattened_tree) {
+	// initialize outer and inner horizontal line iterators
+	// Note: the outer iterator for vertical lines is declared and initialized in the
+	//		for loop. 
+	auto h_ln_it_outer = h_flattened_tree.begin();
+	vector<std::array<long long, 2>>::iterator h_ln_it_inner;
+	vector<std::array<long long, 2>>::iterator v_ln_it_inner;
+
+	// declare left and right endpoints for the horizontal lines to be used in the loops.
+	long long h_left_endpoint;
+	long long h_right_endpoint;
+
+
+	// declare left and right endpoints for the vertical lines to be used in the loops.
+	long long v_bottom_endpoint;
+	long long v_top_endpoint;
+
+	// declare the y_axis varialbe for horizontal lines
+	long long h_y_axis;
+
+	// declare the x_axis varialbe for vertical lines
+	long long v_x_axis;
+
+	// running total of the number of plus signs found
+	int total_plus_signs = 0;
+
+	// these pair of variables hold the indices that correspond to the left and right
+	//		endpoints being the coordinates of the two vertical lines that set 
+	//		boundaries for traversing the vertical lines.
+	int low_index;
+	int high_index;
+
+	int counter = 0;
+	cout << "h size = " << h_flattened_tree.size() << endl;
+	cout << "v size = " <<  v_flattened_tree.size() << endl;
+
+	// iterate over the horizontal lines
+	while(h_ln_it_outer != h_flattened_tree.cend()) {
+		counter++;
+
+		h_y_axis = (*h_ln_it_outer)->line_coord;
+		// set the left and right endpoint variables using the horizontal endpoint vector
+		//		for readability
+
+		// set the inner horizontal endpoints iterator
+		h_ln_it_inner = (*h_ln_it_outer)->same_coord_lines.begin();
+		
+		// !!! iterate over the inner vectors of h_endpoints.
+		while(h_ln_it_inner != (*h_ln_it_outer)->same_coord_lines.cend()) {
+			h_left_endpoint = (*h_ln_it_inner)[0];
+			h_right_endpoint = (*h_ln_it_inner)[1];
+
+			low_index = findNodeIndex(v_flattened_tree, h_left_endpoint + 1)[0];
+			high_index = findNodeIndex(v_flattened_tree, h_right_endpoint)[0];
+
+			// iterate over the outer vectors of v_endpoints
+			for(auto v_ln_it_outer = v_flattened_tree.begin() + low_index; v_ln_it_outer != v_flattened_tree.begin() + high_index; v_ln_it_outer++) {
+				v_x_axis = (*v_ln_it_outer)->line_coord;
+
+				// set the inner vertical endpoints iterator
+				v_ln_it_inner = (*v_ln_it_outer)->same_coord_lines.begin();
+
+				//iterate over the inner vectors of v_endpoints
+				while(v_ln_it_inner != (*v_ln_it_outer)->same_coord_lines.cend()) {
+					
+					// determine if the given horizontal and vertical lines form a plus
+					//		sign
+					if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
+						total_plus_signs++;
+					}
+
+					// increment the iterator for the inner v_endpoints vector.
+					v_ln_it_inner++;
+				}
+			}
+
+			// increment the iterator for the inner h_endpoints vector
+			h_ln_it_inner++;
+		}
+
+
+
+		// increment the iterator for h_lines.
+		h_ln_it_outer++;
+
+	}
+
+	cout << "total plus signs = " << total_plus_signs << endl;
+	return total_plus_signs;
+}
