@@ -8,6 +8,11 @@ using namespace std;
 #define RED true
 #define BLACK false
 
+#define DELETE true
+#define INSERT false
+
+// !!! implement a function is_red_black_tree(root) that will take in a root node, and
+//		determine whether the tree is red black or not.
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -30,12 +35,18 @@ struct node {
 void insert(node*& root, int value);
 void insert_helper(node*& root, node* new_node);
 
-void RR_rotation(node*& root, node* new_node);
+void RR_rotation(node*& root, node* parent_node, bool del_or_insert);
 void RL_rotation(node*& root, node* new_node);
-void LL_rotation(node*& root, node* new_node);
+void LL_rotation(node*& root, node* parent_node, bool del_or_insert);
 void LR_rotation(node*& root, node* new_node);
 
 void display_tree(node* root);
+
+void delete_node(node*& root, node* node_to_del);
+
+node* find_inorder(node* node_to_del);
+
+node* binary_search(node* root, int value);
 
 
 int main() {
@@ -43,16 +54,60 @@ int main() {
 	root = NULL;
 
 	int value;
-	int line_coordinates[21] = {20, 5, 30, 40, 50, 35, 6, 9, 3, 60, 33, 1, 34, 0, 70, 32,
-							2, -1, 37, 65, 38};
+	// int line_coordinates[21] = {20, 5, 30, 40, 50, 35, 6, 9, 3, 60, 33, 1, 34, 0, 70, 32,
+	// 						2, -1, 37, 65, 38};
+	int line_coordinates[16] = {20, 5, 30, 40, 50, 35, 6, 9, 3, 60, 33, 1, 34, 0, 70,
+		2};
+	// int line_coordinates[17] = {4, 10, 16, 12, 11, 3, 9, 7, 5, 2, 13, 15, 1, 14, 10, 17};
+	// int line_coordinates[] = {1, 5, 2};
 	for(int i = 0; i < sizeof(line_coordinates)/4; i++) {
 		// cout << "Enter a value: ";
 		// cin >> value;
 		// cout << endl;
-		// cout << line_coordinates[i] << endl;
+		cout << line_coordinates[i] << endl;
 		insert(root, line_coordinates[i]);
 		display_tree(root);
 	}
+
+	node* node_to_del;
+
+	// while(value != -1) {
+	// 	cout << "Enter a value to delete. enter -1 to exit: \n";
+	// 	cin >> value;
+	// 	if(value != -1) {
+	// 		node_to_del = binary_search(root, value);
+	// 		if(node_to_del != NULL) {
+
+	// 			delete_node(root, node_to_del);
+	// 			display_tree(root);				
+	// 		}
+	// 		else {
+	// 			cout << "value not in the tree.\n";
+	// 		}
+
+	// 	}
+	// }
+
+	// int vals_to_del[] = {30, 5, 6, 40, 20, 33, 70, 34, 0, 2, 1, 3, 60, 50};
+	int vals_to_del[] = {30, 5, 6, 40, 20, 33, 70, 34, 0, 60, 2, 50};
+
+	for(int value: vals_to_del) {
+		cout << "=============================================================" << endl;
+		cout << "=============================================================" << endl;
+		cout << "=============================================================" << endl;
+		cout << "=============================================================" << endl;
+		node_to_del = binary_search(root, value);
+		if(node_to_del != NULL) {
+
+			delete_node(root, node_to_del);
+			display_tree(root);				
+		}
+		else {
+			cout << "value not in the tree.\n";
+		}
+	}
+
+
 
 
 	return 0;
@@ -79,9 +134,14 @@ void insert(node*& root, int value) {
 	} 
 	// Case 2: Tree is not empty. Create a new Red node
 	else {
+		// dynamically create a new node pointer
 		node* new_node = new node;
 
+		// set the value of the new node to the given value
 		new_node->value = value;
+
+		// set the double black to false (default)
+		new_node->is_double_black = false;
 
 		// the new node always has a color red.
 		new_node->color = RED;
@@ -172,13 +232,13 @@ void insert_helper(node*& root, node* new_node) {
 		if(parent_sibling_node == NULL || parent_sibling_node->color == BLACK) {
 			// do suitable rotation (RR, RL, LR, or LL)
 			if(new_node->which_child == RIGHT && parent_node->which_child == RIGHT){
-				RR_rotation(root, new_node);
+				RR_rotation(root, new_node->parent, INSERT);
 			} else if(new_node->which_child == LEFT && parent_node->which_child == RIGHT) {
 				RL_rotation(root, new_node);
 			} else if(new_node->which_child == LEFT && parent_node->which_child == LEFT) {
-				LL_rotation(root, new_node);
+				LL_rotation(root, new_node->parent, INSERT);
 			} else {
-				LL_rotation(root, new_node);
+				LR_rotation(root, new_node);
 			}
 		}
 		// Case 4b: parent's sibling is Red, recolor parent and parent's parent
@@ -205,38 +265,26 @@ void insert_helper(node*& root, node* new_node) {
 		// go through cases 3 and 4 again and recolor/rotate if necessary
 	// Case 3: parent of new node is Black, exit
 	}
-
-	// delete local pointers
-	parent_node = NULL;
-	parent_sibling_node = NULL;
-	parent_parent_node = NULL;
-
-	delete parent_node;
-	delete parent_sibling_node;
-	delete parent_parent_node;
 }
 
 // do an RR rotation
 // @parameters
 //		root = a reference to a pointer to the root of the tree
-//		new_node = a pointer to the new node.
-void RR_rotation(node*& root, node* new_node) {
+//		parent_node = a pointer to the parent of the node to be inserted or deleted.
+//		del_or_insert = true if RR is used for deletion operation
+//						false if this function is used for insert operation
+//			The difference is to recolor or not recolor the parent and parents parent
+void RR_rotation(node*& root, node* parent_node, bool del_or_insert) {
 	// declare temporary pointers to store the parent and parent's parent 
-	node* parent_node = new_node->parent;
+	// node* parent_node = new_node->parent;
 	node* parent_parent_node = parent_node->parent;
 
-	cout << "before rr rotation: " << endl;
-	display_tree(root);
-
-	cout << "parents parent parent = " << parent_parent_node->parent->value << endl;
-	cout << "parents parent = " << parent_parent_node->value << endl;
-	cout << "parent = " << parent_node->value << endl;
-	cout << "new node = " << new_node->value << endl;
 	// steps are taken from notebook
 
 	// step 1
 	// cout << "parent_node->parent = parent_parent_node->parent " << parent_node->parent->value << " = " << parent_parent_node->parent->value << endl;
 	parent_node->parent = parent_parent_node->parent;
+
 	// step 2
 	// reset parent's parent child (unless it is NULL)
 	if(parent_parent_node->parent != NULL) {
@@ -262,29 +310,24 @@ void RR_rotation(node*& root, node* new_node) {
 		parent_node->left_child->which_child = RIGHT; 
 	}
 	// step 5
-	// cout << "parent_parent_node->right_child = parent_node->left_child " << 	parent_parent_node->right_child->value << " = " << parent_node->left_child->value << endl;
 	parent_parent_node->right_child = parent_node->left_child;
 	// step 6
-	// cout << "parent_node->left_child == parent_parent_node " << parent_node->left_child->value << " = " << parent_parent_node->value << endl;
 	parent_node->left_child = parent_parent_node;
 	// reset which child of parents_parent node
 	parent_parent_node->which_child = LEFT;
 
 
-	// step 7: recolor parent and parent's parent nodes
-	parent_node->color = BLACK;
-	parent_parent_node->color = RED;
-	// cout << "after RR rotation\n";
-	// display_tree(root);
-	// delete local pointers
-	parent_node = NULL;
-	parent_parent_node = NULL;
-
-	delete parent_node;
-	delete parent_parent_node;
+	// step 7: recolor parent and parent's parent nodes (if called for insertion)
+	if(del_or_insert == INSERT) {
+		parent_node->color = BLACK;
+		parent_parent_node->color = RED;		
+	}
 
 
-
+	// reset the root if necessary
+	if(root == parent_parent_node) {
+		root = parent_node;
+	}
 }
 
 // do an RL rotation
@@ -323,23 +366,20 @@ void RL_rotation(node*& root, node* new_node) {
 	}
 
 	// call LL_rotation
-	RR_rotation(root, parent_node);
+	RR_rotation(root, parent_node->parent, INSERT);
 
-	// delete local pointers
-	parent_node = NULL;
-	parent_parent_node = NULL;
-
-	delete parent_node;
-	delete parent_parent_node;
 }
 
 // do an LL rotation
 // @parameters
 //		root = a reference to a pointer to the root of the tree
-//		new_node = a pointer to the new node.
-void LL_rotation(node*& root, node* new_node) {
+//		parent_node = a pointer to the parent of the node to be inserted or deleted.
+//		del_or_insert = true if RR is used for deletion operation
+//						false if this function is used for insert operation
+//			The difference is to recolor or not recolor the parent and parents parent
+void LL_rotation(node*& root, node* parent_node, bool del_or_insert) {
 	// declare temporary pointers to store the parent and parent's parent 
-	node* parent_node = new_node->parent;
+	// node* parent_node = new_node->parent;
 	node* parent_parent_node = parent_node->parent;
 
 	// step 1 
@@ -351,13 +391,16 @@ void LL_rotation(node*& root, node* new_node) {
 		parent_node->right_child->which_child = LEFT;
 	}
 	// step 3
-	if(parent_parent_node->which_child == LEFT) {
-		parent_parent_node->parent->left_child = parent_node;
-	} else {
-		parent_parent_node->parent->right_child = parent_node;
-		// reset which child of parent node
-		parent_node->which_child = RIGHT;
+	if(parent_parent_node->parent != NULL) {
+		if(parent_parent_node->which_child == LEFT) {
+			parent_parent_node->parent->left_child = parent_node;
+		} else {
+			parent_parent_node->parent->right_child = parent_node;
+			// reset which child of parent node
+			parent_node->which_child = RIGHT;
+		}		
 	}
+
 	// step 4
 	parent_parent_node->parent = parent_node;
 	// step 5
@@ -370,16 +413,17 @@ void LL_rotation(node*& root, node* new_node) {
 	parent_parent_node->which_child = RIGHT;
 
 
-	// step 7: recolor parent and parent's parent nodes
-	parent_node->color = BLACK;
-	parent_parent_node->color = RED;
+	// step 7: recolor parent and parent's parent nodes (if called for insertion)
+	if(del_or_insert == INSERT) {
+		parent_node->color = BLACK;
+		parent_parent_node->color = RED;		
+	}
 
-	// delete local pointers
-	parent_node = NULL;
-	parent_parent_node = NULL;
 
-	delete parent_node;
-	delete parent_parent_node;
+	// reset the root if necessary
+	if(root == parent_parent_node) {
+		root = parent_node;
+	}
 }
 
 // do an LR rotation
@@ -417,14 +461,14 @@ void LR_rotation(node*& root, node* new_node) {
 	// no need to change which child of parent node, because it is already LEFT
 
 	// call LL_rotation
-	LL_rotation(root, parent_node);
+	LL_rotation(root, parent_node->parent, INSERT);
 
-	// delete local pointers
-	parent_node = NULL;
-	parent_parent_node = NULL;
+	// // delete local pointers
+	// delete parent_node;
+	// delete parent_parent_node;
 
-	delete parent_node;
-	delete parent_parent_node;
+	// parent_node = NULL;
+	// parent_parent_node = NULL;
 }
 
 void display_tree(node* root) {
@@ -443,6 +487,7 @@ void display_tree(node* root) {
 		cout << "Tree is empty" << endl;
 	}
 
+	char left_or_right;
 
 	cout << "*********************************************************************\n";
 	cout << "*********************************************************************\n";
@@ -454,9 +499,21 @@ void display_tree(node* root) {
 		while(num_of_nodes_on_level > 0) {
 			// display the node
 			cout << nodes_on_level.front()->value;
+			if(nodes_on_level.front()->color == BLACK) {
+				cout << "B";
+			}
+			else {
+				cout << "R";
+			}
+
+			if(nodes_on_level.front()->which_child == LEFT) {
+				left_or_right = 'L';
+			} else {
+				left_or_right = 'R';
+			}
 			// display the which_child and parent's value of the node
 			if(nodes_on_level.front()->parent != NULL) {
-				cout << "(" << nodes_on_level.front()->which_child << ", " << nodes_on_level.front()->parent->value << ")   ";
+				cout << "(" << left_or_right << " of " << nodes_on_level.front()->parent->value << ")   ";
 			}
 
 			// push the children of the given node into the queue. After push, the queue
@@ -477,14 +534,19 @@ void display_tree(node* root) {
 		// NOTE: after the inner loop is done, the queue exclusively contains the nodes of the
 		//		next level
 
-		// level breaks for visualization
-		cout << "\n------------------------------------------------------------------\n"; 
-
 		// reset the number of nodes on the current level for the next iterations of the
 		//		inner while loop
 		num_of_nodes_on_level = nodes_on_level.size();
 
+		if(nodes_on_level.size() != 0) {
+			// level breaks for visualization
+			cout << "\n------------------------------------------------------------------\n"; 			
+		}
+
+
 	}
+	cout << "\n*********************************************************************\n";
+	cout << "*********************************************************************\n";
 }
 
 
@@ -494,8 +556,8 @@ void display_tree(node* root) {
 // @parameters
 //		root = the root of the tree from which we want to delete the given value
 //		value = the value of the node to be deleted
-void delete_node(bst_node*& root, bst_node* node_to_del) {
-	// *** Case 1 (a) and (b)
+void delete_node(node*& root, node* node_to_del) {
+	// *** Case 1 (a) and (b) (Base Case)
 	if(!node_to_del->is_double_black) {
 		// Step 1: if the node is an internal node, find the inorder successor
 		if(node_to_del->left_child != NULL && node_to_del->right_child != NULL) {
@@ -519,8 +581,8 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			} else {
 				node_to_del->parent->left_child = NULL;
 			}
-			node_to_del = NULL;
 			delete node_to_del;
+			node_to_del = NULL;
 		}
 		// The node is not internal, and is not Red. So it must be Black and either a leaf
 		//		node or a node with a Red child.
@@ -569,16 +631,19 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			else {
 				// make node DB and recurse
 				node_to_del->is_double_black = true;
+				// recurse, with inorder being the new node to delete
+				delete_node(root, node_to_del);
 			}
 		}
 	}
 	// node is DB
+	// Note: node and node_to_del are used interchangeably.
 	// *** Cases 2 through 6
 	else {
-		// * Case 2: node is a root node, make DB into B, and exit
+		// * Case 2: node is a root node, make DB into B, and exit: Base Case
 		if(node_to_del->parent == NULL) {
 			// node is a root node
-			node->is_double_black = false;
+			node_to_del->is_double_black = false;
 		}
 		// *** Cases 3 through 6
 		else {
@@ -620,9 +685,19 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 
 						node_for_deletion = node_to_del;
 
+						// set the parent's left or right child to null before deleting
+						//		the node
+						if(node_to_del->which_child == RIGHT) {
+							parent->right_child = NULL;
+						}
+						else {
+							parent->left_child = NULL;
+						}
+						
 						// delete the node
 						delete node_for_deletion;
 						node_for_deletion = NULL;
+
 					}
 					// node_to_del is not a leaf node, so only make the DB into B
 					else {
@@ -630,22 +705,23 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 						node_to_del->color = BLACK;
 					}
 
+					// case 3 (b) (P is Black)
 					// add Black to node_to_del's parent
 					if(parent->color == BLACK) {
 						parent->is_double_black = true;
+						// now the parent becomes the node_to_del. 
+						// recursively call this function, where parent becomes the new 
+						//		node_to_del
+						delete_node(root, parent);
+					// case 3 (a) (P is Red)
 					} else {
+						// no need to recurse
 						parent->color = BLACK;
 					}
 
 
 					// make sibling Red
 					sibling->color = RED;
-
-					// now the parent becomes the node_to_del. 
-					// recursively call this function, where parent becomes the new 
-					//		node_to_del
-					delete_node(root, parent);
-
 				}
 				// * Case 5: DB's (node_to_del's) sibling is Black, far_child is Black,
 				//		near child is red
@@ -687,16 +763,83 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 						sibling->parent = near_child;
 						near_child->right_child = sibling;
 					}
+
+					// recurse, case 6 will be applied after case 5 always.
+					delete_node(root, node_to_del);
+				} 
+				// * Case 6: DB's (node_to_del's) sibling is Black, far child is Red,
+				//		near child is Black
+				else if((far_child != NULL && far_child->color == RED)) {
+					cout << "in case 6" << endl;
+					display_tree(root);
+					// swap color of Parent and sibling
+					bool temp_color = sibling->color;
+					sibling->color = parent->color;
+					parent->color = temp_color;
+
+					// rotate P in DB's (node_to_del's) direction
+					// 2 mirror cases for rotation.
+					// 1) sibling is the right child of parent
+					if(sibling->which_child == RIGHT) {
+						// identical to LL rotation, with 
+						//		far_child = new_node
+						//		sibling = parent
+						//		parent = parents_parent
+						RR_rotation(root, sibling, DELETE);
+					}
+					// 2) mirror case of case 1: sibling is the left child of parent
+					else {
+						// identical to LL rotation, with 
+						//		far_child = new_node
+						//		sibling = parent
+						//		parent = parents_parent
+						LL_rotation(root, sibling, DELETE);
+					}
+
+					// change DB to B or delete node_to_del if it is a leaf node
+					if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
+						if(node_to_del->which_child == RIGHT) {
+							parent->right_child = NULL;
+						} else {
+							parent->left_child = NULL;
+						}
+						delete node_to_del;
+						node_to_del = NULL;
+					} 
+					// make it Black
+					else {
+						node_to_del->color = BLACK;
+						node_to_del->is_double_black = false;
+					}
+
+					// change far child's color to BLACK
+					far_child->color = BLACK;
 				}
 			}
 			// * Case 4: sibling is Red
 			else {
+				// swap colors of P and sibling
+				bool temp_color = sibling->color;
+				sibling->color = parent->color;
+				parent->color = temp_color;
 
+				// rotate P in DB direction
+				// if sibling is a LEFT child
+				if(sibling->which_child == LEFT) {
+					// call LL rotation with DELETE option
+					LL_rotation(root, sibling, DELETE);
+				}
+				// sibling is a right child
+				else {
+					// call RR rotation with DELETE option
+					RR_rotation(root, sibling, DELETE);				
+				}
+
+				// reapply cases (recurse)
+				delete_node(root, node_to_del);
 			}
 		}
 	}
-	
-
 }
 
 
