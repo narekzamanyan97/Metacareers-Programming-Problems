@@ -8,6 +8,9 @@ using namespace std;
 #define SUCCESSOR true
 #define PREDECESSOR false
 
+// Implementation of Binary Search Tree (BST), insertion, deletion, display
+// Also includes Binary Search
+
 ////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 //							Declarations of structure and functions
@@ -49,11 +52,10 @@ int main() {
 	// 	display_tree(root);
 	// }
 
-	// int values[31] = {11, 19, 29, 5, 1, 14, 10, 3,
-	// 				8, 7, 30, 40, 35, 22, 24, 20, 16, 17,
-	// 				2, 18, 12, 36, 0, -4, 15, 27, 34, 41, 21,
-	// 				13, 9};
-	int values[] = {5,4,3,3,5,2,1};
+	int values[31] = {11, 19, 29, 5, 1, 14, 10, 3,
+					8, 7, 30, 40, 35, 22, 24, 20, 16, 17,
+					2, 18, 12, 36, 0, -4, 15, 27, 34, 41, 21,
+					13, 9};
 	for(int i = 0; i < sizeof(values)/sizeof(values[0]); i++) {
 		insert(root, values[i]);
 	}
@@ -224,8 +226,8 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 	else if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
 		// the node is the root with no children
 		if(node_to_del->parent == NULL) {
-			node_to_del = NULL;
 			delete node_to_del;
+			node_to_del = NULL;
 
 			root = NULL;
 		}
@@ -235,14 +237,15 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			// 		of its parent to NULL
 			if(node_to_del->which_child == RIGHT) {
 				node_to_del->parent->right_child = NULL;
+		   		delete node_to_del;			
 				node_to_del = NULL;
 			}
 			else {
 				node_to_del->parent->left_child = NULL;
+		   		delete node_to_del;			
 				node_to_del = NULL;
 			}
 
-		   delete node_to_del;			
 		}
 	}
 	// Case 2a: the node to be deleted has 1 child, left 
@@ -254,8 +257,8 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			root->parent = NULL;
 
 			// delete the node
-			node_to_del = NULL;
 			delete node_to_del;			
+			node_to_del = NULL;
 		} else {
 			// reset the child and parent pointers appropriately before deleting the 
 			//		node_to_del
@@ -268,13 +271,12 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			}
 
 			// delete the node
-			node_to_del = NULL;
 			delete node_to_del;
+			node_to_del = NULL;
 		}
 	}
 	// Case 2b: the node to be deleted has 1 child, right 
 	else if(node_to_del->right_child != NULL && node_to_del->left_child == NULL) {
-		cout << "aki" << endl;
 		// if the node is the root node
 		if(node_to_del->parent == NULL) {
 			// set the right child of the node to be the root
@@ -282,8 +284,8 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			root->parent = NULL;
 
 			// delete the node
-			node_to_del = NULL;
 			delete node_to_del;
+			node_to_del = NULL;
 		} else {
 			// reset the child and parent pointers appropriately before deleting the 
 			//		node_to_del
@@ -295,8 +297,8 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 				node_to_del->right_child->which_child = LEFT;
 			}
 			// delete the node
-			node_to_del = NULL;
 			delete node_to_del;
+			node_to_del = NULL;
 		}
 	}
 	// Case 3: the node has 2 children
@@ -313,26 +315,6 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 
 		// recursively call delete node to delete the inorder successor found above
 		delete_node(root, inorder);
-		// cout << "successor = " << inorder->value << endl;
-
-		// // assign the value of inorder to the value of node_to_delete
-		// node_to_del->value = inorder->value;
-
-		// // connect right_child of inorder with the parent of inorder. Pay attention to 
-		// //		the left-right relationships
-		// inorder->right_child->parent = inorder->parent;
-		// if(inorder->which_child == RIGHT) {
-		// 	// inorder->right_child->which_child = RIGHT;
-		// 	inorder->parent->right_child = inorder->right_child;
-		// }
-		// else {
-		// 	inorder->right_child->which_child = LEFT;
-		// 	inorder->parent->left_child = inorder->right_child;
-		// }
-
-		// // delete inorder
-		// inorder = NULL;
-		// delete inorder;
 	}
 
 }

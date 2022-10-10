@@ -108,8 +108,8 @@ vector<int> generate_lengths(int number_of_moves, int max_move_size, int seed);
 // } NIL;
 
 int main(){
-	int N = 500000;
-	int L_i = 100000;
+	int N = 2000000;
+	int L_i = 1000000000;
 	string D;
 	vector<int> L;
 	L = generate_lengths(N, L_i, 1);
@@ -345,6 +345,7 @@ long long getPlusSignCountTree(int N, vector<int> L, string D) {
 
 	flatten_tree(h_root, h_flattened_tree);
 	flatten_tree(v_root, v_flattened_tree);
+	cout << "counting" << endl;
 
 	// cout << "******************************************" << endl;
 	// cout << "Horizontal lines: " << endl;
@@ -370,24 +371,25 @@ long long getPlusSignCountTree(int N, vector<int> L, string D) {
 	auto start_time = std::chrono::steady_clock::now();
 	countPlusSignTree(h_flattened_tree, v_flattened_tree);
 	auto end_time_1 = std::chrono::steady_clock::now();
-	countPlusSignTreeOld(h_flattened_tree, v_flattened_tree);
-	auto end_time_2 = std::chrono::steady_clock::now();
+	// countPlusSignTreeOld(h_flattened_tree, v_flattened_tree);
+	// auto end_time_2 = std::chrono::steady_clock::now();
 
 
 	std::chrono::duration<double> elapsed_seconds_1 = end_time_1 - start_time;
-	std::chrono::duration<double> elapsed_seconds_2 = end_time_2 - end_time_1;
+	//std::chrono::duration<double> elapsed_seconds_2 = end_time_2 - end_time_1;
 	
-	cout << "performance new: " << elapsed_seconds_1.count() << "sec" << endl;
-	cout << "performance old: " << elapsed_seconds_2.count() << "sec" << endl;
-	cout << "performance gain (1/2): " << elapsed_seconds_2.count() / elapsed_seconds_1.count() << "x" << endl;
+	// cout << "performance new: " << elapsed_seconds_1.count() << "sec" << endl;
+	// cout << "performance old: " << elapsed_seconds_2.count() << "sec" << endl;
+	// cout << "performance gain (1/2): " << elapsed_seconds_2.count() / elapsed_seconds_1.count() << "x" << endl;
 
 	
 	// delete the root pointers
+	// Note: Call delete first, then set the pointer to NULL
+	delete h_root;
+	delete v_root;
 	h_root = NULL;
 	v_root = NULL;
 
-	delete h_root;
-	delete v_root;
 
 
 }
@@ -506,8 +508,8 @@ void insertIntoTree(line_node*& root, long long new_line_coord, long long low_en
 		}
 
 		// delete the pointer
-		new_node = NULL;
 		delete new_node;
+		new_node = NULL;
 	}
 
 }
@@ -629,11 +631,11 @@ void insertIntoTreeHelper(line_node*& root, line_node* new_node) {
 
 
 	// delete pointers
-    parent_node = NULL;
 	delete parent_node;
+    parent_node = NULL;
 
-	parents_parent_node = NULL;
 	delete parents_parent_node;
+	parents_parent_node = NULL;
 
 }
 
@@ -687,12 +689,13 @@ void RR_rotation(line_node*& root, line_node* new_node) {
 	parent_node->color = BLACK;
 	parents_parent_node->color = RED;
 
-	// delete the pointers
-	parent_node = NULL;
-	parents_parent_node = NULL;
 
+	// delete the pointers
 	delete parent_node;
 	delete parents_parent_node;
+
+	parent_node = NULL;
+	parents_parent_node = NULL;
 
 
 
@@ -743,11 +746,11 @@ void LL_rotation(line_node*& root, line_node* new_node) {
 	parents_parent_node->color = RED;
 
 	// delete the pointers
-	parent_node = NULL;
-	parents_parent_node = NULL;
-
 	delete parent_node;
 	delete parents_parent_node;
+
+	parent_node = NULL;
+	parents_parent_node = NULL;
 }
 
 // helper function to execute the LR rotation
@@ -780,11 +783,11 @@ void LR_rotation(line_node*& root, line_node* new_node) {
 
 	// call the LL algorithm after completing LR algorithm
 	// delete the pointers
-	parent_node = NULL;
-	parents_parent_node = NULL;
-
 	delete parent_node;
 	delete parents_parent_node;
+
+	parent_node = NULL;
+	parents_parent_node = NULL;
 }
 
 // helper function to execute the RL rotation
@@ -816,11 +819,12 @@ void RL_rotation(line_node*& root, line_node* new_node) {
 
 	// call the LL algorithm after completing LR algorithm
 	// delete the pointers
+	delete parent_node;
+	delete parents_parent_node;
+
 	parent_node = NULL;
 	parents_parent_node = NULL;
 
-	delete parent_node;
-	delete parents_parent_node;
 }
 
 // iterative implementation of breadth first traversal of red-black tree.
@@ -1186,10 +1190,15 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 
 	// iterate over the horizontal lines
 	while(h_ln_it_outer != h_flattened_tree.cend()) {
+		if(counter % 10000 == 0) {
+			cout << counter << endl;
+		}
+		counter++;
 		h_y_axis = (*h_ln_it_outer)->line_coord;
 		
-		// if same_coord_line has only one element, then no need to iterate over the
-		//		vector. Only use the array single_line_endpoints
+		// if same_coord_line of the given horizontal line has only one element,
+		//		then no need to iterate over the vector. Only use the array 
+		//		single_line_endpoints
 		if((*h_ln_it_outer)->is_single_line) {
 			int successful_checks;
 
@@ -1203,6 +1212,7 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 			low_index = findNodeIndex(v_flattened_tree, h_left_endpoint + 1)[0];
 			high_index = findNodeIndex(v_flattened_tree, h_right_endpoint)[0];
 
+			// cout << low_index << " to " << high_index << endl;
 
 			// iterate over the outer vectors of v_endpoints
 			for(auto v_ln_it_outer = v_flattened_tree.begin() + low_index; v_ln_it_outer != v_flattened_tree.begin() + high_index; v_ln_it_outer++) {
@@ -1211,6 +1221,7 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 				// if is_single_line == true, then do not iterate over the same_coord-lines
 				if((*v_ln_it_outer)->is_single_line) {
 						// determine if the given horizontal and vertical lines form a plus
+						// cout << "2222222" << endl;
 						//		sign
 						if((*v_ln_it_outer)->single_line_endpoints[0] < h_y_axis && (*v_ln_it_outer)->single_line_endpoints[1] > h_y_axis) {
 							total_plus_signs++;
@@ -1226,6 +1237,7 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 					//iterate over the inner vectors of v_endpoints
 					while(v_ln_it_inner != (*v_ln_it_outer)->same_coord_lines.cend()) {
 						
+						// cout << "3333333333333333333333333333333333333333333333333333333" << endl;
 						// determine if the given horizontal and vertical lines form a plus
 						//		sign
 						if((*v_ln_it_inner)[0] < h_y_axis && (*v_ln_it_inner)[1] > h_y_axis) {
@@ -1240,6 +1252,7 @@ long long countPlusSignTree(vector<line_node*> h_flattened_tree, vector<line_nod
 				
 			}
 		}
+		// else, the given horizontal line has more than one line with the given y-axis 
 		else {
 			// set the inner horizontal endpoints iterator
 			h_ln_it_inner = (*h_ln_it_outer)->same_coord_lines.begin();
