@@ -63,6 +63,7 @@ node* demo_build_tree_input();
 node* demo_build_tree_random(int num_of_nodes);
 void demo_delete_node_array(node* root, int vals_to_del[], int size_of_array);
 void demo_delete_node_input(node* root);
+void demo_delete_node_random(node* root, int num_of_nodes, int num_of_nodes_to_del);
 
 bool is_integer(string str);
 
@@ -91,8 +92,9 @@ int main() {
 		cout << "This is not a binary tree." << endl;
 	}
 	
-	// display_tree(root);
-	cout << root->value << endl;
+	display_tree(root);
+
+	demo_delete_node_random(root, 1000, 990);
 	return 0;
 }
 
@@ -125,6 +127,110 @@ void demo_delete_node_array(node* root, int* vals_to_del, int size_of_array) {
 	display_tree(root);				
 }
 
+// randomly delete num_of_nodes number of nodes from the tree 
+// @parameters
+//		root = a pointer to the root of the tree
+//		num_of_nodes = the number of nodes in the tree
+//		num_of_nodes_to_del = the number of nodes to be deleted from the tree
+void demo_delete_node_random(node* root, int num_of_nodes, int num_of_nodes_to_del) {
+	// initialize random seed
+	srand(time(NULL));
+	
+	// temp variable to store the node to be deleted
+	node* node_to_del;
+
+	// value to add
+	int value; 
+
+	bool is_binary = true;
+
+	for(int i = 0; i < num_of_nodes_to_del; i++) {
+		// if there are no more nodes in the tree (tree is empty), break from the loop
+		//		and exit the function
+		if(root == NULL) {
+			cout << "Tree is empty." << endl;
+			break;
+		} else {
+			// generate a random integer
+			value = rand() % (num_of_nodes);
+
+			// store the node found into node_to_del
+			node_to_del = binary_search(root, value);
+
+			// if the node is not found, generate another integer
+			while(node_to_del == NULL) {
+				// regenerate a random number
+				value = rand() % (num_of_nodes);
+
+				// store the node found into node_to_del
+				node_to_del = binary_search(root, value);
+			}
+
+			cout << value << endl;
+			// delete the node
+			delete_node(root, node_to_del);
+		}
+		// if(is_red_black_tree(root)) {
+		// 	cout << "Red Black Tree." << endl;
+		// } else {
+		// 	cout << "Fail." << endl;
+		// 	break;
+		// }
+	}
+
+	display_tree(root);
+}
+
+// deletes user-input values from a tree
+// asks the user for the values to delete from the tree that was built.
+// @parameters:
+//		root = a pointer to the root of the tree
+void demo_delete_node_input(node* root) {
+	// reset is_done to anything other than 'e' or 'E'
+	string is_done;
+
+	// the variable for the value to be deleted.
+	int value;
+
+
+	// store the node to be deleted
+	node* node_to_del;
+
+
+	cout << "Enter a value to insert. Enter Non Int to exit \n";
+	cin >> is_done;
+
+	while(is_integer(is_done)) {
+		// convert the input string into an int
+		value = stoi(is_done);
+
+		node_to_del = binary_search(root, value);
+
+		if(node_to_del != NULL) {
+
+			delete_node(root, node_to_del);
+			display_tree(root);		
+
+			if(is_binary_tree(root)) {
+				cout << "tree is still a binary tree." << endl;
+			} else {
+				cout << "Not a binary tree." << endl;
+			}
+			if(is_red_black_tree(root)) {
+				cout << "tree is still a red black tree." << endl;
+			} else {
+				cout << "Not a red black tree." << endl;
+			}
+		}
+		else {
+			cout << "value not in the tree.\n";
+		}
+	
+		cout << "Enter a value to delete. Enter Non Int to exit \n";
+		cin >> is_done;
+	}
+}
+
 // build a tree using the values in a given array
 // @parameters:
 //		array_of_values = an array of int values to be inserted into the tree
@@ -149,52 +255,6 @@ node* demo_build_tree_from_array(int* array_of_values, int size_of_array) {
 	return root;
 }
 
-// deletes user-input values from a tree
-// asks the user for the values to delete from the tree that was built.
-// @parameters:
-//		root = a pointer to the root of the tree
-void demo_delete_node_input(node* root) {
-	// reset is_done to anything other than 'e' or 'E'
-	string is_done;
-
-	// the variable for the value to be deleted.
-	int value;
-
-
-	// store the node to be deleted
-	node* node_to_del;
-
-	// used for conversion between string and int
-	stringstream ss;
-
-	cout << "Enter a value to delete. enter -1 to exit: Enter Non Int to exit \n";
-	cin >> is_done;
-
-	while(is_integer(is_done)) {
-		// convert the input string into an int
-		ss << is_done;
-
-		ss >> value;
-
-		if(value != -1) {
-			node_to_del = binary_search(root, value);
-			if(node_to_del != NULL) {
-
-				delete_node(root, node_to_del);
-				display_tree(root);				
-			}
-			else {
-				cout << "value not in the tree.\n";
-			}
-
-		}	
-	
-		cout << "Enter a value to delete. enter -1 to exit: Enter Non Int to exit \n";
-		cin >> is_done;
-	}
-}
-
-
 // builds a tree from input values given by the user
 // @return:
 //		root = a pointer to the root node of the newly built tree
@@ -209,7 +269,7 @@ node* demo_build_tree_input() {
 	string is_done;
 
 
-	cout << "Enter a value to insert. enter -1 to exit: Enter Non Int to exit \n";
+	cout << "Enter a value to insert. Enter Non Int to exit \n";
 	cin >> is_done;
 
 	while(is_integer(is_done)) {
@@ -218,7 +278,7 @@ node* demo_build_tree_input() {
 
 		insert(root, value);
 
-		cout << "Enter a value to delete. enter -1 to exit: Enter Non Int to exit \n";
+		cout << "Enter a value to delete. Enter Non Int to exit \n";
 		cin >> is_done;
 	}
 
@@ -258,8 +318,11 @@ node* demo_build_tree_random(int num_of_nodes) {
 			// 	break;
 			// }
 			value = rand() % num_of_nodes;
-		}		
+		}	
+		cout << value << ", ";	
 	}
+
+	cout << endl;
 
 	return root;
 
@@ -993,8 +1056,16 @@ void display_tree(node* root) {
 //		root = the root of the tree from which we want to delete the given value
 //		value = the value of the node to be deleted
 void delete_node(node*& root, node* node_to_del) {
+	// case 0: if the node is the root, and it is the only node in the tree
+	if(node_to_del->parent == NULL && node_to_del->left_child == NULL 
+			&& node_to_del->right_child == NULL) {
+
+		// delete the root and set it to NULL
+		delete root;
+		root = NULL;
+	}
 	// *** Case 1 (a) and (b) (Base Case)
-	if(!node_to_del->is_double_black) {
+	else if(!node_to_del->is_double_black) {
 		// Step 1: if the node is an internal node, find the inorder successor
 		if(node_to_del->left_child != NULL && node_to_del->right_child != NULL) {
 			// find the inorder of the node to delete
@@ -1206,8 +1277,6 @@ void delete_node(node*& root, node* node_to_del) {
 				// * Case 6: DB's (node_to_del's) sibling is Black, far child is Red,
 				//		near child is Black
 				else if((far_child != NULL && far_child->color == RED)) {
-					cout << "in case 6" << endl;
-					display_tree(root);
 					// swap color of Parent and sibling
 					bool temp_color = sibling->color;
 					sibling->color = parent->color;
