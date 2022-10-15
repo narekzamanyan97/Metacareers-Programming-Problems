@@ -8,7 +8,8 @@ using namespace std;
 #define SUCCESSOR true
 #define PREDECESSOR false
 
-// Implementation of Binary Search Tree (BST), insertion, deletion, display
+// Implementation of Binary Search Tree (BST), insertion, deletion, display,
+// !!! Implement is_binary_tree
 // Also includes Binary Search
 
 ////////////////////////////////////////////////////////////////////////////////////////
