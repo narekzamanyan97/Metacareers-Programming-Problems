@@ -1,5 +1,9 @@
 #include <iostream>
 #include <queue>
+#include <string>
+#include <sstream>
+#include <time.h>
+#include <stdlib.h>
 using namespace std;
 
 #define RIGHT true
@@ -30,7 +34,7 @@ struct node {
 	int value;
 };
 
-void insert(node*& root, int value);
+bool insert(node*& root, int value);
 void insert_helper(node*& root, node* new_node);
 
 void RR_rotation(node*& root, node* parent_node, bool del_or_insert);
@@ -54,38 +58,41 @@ int is_red_black_tree_helper2(node* root);
 
 // functions for the main method to demo the insert, delete, display, and check 
 //		functions
-void demo_delete_node_array(node* root, int vals_to_del[], int size_of_array);
 node* demo_build_tree_from_array(int array_of_values[], int size_of_array);
-void demo_delete_node_input(node* root);
 node* demo_build_tree_input();
+node* demo_build_tree_random(int num_of_nodes);
+void demo_delete_node_array(node* root, int vals_to_del[], int size_of_array);
+void demo_delete_node_input(node* root);
+
+bool is_integer(string str);
 
 int main() {
 	node* root;
 	root = NULL;
 
 	int value;
-	int line_coordinates[] = {30, 5, 6, 40, 20, 33, 70, 34, 0, 2, 1, 3, 60, 50, 100, 29, 39, 51, 54, 66, 64, 9, 8, 18, 28, 98, 38, 17, 64, 61, 31, 32, 33, 43, 13};
+
+	// after inserting 57, the tree is not binary anymore
+	// int values[] = {45, 16, 98, 95, 84, 50, 90, 31, 5, 57, 89, 52, 6, 53, 29, 13, 67, 58, 61, 39, 85, 17};
+	// int values[] = {45, 16, 98, 95, 84, 50, 90, 31, 5, 57};
+
+	root = demo_build_tree_random(1000);
+
+	if(is_red_black_tree(root)) {
+		cout << "This is Red Black Tree." << endl;
+	}
+	else {
+		cout << "Not a Red-Black Tree." << endl;
+	}
+	if(is_binary_tree(root)) {
+		cout << "This is a binary tree." << endl;
+	}
+	else {
+		cout << "This is not a binary tree." << endl;
+	}
 	
-	// int line_coordinates[21] = {20, 5, 30, 40, 50, 35, 6, 9, 3, 60, 33, 1, 34, 0, 70, 32,
-	// 						2, -1, 37, 65, 38};
-	
-	// int line_coordinates[17] = {4, 10, 16, 12, 11, 3, 9, 7, 5, 2, 13, 15, 1, 14, 10, 17};
-	// int line_coordinates[] = {1, 5, 2};
-
-	root = demo_build_tree_from_array(line_coordinates, sizeof(line_coordinates)/sizeof(line_coordinates[0]));
-	display_tree(root);
-
-	int vals_to_del[] = {33, 30, 17, 39, 64};
-
-	cout << endl;
-	cout << endl;
-	cout << endl;
-	cout << endl;
-	cout << endl;
-	cout << endl;
-	demo_delete_node_array(root, vals_to_del, sizeof(vals_to_del)/sizeof(vals_to_del[0]));
-	display_tree(root);
-
+	// display_tree(root);
+	cout << root->value << endl;
 	return 0;
 }
 
@@ -130,10 +137,14 @@ node* demo_build_tree_from_array(int* array_of_values, int size_of_array) {
 
 	// iterate over the array of values, and insert the values into the tree one by one
 	for(int i = 0; i < size_of_array; i++) {
-		cout << size_of_array << endl;
+		// cout << array_of_values[i] << endl;
 		insert(root, array_of_values[i]);
+		// if(!is_binary_tree(root)) {
+		// 	cout << "Not a Binary tree" << endl;
+		// 	display_tree(root);
+		// }
+		// display_tree(root);
 	}
-	display_tree(root);
 
 	return root;
 }
@@ -144,16 +155,27 @@ node* demo_build_tree_from_array(int* array_of_values, int size_of_array) {
 //		root = a pointer to the root of the tree
 void demo_delete_node_input(node* root) {
 	// reset is_done to anything other than 'e' or 'E'
-	char is_done;
+	string is_done;
 
 	// the variable for the value to be deleted.
 	int value;
 
+
+	// store the node to be deleted
 	node* node_to_del;
 
-	while(is_done != 'e' && is_done != 'E') {
-		cout << "Enter a value to delete. enter -1 to exit: \n";
-		cin >> value;
+	// used for conversion between string and int
+	stringstream ss;
+
+	cout << "Enter a value to delete. enter -1 to exit: Enter Non Int to exit \n";
+	cin >> is_done;
+
+	while(is_integer(is_done)) {
+		// convert the input string into an int
+		ss << is_done;
+
+		ss >> value;
+
 		if(value != -1) {
 			node_to_del = binary_search(root, value);
 			if(node_to_del != NULL) {
@@ -165,12 +187,13 @@ void demo_delete_node_input(node* root) {
 				cout << "value not in the tree.\n";
 			}
 
-		}
-
-		cout << "Enter 'e' or 'E' to exit. Press anything else to continue: " << endl;
+		}	
+	
+		cout << "Enter a value to delete. enter -1 to exit: Enter Non Int to exit \n";
 		cin >> is_done;
 	}
 }
+
 
 // builds a tree from input values given by the user
 // @return:
@@ -183,22 +206,80 @@ node* demo_build_tree_input() {
 	int value;
 
 	// a char variable for exiting from the loop
-	char is_done;
+	string is_done;
 
-	while(is_done != 'e' && is_done != 'E') {
-		cout << "Enter a value: ";
-		cin >> value;
-		cout << endl;
+
+	cout << "Enter a value to insert. enter -1 to exit: Enter Non Int to exit \n";
+	cin >> is_done;
+
+	while(is_integer(is_done)) {
+		// convert the string into an int
+		value = stoi(is_done);
+
 		insert(root, value);
 
-		// display the tree after inserting a value
-		display_tree(root);	
-
-		cout << "Enter 'e' or 'E' to exit. Press anything else to continue: " << endl;
+		cout << "Enter a value to delete. enter -1 to exit: Enter Non Int to exit \n";
 		cin >> is_done;
 	}
 
 	return root;
+}
+
+
+// build a tree from a randomly generated integers. The tree will have num_of_nodes
+//		number of elements
+// @parameters
+//		num_of_nodes = the number of nodes we want the tree to have
+// @return:
+//		root = a pointer to the root node of the newly built tree
+node* demo_build_tree_random(int num_of_nodes) {
+	// a pointer holding the root of the tree
+	node* root = NULL;
+
+	// initialize random seed
+	srand(time(NULL));
+	
+	// value to add
+	int value; 
+
+	bool is_binary = true;
+
+	for(int i = 0; i < num_of_nodes; i++) {
+		value = rand() % (num_of_nodes);
+
+		// if the random number has already been generated and inserted into the tree,
+		//		try again
+		while(!insert(root, value)) {
+			// if(!is_binary_tree(root)) {
+			// 	is_binary = false;
+			// 	//cout << "Not a binary tree" << endl;
+			// 	//cout << "value = " << value << endl;
+			// 	display_tree(root);
+			// 	break;
+			// }
+			value = rand() % num_of_nodes;
+		}		
+	}
+
+	return root;
+
+}
+
+
+// a helper function to determine if a given string is an integer
+// @parameter:
+//		str = a string to check
+// @return
+//		true = if the string is an int (e.g. "31232")
+//		false = otherwise (e.g. "3kd20")
+bool is_integer(string str) {
+	for(int i = 0; i < str.length(); i++) {
+		if(isdigit(str[i]) == false) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // determine if the given tree with the given root node is binary. (left child is
@@ -246,6 +327,7 @@ bool is_binary_tree(node* root) {
 			if(nodes_on_level.front()->left_child != NULL) {
 				// if the left child is not less than the node, return false
 				if(nodes_on_level.front()->left_child->value >= nodes_on_level.front()->value) {
+					cout << nodes_on_level.front()->value << "has a wrong left child" << endl;
 					return false;
 				}
 				// else, keep checking
@@ -256,11 +338,37 @@ bool is_binary_tree(node* root) {
 			if(nodes_on_level.front()->right_child != NULL) {
 				// if the right child is not greateer than the node, return false
 				if(nodes_on_level.front()->right_child->value <= nodes_on_level.front()->value) {
+					cout << nodes_on_level.front()->value << "has a wrong right child" << endl;
 					return false;
 				}
 				// else, keep searching the tree
 				else {
 					nodes_on_level.push(nodes_on_level.front()->right_child);
+				}
+			}
+
+			// Additional check, in case recoloring is not done properly, or parent
+			//		attribute is not reset properly
+			// do the same test as above, but this time starting with the child node.
+			//		that is, make sure that the parent has a larger value than the node
+			//		if the node is a left child, and a lower value if the node is a 
+			//		right child
+			if(nodes_on_level.front()->parent != NULL) {
+				// the node is a right child. it must have a value greater than the value
+				//	of its parent
+				if(nodes_on_level.front()->which_child == RIGHT) {
+					if(nodes_on_level.front()->value <= nodes_on_level.front()->parent->value) {
+						cout << nodes_on_level.front()->value << "has a wrong parent" << endl;
+						// not a binary tree
+						return false;
+					}
+				}
+				else {
+					if(nodes_on_level.front()->value >= nodes_on_level.front()->parent->value) {
+						cout << nodes_on_level.front()->value << "has a wrong parent" << endl;
+						// not a binary tree
+						return false;
+					}
 				}
 			}
 
@@ -286,12 +394,21 @@ bool is_binary_tree(node* root) {
 //		true = if the tree is Red-Black
 //		false = otherwise
 bool is_red_black_tree(node* root) {
-	int tot_bl_nodes_on_leftmost_path = is_red_black_tree_helper2(root); 
+	// first, check if the tree is a binary tree. If not, return
+	if(is_binary_tree(root)) {
+		int tot_bl_nodes_on_leftmost_path = is_red_black_tree_helper2(root); 
 
-	// At the beginning, the running total is 0
-	return is_red_black_tree_helper1(root, 0, tot_bl_nodes_on_leftmost_path);
+		// At the beginning, the running total is 0
+		return is_red_black_tree_helper1(root, 0, tot_bl_nodes_on_leftmost_path);	
+	} else {
+		// not a binary tree, so cannot be a red black tree.
+		return false;
+	}
+	
 }
 
+// Recursive implementation of checking whether a given tree (with the given root) is
+//		Red-Black
 // Things to test:
 // 1. Check  property 4 (all paths from any node to its NILL descendants contain the same
 //		number of black nodes) 
@@ -315,30 +432,35 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 	// stores the return values of the leaf nodes in each path. Do not continue 
 	//		recursion if its value becomes false
 	bool passed_the_test = true;
+	
+	// base case. If the node is NIL node, compare it to the second argument
+	if(root == NULL) {
 
-	// base case. If the node is leaf, compare it to the second argument
-	if(root->left_child == NULL && root->right_child == NULL) {
-		if(root->color == BLACK) {
-			running_total++;
-		}
-
-		// !!!
+		// if the running total (the # of black nodes on the path to this node) is
+		//		the same as the one for the left-most node, return true 
 		if(running_total == tot_bl_nodes_on_leftmost_path) {
-			cout << "value = " << root->value << endl;
-			cout << "correct: " << running_total << endl;
-			cout << "-------------------------------------------------------" << endl;
+			// cout << "correct: " << running_total << endl;
+			// cout << "-------------------------------------------------------" << endl;
 			return true;
 		}
 		else {
-			cout << "value = " << root->value << endl;
-			cout << "Should be: " << tot_bl_nodes_on_leftmost_path << endl;
-			cout << "Is: " << running_total << endl;
+			// cout << "Should be: " << tot_bl_nodes_on_leftmost_path << endl;
+			// cout << "Is: " << running_total << endl;
+
 			cout << "-------------------------------------------------------" << endl;
 			return false;
 		}
 	}
 	// not a base case, continue doing a depth first traversal
 	else {
+		// increment the running total of the black nodes on the path if the current 
+		//		node (root) is BLACK
+		if(root->color == BLACK) {
+			running_total++;
+		}
+
+
+
 		///////////////////////////////////////////////////////////////////////////////
 		// check property 3 before recursing
 		// if the current node is RED
@@ -346,6 +468,8 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 			// if any of its children are RED, set passed_the_test to false
 			if(root->left_child != NULL) {
 				if(root->left_child->color == RED) {
+					// cout << "Red node has a red child" << endl;
+					// cout << root->value << " and " << root->left_child->value << endl;
 					passed_the_test = false;
 				}
 			}
@@ -353,23 +477,40 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 			// if the previous test is not passed, skip the right child
 			if(root->right_child != NULL && passed_the_test) {
 				if(root->right_child->color == RED) {
+					// cout << "Red node has a red child" << endl;
+					// cout << root->value << " and " << root->right_child->value << endl;
 					passed_the_test = false;
 				}
 			}
 		} 
 
+		// check property 3, this time, starting from the child, and going to the parent
+		if(root->color == RED) {
+			// if the node has a parent, then check if it is RED. If it is, then set
+			//		passed_the_test to false
+			if(root->parent != NULL) {
+				if(root->parent->color == RED) {
+					passed_the_test = false;
+				}
+			}
+		}
+
+
 		///////////////////////////////////////////////////////////////////////////////
 		// Recurse to check property 4
 		// go to the left child (if passed_the_test from property 3 is true)
 		if(passed_the_test) {
-			passed_the_test = is_red_black_tree(root->left_child, tot_bl_nodes_on_leftmost_path);
+			// cout << "recursing left of " << root->value << endl;
+			passed_the_test = is_red_black_tree_helper1(root->left_child, running_total, tot_bl_nodes_on_leftmost_path);
 		}
 
 		// go to the right child (if passed_the_test from the left recursion is true
 		if (passed_the_test) {
-			passed_the_test = is_red_black_tree(root->right_child, tot_bl_nodes_on_leftmost_path);
+			// cout << "recursing right of " << root->value << endl;
+			passed_the_test = is_red_black_tree_helper1(root->right_child, running_total, tot_bl_nodes_on_leftmost_path);
 		}	
 	}
+
 
 	return passed_the_test;
 
@@ -405,7 +546,10 @@ int is_red_black_tree_helper2(node* root) {
 //			to allow us to set it in case root is NULL (the there is empty) and the
 //			value is the first node in the tree
 //		value = the value of the node to be isnerted
-void insert(node*& root, int value) {
+// @return
+//		true = if the new node was successfully inserted
+//		false = if it was not (a node with the same value is already in the tree)
+bool insert(node*& root, int value) {
 	// Case 1: Tree is empty. Create a new Black node as the root
 	if(root == NULL) {
 		root = new node;
@@ -416,6 +560,8 @@ void insert(node*& root, int value) {
 
 		root->color = BLACK;
 		root->is_double_black = false;
+
+		return true;
 	} 
 	// Case 2: Tree is not empty. Create a new Red node
 	else {
@@ -463,12 +609,9 @@ void insert(node*& root, int value) {
 			}
 			// found the node, no need to insert it (because no duplicates are allowed)
 			else {
-				cout << "Node is already in the tree. No duplicates are allowed." << endl;
 				found = true;
 			}
 		}
-
-		cout << found << endl;
 
 		// Case 2: Tree is not empty. Create a new Red node
 		// a node with the given value is not found, so insert as a child to the 
@@ -486,6 +629,11 @@ void insert(node*& root, int value) {
 			// Case 4 is taken care of insert_helper function
 			insert_helper(root, new_node);
 		}
+
+		// return the negation of found.
+		//	if not found, it means the value was inserted
+		//	if found, then it was not inserted.
+		return !found;
 
 	}
 }
@@ -631,6 +779,7 @@ void RL_rotation(node*& root, node* new_node) {
 	// step 2
 	parent_node->left_child = new_node->right_child;
 
+
 	// step 3
 	parent_parent_node->right_child = new_node;
 
@@ -647,8 +796,9 @@ void RL_rotation(node*& root, node* new_node) {
 	// step 6
 	if(parent_node->left_child != NULL) {
 		parent_node->left_child->parent = parent_node;
-		// reset which_child of parent_node->left_child
-		parent_node->left_child->which_child = RIGHT;
+	
+		// reset which child of parent_node->left_child child to LEFT
+		parent_node->left_child->which_child = LEFT;
 	}
 
 	// call LL_rotation
