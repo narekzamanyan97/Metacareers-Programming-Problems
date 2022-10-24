@@ -52,6 +52,9 @@ void generate_matrix(int** matrix, int N) {
 	for(int row = 0; row < N; row++) {
 		for(int col = 0; col < N; col++) {
 			matrix[row][col] = rand() % 100;
+			while(matrix[row][col] < 10) {
+				matrix[row][col] = rand() % 100;
+			}
 		}
 	}
 }
