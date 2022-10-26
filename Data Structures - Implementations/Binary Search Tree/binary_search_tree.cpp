@@ -9,7 +9,6 @@ using namespace std;
 #define PREDECESSOR false
 
 // Implementation of Binary Search Tree (BST), insertion, deletion, display,
-// !!! Implement is_binary_tree
 // Also includes Binary Search
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +27,7 @@ struct bst_node {
 	int value;
 };
 
+
 void display_tree(bst_node* root);
 
 
@@ -39,6 +39,7 @@ bst_node* find_inorder(bst_node* root, int value, bool successor_or_predecessor)
 
 
 bst_node* binary_search(bst_node* root, int value);
+
 
 int main() {
 	int value;
@@ -406,4 +407,109 @@ bst_node* binary_search(bst_node* root, int value) {
 			return root;
 		}
 	}
+}
+
+
+// determine if the given tree with the given root node is binary. (left child is
+//		less than the parent, and right child is greater than the parent, for every node)
+// Note: It is assumed that duplicates are not allowed.
+// @parameters:
+//		root = a pointer to the root node of the tree.
+// @return
+//		true = if the tree is binary (left child of any node is either NULL or < node)
+//		false = if the tree is not binary
+bool is_binary_tree(node* root) { 
+	// stores the nodes of a tree in a breadth-first traversal. Updated throughout the
+	//		inner while loop
+	queue<node*> nodes_on_level;
+	
+	// stores the number of nodes on a given level.
+	int num_of_nodes_on_level;
+
+	if(root != NULL) {
+		// push the node on the zeroth level (root) into the queue
+		nodes_on_level.push(root);
+		num_of_nodes_on_level = 1;
+	} else {
+		//Tree is empty, so return true
+		return true;
+	}
+
+
+	// go through every node of each level (breadth-first).
+	//	If, for any of them, 
+	//		node->value <= node->left_child->value
+	//				or
+	//		node->value >= node->right_child->value
+	//	then return false
+
+		// at the beginning of the loop, the queue (nodes_on_level) contains all the nodes
+	//		on the current level
+	while(nodes_on_level.size() > 0) {
+		// traverse the nodes of the current level
+		while(num_of_nodes_on_level > 0) {
+			// display the node
+
+			// push the children of the given node into the queue. After push, the queue
+			//		has a mix of nodes from the current and next levels.
+			if(nodes_on_level.front()->left_child != NULL) {
+				// if the left child is not less than the node, return false
+				if(nodes_on_level.front()->left_child->value >= nodes_on_level.front()->value) {
+					cout << nodes_on_level.front()->value << "has a wrong left child" << endl;
+					return false;
+				}
+				// else, keep checking
+				else {
+					nodes_on_level.push(nodes_on_level.front()->left_child);
+				}
+			}			
+			if(nodes_on_level.front()->right_child != NULL) {
+				// if the right child is not greateer than the node, return false
+				if(nodes_on_level.front()->right_child->value <= nodes_on_level.front()->value) {
+					cout << nodes_on_level.front()->value << "has a wrong right child" << endl;
+					return false;
+				}
+				// else, keep searching the tree
+				else {
+					nodes_on_level.push(nodes_on_level.front()->right_child);
+				}
+			}
+
+			// Additional check, in case recoloring is not done properly, or parent
+			//		attribute is not reset properly
+			// do the same test as above, but this time starting with the child node.
+			//		that is, make sure that the parent has a larger value than the node
+			//		if the node is a left child, and a lower value if the node is a 
+			//		right child
+			if(nodes_on_level.front()->parent != NULL) {
+				// the node is a right child. it must have a value greater than the value
+				//	of its parent
+				if(nodes_on_level.front()->which_child == RIGHT) {
+					if(nodes_on_level.front()->value <= nodes_on_level.front()->parent->value) {
+						cout << nodes_on_level.front()->value << "has a wrong parent" << endl;
+						// not a binary tree
+						return false;
+					}
+				}
+				else {
+					if(nodes_on_level.front()->value >= nodes_on_level.front()->parent->value) {
+						cout << nodes_on_level.front()->value << "has a wrong parent" << endl;
+						// not a binary tree
+						return false;
+					}
+				}
+			}
+
+			// remove from the queue and decrement num_of_nodes_on_level
+			nodes_on_level.pop();
+			num_of_nodes_on_level--;
+		}
+
+		// reset the number of nodes on the current level for the next iterations of the
+		//		inner while loop
+		num_of_nodes_on_level = nodes_on_level.size();
+	}
+
+	// if we get to this point, then the tree is binary
+	return true;
 }
