@@ -25,7 +25,7 @@ int main() {
 
 	int size = tree.to_array(flattened_tree);
 
-	demo_delete_node_random(tree, flattened_tree, 220, 205);
+	demo_delete_node_random(tree, flattened_tree, 220, 220);
 
 	// int values_to_delete[207] = {42, 399, 149, 303, 153, 257, 427, 99, 70, 446, 352, 245, 143, 116, 156, 4, 434, 473, 24, 301, 387, 43, 240, 194, 497, 431, 346, 411, 351, 252, 368, 302, 192, 390, 354, 287, 450, 383, 74, 189, 289, 126, 330, 163, 87, 115, 454, 459, 55, 471, 2, 316, 397, 280, 146, 52, 495, 376, 97, 488, 466, 342, 310, 360, 361, 145, 89, 417, 36, 170, 409, 6, 242, 362, 100, 258, 254, 44, 159, 314, 319, 17, 285, 300, 88, 57, 140, 373, 26, 475, 498, 231, 200, 128, 441, 133, 371, 455, 268, 401, 267, 113, 138, 134, 398, 353, 462, 331, 272, 127, 19, 262, 211, 305, 234, 109, 335, 20, 467, 141, 137, 47, 29, 199, 238, 403, 312, 317, 135, 35, 381, 295, 413, 255, 288, 439, 83, 355, 183, 132, 469, 491, 483, 266, 440, 16, 198, 412, 392, 375, 180, 185, 377, 188, 325, 274, 499, 10, 477, 470, 158, 50, 394, 14, 264, 480, 391, 68, 422, 222, 418, 228, 201, 349, 367, 478, 445, 400, 136, 79, 324, 457, 142, 157, 456, 7, 250, 419, 378, 315, 246, 484, 444, 313, 276, 437, 31, 63, 322, 235, 225, 464, 476, 177, 179, 277, 438};
 	// demo_delete_node_random(tree, 230, 205);
@@ -37,7 +37,6 @@ int main() {
 	}
 	else {
 		cout << "Not a red black tree." << endl;
-
 	}
 
 	delete[] flattened_tree;
@@ -73,7 +72,7 @@ void demo_delete_node_array(RedBlackTree& tree, int* vals_to_del, int size_of_ar
 		}
 	}
 	
-	tree.display_tree();				
+	// tree.display_tree();				
 }
 
 // randomly delete num_of_nodes number of nodes from the given tree. Deletes nodes in 
@@ -96,7 +95,8 @@ void demo_delete_node_random(RedBlackTree& tree, int* array_of_values, int size_
 		num_of_nodes_to_del = size_of_array - 10;
 	}
 
-	for(int i = 0; i < num_of_nodes_to_del; i++) {
+	// delete given number of nodes
+	for(int i = size_of_array - 1; i >= size_of_array - num_of_nodes_to_del; i--) {
 		// if there are no more nodes in the tree (tree is empty), break from the loop
 		//		and exit the function
 		if(tree.is_empty()) {
@@ -112,8 +112,6 @@ void demo_delete_node_random(RedBlackTree& tree, int* array_of_values, int size_
 			tree.delete_node(node_to_del);
 		}
 	}
-	cout << "after deletion (the end of demo_delete_node_random)" << endl;
-	tree.display_tree();
 }
 
 // deletes user-input values from a tree
