@@ -38,7 +38,6 @@ int main() {
 	zero_matrix(matrix, rows, columns);
 	cout << "**********************************************" << endl;
 	display_matrix(matrix, rows, columns);
-
 }
 
 
