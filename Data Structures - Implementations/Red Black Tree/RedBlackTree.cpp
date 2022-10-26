@@ -93,9 +93,7 @@ RedBlackTree::~RedBlackTree() {
 
 			// before deleting the node
 			// push the children of the given node into the queue. After push, the queue
-			//		has a mix of nodes from the current and next levels. num_of_nodes_on_level
-			//		helps us stop the printing on the right node and start the iteration
-			//		of the outer loop for the next level
+			//		has a mix of nodes from the current and next levels.
 			if(nodes_on_level.front()->left_child != NULL) {
 				nodes_on_level.push(nodes_on_level.front()->left_child);
 			}			
@@ -107,9 +105,6 @@ RedBlackTree::~RedBlackTree() {
 			delete nodes_on_level.front();
 			nodes_on_level.front() = NULL;
 
-			cout << "just deleted " << nodes_on_level.front()->value << endl;
-
-
 			// remove from the queue and decrement num_of_nodes_on_level
 			nodes_on_level.pop();
 			num_of_nodes_on_level--;
@@ -120,7 +115,6 @@ RedBlackTree::~RedBlackTree() {
 		num_of_nodes_on_level = nodes_on_level.size();
 	}
 
-	this->display_tree();
 }
 
 // return true if the tree is empty. False otherwise.

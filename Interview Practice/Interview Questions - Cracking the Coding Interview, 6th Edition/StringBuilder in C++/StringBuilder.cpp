@@ -514,11 +514,6 @@ int StringBuilder::indexOf(string str) {
 	// index for the given string str
 	int str_index = 0;
 
-	// // keep track of the first index after which the given string starts to match
-	// //		This is the index to be returned if the entire str matches with a sequence
-	// //		in the char array 
-	// int first_instance_index = -1; 
-
 	// keep track of the number of char matches. if it is equal to the size of the string,
 	// 		then we have a match
 	int num_of_matches = 0;
