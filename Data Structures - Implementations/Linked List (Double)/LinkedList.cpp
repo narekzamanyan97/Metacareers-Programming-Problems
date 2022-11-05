@@ -76,14 +76,11 @@ LinkedList::LinkedList(int seed, int num_of_nodes, int max_value) {
 		// generate the random value
 		value = rand() % (max_value + 1);
 
-		cout << value << ", ";
 		// push the value at the end of the linked list
 		this->add_last(value);
 
 
 	}
-
-	cout << endl;
 
 	// set the number_of_nodes to size
 	this->number_of_nodes = num_of_nodes;
@@ -95,6 +92,73 @@ LinkedList::LinkedList(int seed, int num_of_nodes, int max_value) {
 LinkedList::~LinkedList() {
 	// call the clear function
 	this->clear();
+}
+
+// return a pointer to the first node (as an iterator)
+Node* LinkedList::begin() {
+	return this->head;
+}
+
+// return a pointer to the last node (as an iterator)
+Node* LinkedList::end() {
+	return this->tail;
+}
+
+// remove the given node pointer (iterator) from the list
+// @parameter:
+//		pointer = a pointer to the node that needs to be deleted
+// @return:
+//		return an pointer (iterator) to the next node
+Node* LinkedList::remove(Node* pointer) {
+	// reset the next and previous pointers around the given pointer
+	if(pointer->previous != NULL) {
+		pointer->previous->next = pointer->next;
+	}
+
+	if(pointer->next != NULL) {
+		pointer->next->previous = pointer->previous;
+	}
+
+	// next pointer to return
+	Node* next_pointer = pointer->next;
+
+	// if the pointer is the head, set head to NULL
+	if(pointer == this->head) {
+		this->head = NULL;
+	}
+
+	// if the pointer is the tail, set tail to NULL
+	if(pointer == this->tail) {
+		this->tail = NULL;
+	}
+
+	// delete the given pointer
+	delete pointer;
+
+	return next_pointer;
+}
+
+// set the given node's value. The given node is a pointer to that node (as an
+//		iterator) so that we don't need to traverse the list. Time complexity
+//		is O(1)
+// @parameter:
+//		pointer = a pointer to the node that needs to be deleted
+//		value = the value to set the given node to
+// @return:
+//		a node object with the set value, its next and previous links set to null
+Node set(Node* pointer, int value) {
+	// set the value of the node
+	pointer->value = value;
+
+	// declare a new node to return
+	Node new_node = *pointer;
+
+	// reset the links of the node to make it impossible to change the list
+	//		outside of this function
+	new_node.next = NULL;
+	new_node.previous = NULL;
+
+	return new_node;
 }
 
 // determine if the linked list is empty
@@ -425,7 +489,6 @@ void LinkedList::clear() {
 	// delete all the node pointers in the list, because they have been allocated 
 	//		dynamically
 	while(node_to_remove != NULL) {
-		cout << node_to_remove->value << ", ";		
 		next_node = node_to_remove->next;
 
 		// delete the node
@@ -537,12 +600,7 @@ bool LinkedList::contains(int value) {
 
 // retrieve (do not remove) the first element in the list
 Node LinkedList::peek_first() {
-	if(this->head != NULL) {
-		return *(this->head);
-	}
-	else {
-		return NULL;
-	}
+	return *(this->head);
 }
 
 // retrieve (do not remove) the last element in the list
@@ -630,8 +688,15 @@ Node LinkedList::set(int value, int position) {
 		// set the value of the node at the given position
 		node_to_set->value = value;
 
-		// return the node
-		return *node_to_set;
+		// declare a new node to return
+		Node new_node = *node_to_set;
+
+		// reset the links of the node to make it impossible to change the list
+		//		outside of this function
+		new_node.next = NULL;
+		new_node.previous = NULL;
+
+		return new_node;
 	}
 }
 

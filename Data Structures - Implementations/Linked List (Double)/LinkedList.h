@@ -36,6 +36,17 @@ public:
 	// destructor
 	~LinkedList();
 
+	// return a pointer to the first node (as an iterator)
+	Node* begin();
+
+	// return a pointer to the last node (as an iterator)
+	Node* end();
+
+	// remove the given node pointer (iterator) from the list
+	Node* remove(Node* pointer);
+
+	// set the given node's value
+	Node set(Node* pointer, int value);
 
 	// determine if the linked list is empty
 	bool is_empty();

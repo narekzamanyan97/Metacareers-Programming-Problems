@@ -149,27 +149,39 @@ int main() {
 
 			case 14:
 				cout << "Peeking at first node: " << endl;
-				node = linked_list.peek_first();
-
-				cout << "value = " << node.value << endl;
-				if(node.next != NULL) {
-					cout << "next = " << node.next->value << endl;
+				// check if the list is not empty before calling peek_first()
+				if(!linked_list.is_empty()) {
+					node = linked_list.peek_first();
+					cout << "value = " << node.value << endl;
+					if(node.next != NULL) {
+						cout << "next = " << node.next->value << endl;
+					}
+					else {
+						cout << "next node is NULL " << endl;
+					}
 				}
 				else {
-					cout << "next node is NULL " << endl;
+						cout << "List is empty " << endl;
 				}
+
+
 				break;
 
 			case 15:
 				cout << "Peeking at last node: " << endl;
-				node = linked_list.peek_last();
-
-				cout << "value = " << node.value << endl;
-				if(node.previous != NULL) {
-					cout << "previous = " << node.previous->value << endl;
+				// check if the list is not empty before calling peek_first()
+				if(!linked_list.is_empty()) {
+					node = linked_list.peek_last();
+					cout << "value = " << node.value << endl;
+					if(node.previous != NULL) {
+						cout << "next = " << node.next->value << endl;
+					}
+					else {
+						cout << "next node is NULL " << endl;
+					}
 				}
 				else {
-					cout << "previous node is NULL " << endl;
+						cout << "List is empty " << endl;
 				}
 				break;
 
