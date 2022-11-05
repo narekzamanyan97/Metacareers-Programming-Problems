@@ -36,20 +36,16 @@ bool isRotation(string str_1, string str_2) {
 		return false;
 	}
 	else {
-		// reverse str_2
-		string str_2_reversed = "";
+		// find the splitting point
+		ffiiiffffi
+		ffffi ffiii
 
-		// iterate over the chars of str_2 from the back and append it to str_2_reversed
-		//		from the front
-		for(int i = str_2.size() - 1; i >= 0; i--) {
-			str_2_reversed += str_2[i];
-		}
+		waterb aatlewaterbottle
+		attlewaterbottle waterb
 
-		cout << str_2_reversed << endl;
+		waterbaa tlewaterbottle
+		attlewaterbot tlewaterb
 
-		// call isSubstring() with str_1 and the reversed str_2. Return the value it 
-		//		returns
-		return isSubstring(str_1, str_2_reversed);
 	}
 }
 
