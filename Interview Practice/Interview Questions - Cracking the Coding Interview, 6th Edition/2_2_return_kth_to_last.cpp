@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../../Data Structures - Implementations/Linked List (Double)/LinkedList.cpp"
+#include <list>
 using namespace std;
 
 int return_kth_to_last(LinkedList linked_list, int k);
@@ -7,6 +8,8 @@ int return_kth_to_last(LinkedList linked_list, int k);
 int return_kth_to_last_recursively(Node* iterator, int& k, int counter = 0);
 
 pair<int, int> return_kth_to_last_recursively_pair(Node* iterator, int k, int counter = 0);
+
+int return_kth_to_last_two_pointers(Node* iterator_1, int k);
 
 int main() {
 	LinkedList linked_list = LinkedList(99, 22, 50);
@@ -20,8 +23,15 @@ int main() {
 		cin >> k;
 
 		if(k != -1) {
-			std::pair<int, int> kth_to_last = return_kth_to_last_recursively_pair(linked_list.begin(), k);
-			cout << kth_to_last.first << ", " << kth_to_last.second << endl;					
+			// approach 1
+			// int kth_to_last = return_kth_to_last_recursively(linked_list.begin(), k);
+			// approach 2
+			// int kth_to_last = return_kth_to_last_recursively(linked_list.begin(), k);
+			// approach 3
+			// std::pair<int, int> kth_to_last = return_kth_to_last_recursively_pair(linked_list.begin(), k);
+			// approach 4
+			int kth_to_last = return_kth_to_last_two_pointers(linked_list.begin(), k);
+			cout << kth_to_last << endl;					
 		}
 
 	} while (k != -1);
@@ -192,7 +202,56 @@ pair<int, int> return_kth_to_last_recursively_pair(Node* iterator, int k, int co
 	}
 	// the list is empty
 	else {
-		throw std::out_of_range("The linked list is empty.");
+		throw std::length_error("The linked list is empty.");
+	}
+}
+
+// return kth to last by using two pointers to loop through the list. When the first
+//		loop gets the the last node, the second one will be the kth to last. 
+// i.e. the distance between the two pointers is k
+// @parameters:
+// 		iterator = a pointer to a node of the list. we start from the beginning (haed) of
+//			the list
+//		k = the index starting from the end of the list. 0 <= k < size of the list
+// @return:
+//		the value of the kth to last node
+int return_kth_to_last_two_pointers(Node* iterator_1, int k) {
+	if(iterator_1 == NULL) {
+		throw std::length_error("The linked list is empty.");
+	}
+	else if(k < 0) {	
+			throw std::out_of_range("k cannot be negative.");
+	}
+	else {
+		// instantiate the second iterator to be the first one for the beginning 
+		Node* iterator_2 = iterator_1;
+
+		// when counter reaches to k, start moving the second iterator
+		int counter = 0;
+
+		// loop through the list
+		// only increment the first iterator until counter == k or the next node is NULL
+		while(iterator_1->next != NULL) {
+			// not the time to increment the second iterator yet
+			if(counter < k) {
+				// increment the counter and iterator
+				counter++;
+				iterator_1 = iterator_1->next;				
+			}
+			// increment both iterators. leave counter as it is
+			else {
+				iterator_1 = iterator_1->next;
+				iterator_2 = iterator_2->next;
+			}
+		}	
+
+		// if counter is still < k, then k was too large
+		if(counter < k) {
+			throw std::out_of_range("k is larger than the size of the list.");
+		}
+		else {
+			return iterator_2->value;
+		}
 	}
 }
 // Hints: 67, 126
