@@ -53,6 +53,8 @@ bool isRotation(string str_1, string str_2) {
 		//		str_2 = indeedthisisaveryveryloooongstring
 		//		str_1 = indeedthisisaveryveryloooongstring
 		//		str_2 = veryloooongstringindeedthisisavery
+		//		str_2 = untilthecharsstartmatchingwiththeendingsubstringofstr_1
+		//		str_2 = withtheendingsubstringofstr_1untilthecharsstartmatching
 		// iterate over both strings from the end
 		int str_1_index = str_1.size() - 1;
 		int str_2_index = str_1_index;
