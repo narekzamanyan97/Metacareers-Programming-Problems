@@ -9,18 +9,25 @@ int main() {
 	string str_1;
 	string str_2;
 
-	cout << "Enter the first string: " << endl;
-	getline(cin, str_1);
+	do {
 
-	cout << "Enter the second string: " << endl;
-	getline(cin, str_2);
 
-	if(isRotation(str_1, str_2)) {
-		cout << "Yes" << endl;
-	}
-	else {
-		cout << "No" << endl;
-	}
+		cout << "Enter the first string: " << endl;
+		getline(cin, str_1);
+
+		if(str_1 != "-1" ) {
+			cout << "Enter the second string: " << endl;
+			getline(cin, str_2);
+
+			if(isRotation(str_1, str_2)) {
+				cout << "Yes" << endl;
+			}
+			else {
+				cout << "No" << endl;
+			}			
+		}
+
+	} while (str_1 != "-1");
 	return 0;
 }
 
@@ -36,20 +43,51 @@ bool isRotation(string str_1, string str_2) {
 		return false;
 	}
 	else {
-		// reverse str_2
-		string str_2_reversed = "";
+		// assume str_1 is the original string, and str_2 is the rotation of str_1
+		// e.g. 
+		//  	str_1 = yaysuchawonderfulday
+		//		str_2 = fuldayyaysuchawonder
+		//  	str_1 = olacomoestasestoybien
+		//		str_2 = moestasestoybienolaco
+		//  	str_1 = thisisaveryveryloooongstringindeed
+		//		str_2 = indeedthisisaveryveryloooongstring
+		//		str_1 = indeedthisisaveryveryloooongstring
+		//		str_2 = veryloooongstringindeedthisisavery
+		//		str_2 = untilthecharsstartmatchingwiththeendingsubstringofstr_1
+		//		str_2 = withtheendingsubstringofstr_1untilthecharsstartmatching
+		// iterate over both strings from the end
+		int str_1_index = str_1.size() - 1;
+		int str_2_index = str_1_index;
 
-		// iterate over the chars of str_2 from the back and append it to str_2_reversed
-		//		from the front
-		for(int i = str_2.size() - 1; i >= 0; i--) {
-			str_2_reversed += str_2[i];
+
+		// loop through str_2 until the chars start matching with the ending
+		// 		substring of str_1
+		while(str_2_index > -1) {
+			// if there is a match, decrement both indices
+			if(str_1[str_1_index] == str_2[str_2_index]) {
+				str_1_index--;
+				str_2_index--;
+			}
+			else {
+				if(str_1_index < str_1.size() - 1) {
+					str_1_index = str_1.size() - 1;
+				}
+				else {
+					str_2_index--;
+				}
+			}
 		}
 
-		cout << str_2_reversed << endl;
+		// after the loop above, str_1_index is the split point, or the
+		//		last char of the first half
+		string first_half_of_str_1 = str_1.substr(0, str_1_index + 1);
 
-		// call isSubstring() with str_1 and the reversed str_2. Return the value it 
-		//		returns
-		return isSubstring(str_1, str_2_reversed);
+		if(isSubstring(str_2, first_half_of_str_1)) {
+			cout << "Yes, first half is " << first_half_of_str_1 << endl; 
+		}
+		else {
+			cout << "Nope." << endl;
+		}
 	}
 }
 
