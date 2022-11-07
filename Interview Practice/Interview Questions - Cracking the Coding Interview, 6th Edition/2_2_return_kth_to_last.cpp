@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../../Data Structures - Implementations/Linked List (Double)/LinkedList.cpp"
-#include <list>
 using namespace std;
 
 int return_kth_to_last(LinkedList linked_list, int k);
