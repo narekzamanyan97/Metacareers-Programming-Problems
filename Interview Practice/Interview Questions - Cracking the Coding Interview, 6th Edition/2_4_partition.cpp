@@ -5,7 +5,7 @@ using namespace std;
 void partition_doubly_linked(LinkedList& linked_list, int value);
 
 int main() {
-	LinkedList linked_list = LinkedList(5, 30, 120);
+	LinkedList linked_list = LinkedList(44, 30, 120);
 
 	int value;
 
@@ -57,34 +57,29 @@ void partition_doubly_linked(LinkedList& linked_list, int value) {
 			// temp_value = left_it->value;
 			// left_it->value = right_it->value;
 			// right_it->value = temp_value;
+			// move the iterators
+			// left_it = left_it->next;
+			// prevent infinite loop
+			// if(left_it != right_it) {
+			// 	right_it = right_it->previous;
+			// }
 			// ////////////////////////////////////////////////////////////
 			// 					swap nodes
-			temp_next_of_left = left_it->next;
-			temp_prev_of_left = left_it->previous;
-
-			if(left_it->next != NULL) {
-				left_it->next->previous = right_it;
-			}
-			if(left_it->previous != NULL) {
-				left_it->previous->next = right_it;
-			}
-			if(right_it->next != NULL) {
-				right_it->next->previous = left_it;
-			}
-			if(right_it->previous != NULL) {
-				right_it->previous->next = left_it;
-			}
-
-			left_it->next = right_it->next;
-			left_it->previous = right_it->previous;
-
-			right_it->next = temp_next_of_left;
-			right_it->previous = temp_prev_of_left;
-
+			// need this for swapping the iterators
 			temp_left_it = left_it;
+		
+			linked_list.swap_nodes(left_it, right_it);
+
+			// swap the iterators
 			left_it = right_it;
 			right_it = temp_left_it;
-			
+
+			// move the iterators
+			left_it = left_it->next;
+			// prevent infinite loop
+			if(left_it != right_it) {
+				right_it = right_it->previous;
+			}			
 		}
 		// the left node is correctly placed, but the right one is not
 		// 		only move the left node iterator (the correct node iterator)
@@ -102,7 +97,7 @@ void partition_doubly_linked(LinkedList& linked_list, int value) {
 		//		infinite loop
 		else {
 			left_it = left_it->next;
-
+			// prevent infinite loop
 			if(left_it != right_it) {
 				right_it = right_it->previous;
 			}
