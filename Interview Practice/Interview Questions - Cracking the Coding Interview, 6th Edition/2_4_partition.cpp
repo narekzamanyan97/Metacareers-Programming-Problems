@@ -4,8 +4,10 @@ using namespace std;
 
 void partition_doubly_linked(LinkedList& linked_list, int value);
 
+void partition_singly_linked(LinkedList& linked_list, int value);
+
 int main() {
-	LinkedList linked_list = LinkedList(44, 30, 120);
+	LinkedList linked_list = LinkedList(45, 30, 120);
 
 	int value;
 
@@ -17,7 +19,7 @@ int main() {
 		cin >> value;
 
 		if(value != -1) {
-			partition_doubly_linked(linked_list, value);
+			partition_singly_linked(linked_list, value);
 		}
 
 	} while (value != -1);
@@ -103,4 +105,44 @@ void partition_doubly_linked(LinkedList& linked_list, int value) {
 			}
 		}
 	}
+}
+
+// partition in a singly linked list
+// loop through the linked list, and remove any node that is greater
+//		than or equal to the given value. Add the removed node to a
+//		temporary linked list, which we'll then append to the given
+//		linked list
+void partition_singly_linked(LinkedList& linked_list, int value) {
+	// this linked list will hold all the nodes that have a value >= the
+	//		given value
+	LinkedList right_partition;
+
+	// pointer to the first node of the given list
+	Node* iterator = linked_list.begin();
+
+	// iterate over the given list, and delete any node whose value is >=
+	//		the given value. Then, add that node to the new linked list,
+	//		later to be appended to the given lined list
+	while(iterator != NULL) {
+		if(iterator->value >= value) {
+			// add the value of the iterator to the right partition
+			right_partition.add_last(iterator->value);
+
+			// delete the node from the given list
+			// the remove function returns the next node iterator
+			iterator = linked_list.remove(iterator);
+
+		}
+		else {
+			iterator = iterator->next;
+		}
+	}
+	cout << "\nLinked list is: " << endl;
+	linked_list.print();
+	cout << "\nRight partition is: " << endl;
+	right_partition.print();
+
+	// merge the two lists. 
+	linked_list.add_last(right_partition);
+
 }
