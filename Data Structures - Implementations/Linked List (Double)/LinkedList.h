@@ -56,7 +56,7 @@ public:
 
 	// traverse the linked list and return that node object
 	// find a node with the given value
-	Node find(int value);
+	Node* find(int value);
 
 	// print the values in the linked list
 	void print();
@@ -69,6 +69,12 @@ public:
 
 	// append at the front (position = 0, before head)
 	Node add_first(int value);
+
+	// append the given linked list at the end (after the last element)
+	void add_last(LinkedList linked_list);
+
+	// append the given linked list at the front (position = 0, before head)
+	void add_first(LinkedList linked_list);
 
 
 	// remove the first oocurrence a node with the given value
@@ -111,6 +117,9 @@ public:
 
 	// removes all the elements from this list
 	void clear();
+
+	// swaps the given nodes
+	void swap_nodes(Node* left_it, Node* right_it);
 
 };
 

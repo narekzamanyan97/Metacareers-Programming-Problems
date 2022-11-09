@@ -187,7 +187,7 @@ int LinkedList::length() {
 //		value = a value to search for in the 
 // @return:
 //		the node that has the given value, or null, if the value is not in the linked list
-Node LinkedList::find(int value) {
+Node* LinkedList::find(int value) {
 	// a pointer to a node to traverse, starting from the head
 	Node* current_node = this->head;
 
@@ -195,7 +195,7 @@ Node LinkedList::find(int value) {
 	while(current_node != NULL) {
 		// if the current node has the given value, return that node
 		if(current_node->value == value) {
-			return *current_node;
+			return current_node;
 		}
 		// otherwise, go to the next node
 		current_node = current_node->next;
@@ -203,7 +203,7 @@ Node LinkedList::find(int value) {
 
 
 	// return current node, which is NULL if we are here
-	return *current_node;
+	return current_node;
 }
 
 // print the values in the linked list
@@ -388,6 +388,65 @@ Node LinkedList::add_first(int value) {
 	this->number_of_nodes++;
 
 	return *new_node;
+}
+
+
+// append the given linked list at the end (after the last element)
+// @parameters:
+//		linked_list = the linked list to append to this list
+void LinkedList::add_last(LinkedList linked_list) {
+	// iterate through the given linked list and create new nodes for each
+	//		node in that list, and append it to this list one at a time
+	Node* iterator = linked_list.begin();
+
+	while(iterator != NULL) {
+		// create a new node
+		Node* new_node = new Node;
+
+		// set its value to the value of the iterator
+		new_node->value = iterator->value;
+		// set the next to NULL to avoid strange behavior (infinite list)
+		new_node->next = NULL;
+
+		// append it to this linked list
+		if(this->tail != NULL) {
+			this->tail->next = new_node;
+		}
+		new_node->previous = this->tail;
+		this->tail = new_node;
+
+		// move on to the next node
+		iterator = iterator->next;
+	}
+}
+
+// append the given linked list at the front (position = 0, before head)
+// @parameters:
+//		linked_list = the linked list to append to this list
+void LinkedList::add_first(LinkedList linked_list) {
+	// start from the end of the given linked list
+	Node* iterator = linked_list.end();
+
+	while(iterator != NULL) {
+		cout << "adding " << iterator->value << endl;
+		// create a new node
+		Node* new_node = new Node;
+
+		// set its value to the value of the iterator
+		new_node->value = iterator->value;
+		// set the previous to NULL to avoid strange behavior (infinite list)
+		new_node->previous = NULL;
+
+		// append it to this linked list
+		if(this->head != NULL) {
+			this->head->previous = new_node;
+		}
+		new_node->next = this->head;
+		this->head = new_node;
+
+		// move on to the previous node
+		iterator = iterator->previous;
+	}
 }
 
 
@@ -787,6 +846,44 @@ bool LinkedList::remove_occurrence_helper(int value, bool first_or_last) {
 	}
 	// node was not found
 	return false;
+}
+
+// swaps the given nodes
+void LinkedList::swap_nodes(Node* left_it, Node* right_it) {
+	Node* temp_next_of_left = left_it->next;
+	Node* temp_prev_of_left = left_it->previous;
+
+	// adjust the next and previous pointers before swapping
+	if(left_it->next != NULL) {
+		left_it->next->previous = right_it;
+	}
+	if(left_it->previous != NULL) {
+		left_it->previous->next = right_it;
+	}
+	if(right_it->next != NULL) {
+		right_it->next->previous = left_it;
+	}
+	if(right_it->previous != NULL) {
+		right_it->previous->next = left_it;
+	}
+
+	// swap the left and right iterators
+	left_it->next = right_it->next;
+	left_it->previous = right_it->previous;
+
+	right_it->next = temp_next_of_left;
+	right_it->previous = temp_prev_of_left;
+
+	// make sure the head and tail pointers point to the right node, in case
+	//		either the left or the right iterators are the head/tail of the
+	//		list. 
+	if(this->head == left_it) {
+		this->head = right_it;
+	}
+	if(this->tail == right_it) {
+		this->tail = left_it;
+	}
+
 }
 
 #endif

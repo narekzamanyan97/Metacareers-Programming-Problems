@@ -3,8 +3,10 @@
 int main() {
 
 	LinkedList linked_list = LinkedList(2, 22, 25);
+	LinkedList linked_list2 = LinkedList(74, 22, 25);
 
 	Node node;
+	Node* node_ptr;
 
 	int selection;
 	int value;
@@ -33,13 +35,18 @@ int main() {
 		cout << "16 - remove_at_index(index): " << endl;
 		cout << "17 - set(position, value): " << endl;
 		cout << "18 - clear(): " << endl;
+		cout << "19 - add_last(linked_list): " << endl;
+		cout << "20 - add_first(linked_list): " << endl;
 		cout << "-1 - exit: " << endl;
 
 		cin >> selection;
 
 		switch(selection){
 			case 0:
+				cout << "\nlinked_list: ";
 				linked_list.print();
+				cout << "\nlinked_list2: ";
+				linked_list2.print();
 				break;
 			case 1:
 				if(linked_list.is_empty()) {
@@ -59,11 +66,11 @@ int main() {
 				cout << "Enter a value to find: " << endl;
 				cin >> value;
 
-				node = linked_list.find(value);
+				node_ptr = linked_list.find(value);
 
-				cout << "The value found is " << node.value << endl;
-				cout << "prev = " << node.previous->value << endl;
-				cout << "next = " << node.next->value << endl;
+				cout << "The value found is " << node_ptr->value << endl;
+				cout << "prev = " << node_ptr->previous->value << endl;
+				cout << "next = " << node_ptr->next->value << endl;
 
 				break;
 			case 4:
@@ -225,10 +232,25 @@ int main() {
 
 				linked_list.clear();
 				break;
+			case 19:
+				// add linked_list to linked_list2 at the tail
+				linked_list.add_last(linked_list2);
+				cout << "after add_last" << endl;
+
+				linked_list.print();
+				break;
+			case 20:
+				// add linked_list to linked_list2 before the head
+				linked_list.add_first(linked_list2);
+				cout << "after add_first" << endl;
+
+				linked_list.print();
+				break;
 
 			case -1:
 				cout << "Bye!" << endl;
 				break;
+
 		}
 
 	} while(selection != -1);
