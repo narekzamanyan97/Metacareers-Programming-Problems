@@ -10,6 +10,8 @@ LinkedList revert(Node* iterator);
 
 LinkedList sum_digits_reverse(LinkedList linked_list_1, LinkedList linked_list_2);
 
+LinkedList sum_digits_recursive(Node* iterator_1, Node* iterator_2, bool carry = false);
+
 int main() {
 	int seed;
 	LinkedList sum;
@@ -20,7 +22,7 @@ int main() {
 
 		if(seed != -1) {
 			//////////////////////////////////////////////////////////////////
-			//					Testing 1st Function
+			//					Testing sum_digits()
 			// LinkedList linked_list_1 = LinkedList(-1, 8, 9);
 			// LinkedList linked_list_2 = LinkedList(-1, 4, 9);
 
@@ -33,7 +35,20 @@ int main() {
 			// sum.print();	
 			// cout << "hello" << endl;
 			// //////////////////////////////////////////////////////////////////
-			//					Testing 1st Function
+			//					Testing sum_digits_reverse()
+			// LinkedList linked_list_1 = LinkedList(-1, 4, 9);
+			// LinkedList linked_list_2 = LinkedList(-1, 4, 9);
+			// linked_list_1.print();
+			// cout << "+" << endl;
+			// linked_list_2.print();
+			
+			// LinkedList sum = LinkedList();
+			
+			// sum = sum_digits_reverse(linked_list_1, linked_list_2);
+			// cout << "=" << endl;
+			// sum.print();
+			// //////////////////////////////////////////////////////////////////
+			//					Testing sum_digits_recursive()
 			LinkedList linked_list_1 = LinkedList(-1, 4, 9);
 			LinkedList linked_list_2 = LinkedList(-1, 4, 9);
 			linked_list_1.print();
@@ -42,7 +57,7 @@ int main() {
 			
 			LinkedList sum = LinkedList();
 			
-			sum = sum_digits_reverse(linked_list_1, linked_list_2);
+			sum = sum_digits_recursive(linked_list_1.begin(), linked_list_2.begin());
 			cout << "=" << endl;
 			sum.print();
 		}
@@ -54,6 +69,8 @@ int main() {
 //		reverse order. e.g. 264 = 4 --> 6 --> 2
 // @parameters:
 //		linked_list_1/2 = the numbers to add
+// @return:
+//		an linked list object representing the sum 
 LinkedList sum_digits(LinkedList linked_list_1, LinkedList linked_list_2) {
 	// iterators for the linked lists
 	Node* iterator_1 = linked_list_1.begin();
@@ -170,8 +187,98 @@ LinkedList sum_digits(LinkedList linked_list_1, LinkedList linked_list_2) {
 
 // }
 
+// the recursive version of sum_digits. 
+// Note: 912 is represented as 2 --> 1 --> 9
+// Note: 3914 is represented as 4 --> 1 --> 9 --> 3
+// @parameters:
+//		linked_list_1/2 = linked lists representing the numbers to add
+//		carry = a boolean that is used to pass the carry as we recurse to the most
+//			significant digit
+// @return:
+//		linked list representing the sum so far. The last one returned will be
+//			the total sum
+LinkedList sum_digits_recursive(Node* iterator_1, Node* iterator_2, bool carry) {
+	if(iterator_1 != nullptr || iterator_2 != nullptr) {
+		// values for both iterators
+		int value_1 = 0;
+		int value_2 = 0;
 
-// !!! approach: revert both lists by recursion and apply the original solution
+		int digit_sum;
+
+		// if the iterator is not nullptr, reset its corresponding value variable
+		if(iterator_1 != nullptr) {
+			value_1 = iterator_1->value;
+
+			// also, move the iterator for recursion later 
+			iterator_1 = iterator_1->next;
+		}
+		if(iterator_2 != nullptr) {
+			value_2 = iterator_2->value;
+
+			// also, move the iterator for recursion later 
+			iterator_2 = iterator_2->next;
+		}
+
+
+		////////////////////////////////////////////////////////////////////////
+		// 			calculate the sum using the carry
+		// sum the two digits
+		if(carry) {
+			// add extra 1 if there is a carry from the previous call
+			digit_sum = value_1 + value_2 + 1;
+		}
+		else {
+			digit_sum = value_1 + value_2;
+		}
+
+		// set carry to false
+		carry = false;
+
+		// if the digit_sum is > 10, then there is carry. reset digit_sum to
+		//		a single digit by subtracting by 10
+		if(digit_sum >= 10) {
+			digit_sum = digit_sum - 10;
+			// reset carry to true
+			carry = true;
+		}
+
+		LinkedList sum = LinkedList();
+
+
+
+
+		////////////////////////////////////////////////////////////////////////
+		// 			recurse
+		sum = sum_digits_recursive(iterator_1, iterator_2, carry);
+		
+		////////////////////////////////////////////////////////////////////////
+		// 			add to first the calculated digit_sum
+		sum.add_first(digit_sum);
+
+		////////////////////////////////////////////////////////////////////////
+		// 			return the sum
+		return sum;
+
+	}
+	// base case: 
+	// both iterators are nullptr
+	else {
+		// return an empty linked list
+		LinkedList sum = LinkedList();
+
+		// if carry is 1, append 1 to the list before returning
+		if(carry) {
+			sum.add_first(1);
+		}
+		
+		return sum;
+		// throw std::exception("One or both of the linked lists is empty.");
+	}
+}
+
+// approach: revert both lists by recursion and apply the original solution
+// @parameters:
+//		linked_list_1/2 = linked lists representing the numbers to add
 LinkedList sum_digits_reverse(LinkedList linked_list_1, LinkedList linked_list_2) {
 	// revert the input linked lists
 	linked_list_1 = revert(linked_list_1.begin());
@@ -185,6 +292,8 @@ LinkedList sum_digits_reverse(LinkedList linked_list_1, LinkedList linked_list_2
 	// return the sum_reverse
 	return sum_reverse;
 }
+
+// 7, 30, 71, 95, 109
 
 // reverts the list with the given iterator, such that the list becomes linked 
 //		from tail to head.
@@ -219,9 +328,3 @@ LinkedList revert(Node* iterator) {
 
 
 }
-// !!! we need to revert back the result as well.
-// 2568413
-//    8959
-
-// iterator_1 --> 2 -> 5 -> 6 -> 8 -> 4 -> 1 -> 3
-// iteartor_2 --> 8 -> 9 -> 5 -> 9 ->___
