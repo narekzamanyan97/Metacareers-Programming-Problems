@@ -17,9 +17,31 @@ int main() {
 		if(seed != -1) {
 			// //////////////////////////////////////////////////////////////////
 			//					Testing is_palindrome(LinkedList string)
-			LinkedList string = LinkedList(-1, 39, 9);
-			
-			is_palindrome(string);		
+			LinkedList string = LinkedList();
+			string.add_last(9);
+			string.add_last(1);
+			string.add_last(4);
+			string.add_last(2);
+			string.add_last(7);
+			string.add_last(0);
+			string.add_last(1);
+
+			string.add_last(8);
+
+			string.add_last(1);
+			string.add_last(0);
+			string.add_last(7);
+			string.add_last(2);
+			string.add_last(4);
+			string.add_last(1);
+			string.add_last(9);
+
+			if(is_palindrome(string)) {
+				cout << "palindrome" << endl;
+			}		
+			else {
+				cout << "not a palindrome" << endl;
+			}
 		}
 	} while (seed != -1);
 	return 0;
@@ -42,7 +64,41 @@ bool is_palindrome(LinkedList string) {
 	int length = revert(string_reverse, string.begin());
 
 	string_reverse.print();
-	cout << length << endl;
+
+
+	// loop through the lists, stop at the half
+	int counter = 0;
+
+	// initialize iterators to test for palindrome
+	Node* iterator_1 = string.begin();
+	Node* iterator_2 = string_reverse.begin();
+
+
+	while(counter <  length/2) {
+		// if the symmetric node values from both ends are the same, increment the
+		//		counter
+		if(iterator_1->value == iterator_2->value) {
+			// increment the counter by 1
+			counter++;
+		
+			// increment the iterators
+			iterator_1 = iterator_1->next;
+			iterator_2 = iterator_2->next;
+		}
+		else {
+			// set counter equal to length to end the loop 
+			counter = length;
+		}
+
+	}
+
+	// return either true or false based on the final of counter
+	if(counter == length) {
+		return false;
+	}
+	else {
+		return true;
+	}
 
 }
 
