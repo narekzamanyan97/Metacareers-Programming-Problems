@@ -1,52 +1,76 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+// !!! Push the changes to git (04/13/2024)
+//		Commit Message:
+//		Modified the LinkedList class to work with a template, so that the type can be
+//			any class or type.
+//		Added an exception handling in the main method for the insert(), set(), and 
+//			remove_at_index() methods
+//		Fixed the remvoe_at_index() to return the removed node object
+
+template <class T> 
 struct Node {
-	int value;
-	Node* next = NULL;
-	Node* previous = NULL;
+	T value;
+	Node* next = nullptr;
+	Node* previous = nullptr;
 };
 
 // duplicates are allowed
+template <class T> 
 class LinkedList {
 private:
 	// a pointer to the front of the linked list (the first element)
-	Node* head;
+	Node<T>* head;
 
-	// a pointer to the back of the linked list
-	Node* tail;
+	// a pointer to the back of the linked list (the last element)
+	Node<T>* tail;
 
 	// keep track of the number of nodes in the linked list
 	int number_of_nodes;
 
 
 	// remove last/first occurrence helper
-	bool remove_occurrence_helper(int value, bool first_or_last);
+	// template <typename T> 
+	bool remove_occurrence_helper(T value, bool first_or_last);
 
 public:
 	// Constructors for linked list
 	LinkedList();
 
 	// create a linked list from a given array of values
-	LinkedList(int* array_of_values, int size);
+	// template <typename T> 
+	LinkedList(T* array_of_values, int size);
 
 	// create a linked list randomly
-	LinkedList(int seed, int num_of_nodes, int max_value);
+	// template <typename T> 
+	LinkedList(int seed, int num_of_nodes, T max_value);
+
+	// override the asignment operator
+	LinkedList& operator=(const LinkedList& other_list);
 
 	// destructor
 	~LinkedList();
 
 	// return a pointer to the first node (as an iterator)
-	Node* begin();
+	Node<T>* begin();
 
 	// return a pointer to the last node (as an iterator)
-	Node* end();
+	Node<T>* end();
+
+
+	// return a pointer to the first node (as an iterator)
+	Node<T>* cbegin() const;
+
+	// return a pointer to the last node (as an iterator)
+	Node<T>* cend() const;
 
 	// remove the given node pointer (iterator) from the list
-	Node* remove(Node* pointer);
+	Node<T>* remove(Node<T>* pointer);
 
 	// set the given node's value
-	Node set(Node* pointer, int value);
+	// template <typename T> 
+	Node<T> set(Node<T>* pointer, T value);
 
 	// determine if the linked list is empty
 	bool is_empty();
@@ -56,19 +80,29 @@ public:
 
 	// traverse the linked list and return that node object
 	// find a node with the given value
-	Node* find(int value);
+	// template <typename T> 
+	Node<T>* find(T value);
 
 	// print the values in the linked list
-	void print();
+	void print() const;
 
 	// insert at the given position. Return an object to the head pointer
-	Node insert(int value, int position);
+	// template <typename T> 
+	Node<T> insert(T value, int position);
 
 	// append at the end (after the last element)
-	Node add_last(int value);
+	// template <typename T> 
+	Node<T> add_last(T value);
 
 	// append at the front (position = 0, before head)
-	Node add_first(int value);
+	// template <typename T> 
+	Node<T> add_first(T value);
+
+	// append at the end (after the last element)
+	void add_last(Node<T>* iterator);
+
+	// append at the front (position = 0, before head)
+	void add_first(Node<T>* iterator);
 
 	// append the given linked list at the end (after the last element)
 	void add_last(LinkedList linked_list);
@@ -76,50 +110,55 @@ public:
 	// append the given linked list at the front (position = 0, before head)
 	void add_first(LinkedList linked_list);
 
-
 	// remove the first oocurrence a node with the given value
-	bool remove_first_occurrence(int value);
+	// template <typename T> 
+	bool remove_first_occurrence(T value);
 
 	// remove the last oocurrence a node with the given value
-	bool remove_last_occurrence(int value);
+	// template <typename T> 
+	bool remove_last_occurrence(T value);
 
 	// delete (pop) the element at the end and return the node object
-	Node remove_last();
+	Node<T> remove_last();
 
 	// delete (pop) the element at the front (the head)
-	Node remove_first();
+	Node<T> remove_first();
 
 	// Returns the index of the first occurrence of the specified element in the list,
 	//		or -1 if the does not contain the element.
-	int index_of(int value);
+	// template <typename T> 
+	int index_of(T value);
 
 	// Returns the index of the last occurrence of the specified element in the list,
 	//		or -1 if the does not contain the element.
-	int last_index_of(int value);
+	// template <typename T> 
+	int last_index_of(T value);
 
 	// !!! implement the ones below
 	// return true if this list contains the specified element
-	bool contains(int value);
+	// template <typename T> 
+	bool contains(T value);
 
 	// retrieve (does not remove) the first element in the list
-	Node peek_first();
+	Node<T> peek_first();
 
 	// retrieve (does not remove) the last element in the list
-	Node peek_last();	
+	Node<T> peek_last();	
 
 	// removes the element at the specified position in this list 
-	Node remove_at_index(int index);
+	Node<T> remove_at_index(int index);
 
 
 
 	// sets the given value at the given position in the list
-	Node set(int value, int position);
+	// template <typename T> 
+	Node<T> set(T value, int position);
 
 	// removes all the elements from this list
 	void clear();
 
 	// swaps the given nodes
-	void swap_nodes(Node* left_it, Node* right_it);
+	void swap_nodes(Node<T>* left_it, Node<T>* right_it);
 
 };
 
