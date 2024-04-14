@@ -19,9 +19,9 @@
 using namespace std;
 
 struct node {
-	node* left_child = NULL;
-	node* right_child = NULL;
-	node* parent = NULL;
+	node* left_child = nullptr;
+	node* right_child = nullptr;
+	node* parent = nullptr;
 
 	bool which_child;
 
@@ -57,7 +57,7 @@ public:
 	// destructor. Delete all the nodes of the tree. breadth first approach
 	~RedBlackTree();
 
-	// return true if the tree is empty (root node is NULL)
+	// return true if the tree is empty (root node is nullptr)
 	bool is_empty();
 
 

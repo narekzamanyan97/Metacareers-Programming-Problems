@@ -4,8 +4,10 @@ using namespace std;
 
 void partition_doubly_linked(LinkedList& linked_list, int value);
 
+void partition_singly_linked(LinkedList& linked_list, int value);
+
 int main() {
-	LinkedList linked_list = LinkedList(5, 30, 120);
+	LinkedList linked_list = LinkedList(45, 30, 120);
 
 	int value;
 
@@ -17,7 +19,7 @@ int main() {
 		cin >> value;
 
 		if(value != -1) {
-			partition_doubly_linked(linked_list, value);
+			partition_singly_linked(linked_list, value);
 		}
 
 	} while (value != -1);
@@ -57,34 +59,29 @@ void partition_doubly_linked(LinkedList& linked_list, int value) {
 			// temp_value = left_it->value;
 			// left_it->value = right_it->value;
 			// right_it->value = temp_value;
+			// move the iterators
+			// left_it = left_it->next;
+			// prevent infinite loop
+			// if(left_it != right_it) {
+			// 	right_it = right_it->previous;
+			// }
 			// ////////////////////////////////////////////////////////////
 			// 					swap nodes
-			temp_next_of_left = left_it->next;
-			temp_prev_of_left = left_it->previous;
-
-			if(left_it->next != NULL) {
-				left_it->next->previous = right_it;
-			}
-			if(left_it->previous != NULL) {
-				left_it->previous->next = right_it;
-			}
-			if(right_it->next != NULL) {
-				right_it->next->previous = left_it;
-			}
-			if(right_it->previous != NULL) {
-				right_it->previous->next = left_it;
-			}
-
-			left_it->next = right_it->next;
-			left_it->previous = right_it->previous;
-
-			right_it->next = temp_next_of_left;
-			right_it->previous = temp_prev_of_left;
-
+			// need this for swapping the iterators
 			temp_left_it = left_it;
+		
+			linked_list.swap_nodes(left_it, right_it);
+
+			// swap the iterators
 			left_it = right_it;
 			right_it = temp_left_it;
-			
+
+			// move the iterators
+			left_it = left_it->next;
+			// prevent infinite loop
+			if(left_it != right_it) {
+				right_it = right_it->previous;
+			}			
 		}
 		// the left node is correctly placed, but the right one is not
 		// 		only move the left node iterator (the correct node iterator)
@@ -102,10 +99,50 @@ void partition_doubly_linked(LinkedList& linked_list, int value) {
 		//		infinite loop
 		else {
 			left_it = left_it->next;
-
+			// prevent infinite loop
 			if(left_it != right_it) {
 				right_it = right_it->previous;
 			}
 		}
 	}
+}
+
+// partition in a singly linked list
+// loop through the linked list, and remove any node that is greater
+//		than or equal to the given value. Add the removed node to a
+//		temporary linked list, which we'll then append to the given
+//		linked list
+void partition_singly_linked(LinkedList& linked_list, int value) {
+	// this linked list will hold all the nodes that have a value >= the
+	//		given value
+	LinkedList right_partition;
+
+	// pointer to the first node of the given list
+	Node* iterator = linked_list.begin();
+
+	// iterate over the given list, and delete any node whose value is >=
+	//		the given value. Then, add that node to the new linked list,
+	//		later to be appended to the given lined list
+	while(iterator != NULL) {
+		if(iterator->value >= value) {
+			// add the value of the iterator to the right partition
+			right_partition.add_last(iterator->value);
+
+			// delete the node from the given list
+			// the remove function returns the next node iterator
+			iterator = linked_list.remove(iterator);
+
+		}
+		else {
+			iterator = iterator->next;
+		}
+	}
+	cout << "\nLinked list is: " << endl;
+	linked_list.print();
+	cout << "\nRight partition is: " << endl;
+	right_partition.print();
+
+	// merge the two lists. 
+	linked_list.add_last(right_partition);
+
 }

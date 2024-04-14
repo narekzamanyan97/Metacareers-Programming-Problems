@@ -2,9 +2,11 @@
 
 int main() {
 
-	LinkedList linked_list = LinkedList(2, 22, 25);
+	LinkedList<int> linked_list = LinkedList<int>(2, 22, 25);
+	LinkedList<int> linked_list2 = LinkedList<int>(74, 22, 25);
 
-	Node node;
+	Node<int> node;
+	Node<int>* node_ptr;
 
 	int selection;
 	int value;
@@ -33,13 +35,18 @@ int main() {
 		cout << "16 - remove_at_index(index): " << endl;
 		cout << "17 - set(position, value): " << endl;
 		cout << "18 - clear(): " << endl;
+		cout << "19 - add_last(linked_list): " << endl;
+		cout << "20 - add_first(linked_list): " << endl;
 		cout << "-1 - exit: " << endl;
 
 		cin >> selection;
 
 		switch(selection){
 			case 0:
+				cout << "\nlinked_list: ";
 				linked_list.print();
+				cout << "\nlinked_list2: ";
+				linked_list2.print();
 				break;
 			case 1:
 				if(linked_list.is_empty()) {
@@ -59,11 +66,21 @@ int main() {
 				cout << "Enter a value to find: " << endl;
 				cin >> value;
 
-				node = linked_list.find(value);
+				node_ptr = linked_list.find(value);
 
-				cout << "The value found is " << node.value << endl;
-				cout << "prev = " << node.previous->value << endl;
-				cout << "next = " << node.next->value << endl;
+				cout << "The value found is " << node_ptr->value << endl;
+				if (node_ptr->previous != nullptr) {
+					cout << "prev = " << node_ptr->previous->value << endl;
+				}
+				else {
+					cout << "No previous node. " << endl;
+				}
+				if(node_ptr->next != nullptr) {
+					cout << "next = " << node_ptr->next->value << endl;
+				}
+				else {
+					cout << "No next node. " << endl;
+				}
 
 				break;
 			case 4:
@@ -72,11 +89,27 @@ int main() {
 				cout << "Enter a position to insert: " << endl;
 				cin >> position;
 
-				node = linked_list.insert(value, position);
+				try {
+					node = linked_list.insert(value, position);
+	
+					cout << "The value inserted is " << node.value << endl;
+					if(node.previous != nullptr) {
+						cout << "prev = " << node.previous->value << endl;
+					}
+					else {
+						cout << "No previous node. " << endl;
+					}
+					if(node.next != nullptr) {
+						cout << "next = " << node.next->value << endl;
+					}
+					else {
+						cout << "No next node. " << endl;
+					}
+				}
+				catch (std::out_of_range ex) {
+					cout << ex.what() << endl;
+				}
 
-				cout << "The value inserted is " << node.value << endl;
-				cout << "prev = " << node.previous->value << endl;
-				cout << "next = " << node.next->value << endl;
 
 				break;
 			case 5:
@@ -153,11 +186,11 @@ int main() {
 				if(!linked_list.is_empty()) {
 					node = linked_list.peek_first();
 					cout << "value = " << node.value << endl;
-					if(node.next != NULL) {
+					if(node.next != nullptr) {
 						cout << "next = " << node.next->value << endl;
 					}
 					else {
-						cout << "next node is NULL " << endl;
+						cout << "next node is nullptr " << endl;
 					}
 				}
 				else {
@@ -173,11 +206,11 @@ int main() {
 				if(!linked_list.is_empty()) {
 					node = linked_list.peek_last();
 					cout << "value = " << node.value << endl;
-					if(node.previous != NULL) {
-						cout << "next = " << node.next->value << endl;
+					if(node.previous != nullptr) {
+						cout << "previous = " << node.previous->value << endl;
 					}
 					else {
-						cout << "next node is NULL " << endl;
+						cout << "previous node is nullptr " << endl;
 					}
 				}
 				else {
@@ -189,14 +222,26 @@ int main() {
 				cout << "Enter an index to remove the node at that location: " << endl;
 				cin >> index;
 
-				node = linked_list.remove_at_index(index);
 				
-				cout << "removed " << node.value << endl;
-				if(node.next != NULL) {
-					cout << "next of removed node = " << node.next->value << endl;
+				try {
+					node = linked_list.remove_at_index(index);
+
+					cout << "removed " << node.value << endl;
+					if(node.next != nullptr) {
+						cout << "next of removed node = " << node.next->value << endl;
+					}
+					else {
+						cout << "the removed node had no next node. " << endl;
+					}
+					if(node.previous != nullptr) {
+						cout << "previous of removed node = " << node.previous->value << endl;
+					}
+					else {
+						cout << "the removed node has no previous node." << endl;
+					}
 				}
-				else {
-					cout << "next of removed node is NULL " << endl;
+				catch(std::out_of_range ex) {
+					cout << ex.what() << endl;
 				}
 				break;
 
@@ -206,16 +251,22 @@ int main() {
 				cout << "Enter a position to set: " << endl;
 				cin >> position;
 
-				node = linked_list.set(value, position);
+				try {
 
-				cout << "The value set = " << node.value << endl;
-				cout << "The position is " << position << endl;
-				if(node.next != NULL) {
-					// !!! how to know if a function returned an empty object 
-					cout << "next of newly set node is " << node.next->value << endl;
+					node = linked_list.set(value, position);
+
+					cout << "The value set = " << node.value << endl;
+					cout << "The position is " << position << endl;
+					if(node.next != nullptr) {
+						// !!! how to know if a function returned an empty object 
+						cout << "next of newly set node is " << node.next->value << endl;
+					}
+					else {
+						cout << "next of newly set node is nullptr" << endl;
+					}
 				}
-				else {
-					cout << "next of newly set node is NULL" << endl;
+				catch(std::out_of_range ex) {
+					cout << ex.what() << endl;
 				}
 				break;
 
@@ -225,10 +276,25 @@ int main() {
 
 				linked_list.clear();
 				break;
+			case 19:
+				// add linked_list to linked_list2 at the tail
+				linked_list.add_last(linked_list2);
+				cout << "after add_last" << endl;
+
+				linked_list.print();
+				break;
+			case 20:
+				// add linked_list to linked_list2 before the head
+				linked_list.add_first(linked_list2);
+				cout << "after add_first" << endl;
+
+				linked_list.print();
+				break;
 
 			case -1:
 				cout << "Bye!" << endl;
 				break;
+
 		}
 
 	} while(selection != -1);

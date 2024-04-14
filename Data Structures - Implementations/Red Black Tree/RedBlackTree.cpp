@@ -6,8 +6,8 @@
 
 // default constructor
 RedBlackTree::RedBlackTree() {
-	// set the root to be NULL
-	this->root = NULL;
+	// set the root to be nullptr
+	this->root = nullptr;
 }
 
 
@@ -16,8 +16,8 @@ RedBlackTree::RedBlackTree() {
 //		array_of_values = an array of int values to be inserted into the tree
 //		size_of_array = the size of the input array
 RedBlackTree::RedBlackTree(int* array_of_values, int size_of_array) {
-	// set the root to be NULL
-	this->root = NULL;
+	// set the root to be nullptr
+	this->root = nullptr;
 
 	// iterate over the array of values, and insert the values into the tree one by one
 	for(int i = 0; i < size_of_array; i++) {
@@ -32,8 +32,8 @@ RedBlackTree::RedBlackTree(int* array_of_values, int size_of_array) {
 //		max_value = the max possible value for any node, has to be at least 2 times 
 //			larger than the number_of_values
 RedBlackTree::RedBlackTree(int seed, int number_of_values, int max_value) {
-	// set the root to be NULL
-	this->root = NULL;
+	// set the root to be nullptr
+	this->root = nullptr;
 
 	// max_value should be at least twice as large as number of values
 	if(max_value < 2 * number_of_values) {
@@ -43,7 +43,7 @@ RedBlackTree::RedBlackTree(int seed, int number_of_values, int max_value) {
 
 	// initialize random seed, if the given seed is -1
 	if(seed == -1) {
-		srand(time(NULL));
+		srand(time(nullptr));
 	}
 	else {
 		srand(seed);
@@ -75,7 +75,7 @@ RedBlackTree::~RedBlackTree() {
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
 
-	if(this->root != NULL) {
+	if(this->root != nullptr) {
 		// push the node on the zeroth level (root) into the queue
 		nodes_on_level.push(this->root);
 		num_of_nodes_on_level = 1;
@@ -94,16 +94,16 @@ RedBlackTree::~RedBlackTree() {
 			// before deleting the node
 			// push the children of the given node into the queue. After push, the queue
 			//		has a mix of nodes from the current and next levels.
-			if(nodes_on_level.front()->left_child != NULL) {
+			if(nodes_on_level.front()->left_child != nullptr) {
 				nodes_on_level.push(nodes_on_level.front()->left_child);
 			}			
-			if(nodes_on_level.front()->right_child != NULL) {
+			if(nodes_on_level.front()->right_child != nullptr) {
 				nodes_on_level.push(nodes_on_level.front()->right_child);
 			}
 
 			// delete the node
 			delete nodes_on_level.front();
-			nodes_on_level.front() = NULL;
+			nodes_on_level.front() = nullptr;
 
 			// remove from the queue and decrement num_of_nodes_on_level
 			nodes_on_level.pop();
@@ -119,7 +119,7 @@ RedBlackTree::~RedBlackTree() {
 
 // return true if the tree is empty. False otherwise.
 bool RedBlackTree::is_empty() {
-	if(this->root == NULL) {
+	if(this->root == nullptr) {
 		return true;
 	}
 	else {
@@ -131,7 +131,7 @@ bool RedBlackTree::is_empty() {
 //		less than the parent, and right child is greater than the parent, for every node)
 // Note: It is assumed that duplicates are not allowed.
 // @return
-//		true = if the tree is binary (left child of any node is either NULL or < node)
+//		true = if the tree is binary (left child of any node is either nullptr or < node)
 //		false = if the tree is not binary
 bool RedBlackTree::is_binary_tree() { 
 	// stores the nodes of a tree in a breadth-first traversal. Updated throughout the
@@ -141,7 +141,7 @@ bool RedBlackTree::is_binary_tree() {
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
 
-	if(this->root != NULL) {
+	if(this->root != nullptr) {
 		// push the node on the zeroth level (root) into the queue
 		nodes_on_level.push(this->root);
 		num_of_nodes_on_level = 1;
@@ -167,7 +167,7 @@ bool RedBlackTree::is_binary_tree() {
 
 			// push the children of the given node into the queue. After push, the queue
 			//		has a mix of nodes from the current and next levels.
-			if(nodes_on_level.front()->left_child != NULL) {
+			if(nodes_on_level.front()->left_child != nullptr) {
 				// if the left child is not less than the node, return false
 				if(nodes_on_level.front()->left_child->value >= nodes_on_level.front()->value) {
 					cout << nodes_on_level.front()->parent->value << endl;
@@ -187,7 +187,7 @@ bool RedBlackTree::is_binary_tree() {
 					nodes_on_level.push(nodes_on_level.front()->left_child);
 				}
 			}			
-			if(nodes_on_level.front()->right_child != NULL) {
+			if(nodes_on_level.front()->right_child != nullptr) {
 				// if the right child is not greateer than the node, return false
 				if(nodes_on_level.front()->right_child->value <= nodes_on_level.front()->value) {
 					cout << nodes_on_level.front()->parent->value << endl;
@@ -213,7 +213,7 @@ bool RedBlackTree::is_binary_tree() {
 			//		that is, make sure that the parent has a larger value than the node
 			//		if the node is a left child, and a lower value if the node is a 
 			//		right child
-			if(nodes_on_level.front()->parent != NULL) {
+			if(nodes_on_level.front()->parent != nullptr) {
 				// the node is a right child. it must have a value greater than the value
 				//	of its parent
 				if(nodes_on_level.front()->which_child == RIGHT) {
@@ -291,7 +291,7 @@ bool RedBlackTree::is_red_black_tree_helper1(node* root, int running_total, int 
 	//		recursion if its value becomes false
 	bool passed_the_test = true;
 	// base case. If the node is NIL node, compare it to the second argument
-	if(root == NULL) {
+	if(root == nullptr) {
 		// if the running total (the # of black nodes on the path to this node) is
 		//		the same as the one for the left-most node, return true 
 		if(running_total == tot_bl_nodes_on_leftmost_path) {
@@ -320,7 +320,7 @@ bool RedBlackTree::is_red_black_tree_helper1(node* root, int running_total, int 
 		// if the current node is RED
 		if(root->color == RED) {
 			// if any of its children are RED, set passed_the_test to false
-			if(root->left_child != NULL) {
+			if(root->left_child != nullptr) {
 				if(root->left_child->color == RED) {
 					// cout << "Red node has a red child" << endl;
 					// cout << root->value << " and " << root->left_child->value << endl;
@@ -329,7 +329,7 @@ bool RedBlackTree::is_red_black_tree_helper1(node* root, int running_total, int 
 			}
 
 			// if the previous test is not passed, skip the right child
-			if(root->right_child != NULL && passed_the_test) {
+			if(root->right_child != nullptr && passed_the_test) {
 				if(root->right_child->color == RED) {
 					// cout << "Red node has a red child" << endl;
 					// cout << root->value << " and " << root->right_child->value << endl;
@@ -342,7 +342,7 @@ bool RedBlackTree::is_red_black_tree_helper1(node* root, int running_total, int 
 		if(root->color == RED) {
 			// if the node has a parent, then check if it is RED. If it is, then set
 			//		passed_the_test to false
-			if(root->parent != NULL) {
+			if(root->parent != nullptr) {
 				if(root->parent->color == RED) {
 					passed_the_test = false;
 				}
@@ -380,7 +380,7 @@ int RedBlackTree::is_red_black_tree_helper2() {
 	// keeps track of the black nodes on the way to the left-most node
 	int tot_bl_nodes_on_leftmost_path = 0;
 
-	while(current_node != NULL) {
+	while(current_node != nullptr) {
 		// if the current node to the left-most leaf is black
 		if(current_node->color == BLACK) {
 			// increment the number of black nodes on the path
@@ -401,12 +401,12 @@ int RedBlackTree::is_red_black_tree_helper2() {
 //		false = if it was not (a node with the same value is already in the tree)
 bool RedBlackTree::insert(int value) {
 	// Case 1: Tree is empty. Create a new Black node as the root
-	if(this->root == NULL) {
+	if(this->root == nullptr) {
 		this->root = new node;
 		this->root->value = value;
-		this->root->right_child = NULL;
-		this->root->left_child = NULL;
-		this->root->parent = NULL;
+		this->root->right_child = nullptr;
+		this->root->left_child = nullptr;
+		this->root->parent = nullptr;
 
 		this->root->color = BLACK;
 		this->root->is_double_black = false;
@@ -442,7 +442,7 @@ bool RedBlackTree::insert(int value) {
 		bool right_or_left;
 
 		// find the parent of the new node and whether it is a left or a right child
-		while(current_node != NULL && !found) {
+		while(current_node != nullptr && !found) {
 			// reset parent node
 			parent_node = current_node;
 
@@ -465,7 +465,7 @@ bool RedBlackTree::insert(int value) {
 		// Case 2: Tree is not empty. Create a new Red node
 		// a node with the given value is not found, so insert as a child to the 
 		//		parent_node to its right or left, depending on the value of right_or_left
-		if(current_node == NULL && !found) {
+		if(current_node == nullptr && !found) {
 			if(right_or_left == RIGHT) {
 				parent_node->right_child = new_node;
 				new_node->which_child = RIGHT;
@@ -498,7 +498,7 @@ void RedBlackTree::insert_helper(node* new_node) {
 	node* parent_parent_node = parent_node->parent;
 	node* parent_sibling_node;
 
-	if(parent_parent_node != NULL) {
+	if(parent_parent_node != nullptr) {
 		// store the uncle node as well (parent_sibling_node)
 		if(parent_node->which_child == RIGHT){ 
 			parent_sibling_node = parent_parent_node->left_child;
@@ -511,7 +511,7 @@ void RedBlackTree::insert_helper(node* new_node) {
 	// Case 4: parent of new node is Red
 	if(parent_node->color == RED) {
 		// Case 4a: parent's sibling is Black or Null, then rotate and recolor
-		if(parent_sibling_node == NULL || parent_sibling_node->color == BLACK) {
+		if(parent_sibling_node == nullptr || parent_sibling_node->color == BLACK) {
 			// do suitable rotation (RR, RL, LR, or LL)
 			if(new_node->which_child == RIGHT && parent_node->which_child == RIGHT){
 				RR_rotation(new_node->parent, INSERT);
@@ -567,8 +567,8 @@ void RedBlackTree::RR_rotation(node* parent_node, bool del_or_insert) {
 	parent_node->parent = parent_parent_node->parent;
 
 	// step 2
-	// reset parent's parent child (unless it is NULL)
-	if(parent_parent_node->parent != NULL) {
+	// reset parent's parent child (unless it is nullptr)
+	if(parent_parent_node->parent != nullptr) {
 		if(parent_parent_node->which_child == LEFT) {
 			parent_parent_node->parent->left_child = parent_node;
 			// reset which child of parent node
@@ -584,7 +584,7 @@ void RedBlackTree::RR_rotation(node* parent_node, bool del_or_insert) {
 	// cout << "parent_parent_node->parent = parent_node " << parent_parent_node->parent->value << " = " << parent_node->value << endl;
 	parent_parent_node->parent = parent_node;
 	// step 4
-	if(parent_node->left_child != NULL) {
+	if(parent_node->left_child != nullptr) {
 		// cout << "parent_node->left_child->parent = parent_parent_node " << parent_node->left_child->parent->value << " = " << parent_parent_node->value << endl;
 		parent_node->left_child->parent = parent_parent_node;
 		// reset which child of parent_node->left_child
@@ -640,7 +640,7 @@ void RedBlackTree::RL_rotation(node* new_node) {
 	// no need to reset which child of parent node, because it is already RIGHT
 
 	// step 6
-	if(parent_node->left_child != NULL) {
+	if(parent_node->left_child != nullptr) {
 		parent_node->left_child->parent = parent_node;
 	
 		// reset which child of parent_node->left_child child to LEFT
@@ -668,11 +668,11 @@ void RedBlackTree::LL_rotation(node* parent_node, bool del_or_insert) {
 	// step 2
 	parent_parent_node->left_child = parent_node->right_child;
 	// reset which child of parent_node->right_child
-	if(parent_node->right_child != NULL) {
+	if(parent_node->right_child != nullptr) {
 		parent_node->right_child->which_child = LEFT;
 	}
 	// step 3
-	if(parent_parent_node->parent != NULL) {
+	if(parent_parent_node->parent != nullptr) {
 		if(parent_parent_node->which_child == LEFT) {
 			parent_parent_node->parent->left_child = parent_node;
 		} else {
@@ -685,7 +685,7 @@ void RedBlackTree::LL_rotation(node* parent_node, bool del_or_insert) {
 	// step 4
 	parent_parent_node->parent = parent_node;
 	// step 5
-	if(parent_node->right_child != NULL) {
+	if(parent_node->right_child != nullptr) {
 		parent_node->right_child->parent = parent_parent_node;
 	}
 	// step 6
@@ -730,7 +730,7 @@ void RedBlackTree::LR_rotation(node* new_node) {
 	// step 4
 	parent_node->parent = new_node;
 	// step 5
-	if(new_node->left_child != NULL) {
+	if(new_node->left_child != nullptr) {
 		new_node->left_child->parent = parent_node;
 		// reset which_child of new_node->left child
 		new_node->left_child->which_child = RIGHT;
@@ -747,8 +747,8 @@ void RedBlackTree::LR_rotation(node* new_node) {
 	// delete parent_node;
 	// delete parent_parent_node;
 
-	// parent_node = NULL;
-	// parent_parent_node = NULL;
+	// parent_node = nullptr;
+	// parent_parent_node = nullptr;
 }
 
 // use breadth first search to display the tree
@@ -760,7 +760,7 @@ void RedBlackTree::display_tree() {
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
 
-	if(this->root != NULL) {
+	if(this->root != nullptr) {
 		// push the node on the zeroth level (root) into the queue
 		nodes_on_level.push(this->root);
 		num_of_nodes_on_level = 1;
@@ -793,7 +793,7 @@ void RedBlackTree::display_tree() {
 				left_or_right = 'R';
 			}
 			// display the which_child and parent's value of the node
-			if(nodes_on_level.front()->parent != NULL) {
+			if(nodes_on_level.front()->parent != nullptr) {
 				cout << "(" << left_or_right << " of " << nodes_on_level.front()->parent->value << ")   ";
 			}
 
@@ -801,10 +801,10 @@ void RedBlackTree::display_tree() {
 			//		has a mix of nodes from the current and next levels. num_of_nodes_on_level
 			//		helps us stop the printing on the right node and start the iteration
 			//		of the outer loop for the next level
-			if(nodes_on_level.front()->left_child != NULL) {
+			if(nodes_on_level.front()->left_child != nullptr) {
 				nodes_on_level.push(nodes_on_level.front()->left_child);
 			}			
-			if(nodes_on_level.front()->right_child != NULL) {
+			if(nodes_on_level.front()->right_child != nullptr) {
 				nodes_on_level.push(nodes_on_level.front()->right_child);
 			}
 
@@ -838,17 +838,17 @@ void RedBlackTree::display_tree() {
 //		value = the value of the node to be deleted
 void RedBlackTree::delete_node(node* node_to_del) {
 	// case 0: if the node is the root, and it is the only node in the tree
-	if(node_to_del->parent == NULL && node_to_del->left_child == NULL 
-			&& node_to_del->right_child == NULL) {
+	if(node_to_del->parent == nullptr && node_to_del->left_child == nullptr 
+			&& node_to_del->right_child == nullptr) {
 
-		// delete the root and set it to NULL
+		// delete the root and set it to nullptr
 		delete this->root;
-		this->root = NULL;
+		this->root = nullptr;
 	}
 	// *** Case 1 (a) and (b) (Base Case)
 	else if(!node_to_del->is_double_black) {
 		// Step 1: if the node is an internal node, find the inorder successor
-		if(node_to_del->left_child != NULL && node_to_del->right_child != NULL) {
+		if(node_to_del->left_child != nullptr && node_to_del->right_child != nullptr) {
 			// find the inorder of the node to delete
 			node* inorder = find_inorder(node_to_del);
 
@@ -865,12 +865,12 @@ void RedBlackTree::delete_node(node* node_to_del) {
 			// delete the node
 			// delete the left/right child pointer of its parent node
 			if(node_to_del->which_child == RIGHT) { 
-				node_to_del->parent->right_child = NULL;
+				node_to_del->parent->right_child = nullptr;
 			} else {
-				node_to_del->parent->left_child = NULL;
+				node_to_del->parent->left_child = nullptr;
 			}
 			delete node_to_del;
-			node_to_del = NULL;
+			node_to_del = nullptr;
 		}
 		// The node is not internal, and is not Red. So it must be Black and either a leaf
 		//		node or a node with a Red child.
@@ -878,7 +878,7 @@ void RedBlackTree::delete_node(node* node_to_del) {
 			// The node must be Black (no need to check).
 			//	 It is a leaf or has 1 Red child (the latter has no children). 
 			// * Case 1 (b) (i): The node has a Red child, left
-			if(node_to_del->left_child != NULL) {
+			if(node_to_del->left_child != nullptr) {
 				// assign the value in the red child to the node, and delete the node
 				node_to_del->value = node_to_del->left_child->value;
 
@@ -891,16 +891,16 @@ void RedBlackTree::delete_node(node* node_to_del) {
 				child_to_delete = node_to_del->left_child;
 
 				// disconnect the child node from the parent node
-				node_to_del->left_child = NULL;
+				node_to_del->left_child = nullptr;
 
 				
 				// delete the left child
 				delete child_to_delete;
-				child_to_delete = NULL;
+				child_to_delete = nullptr;
 
 			}
 			// * Case 1 (b) (ii): The node has a Red child, right
-			else if(node_to_del->right_child != NULL) {
+			else if(node_to_del->right_child != nullptr) {
 				// do the same this as above, but for the right child
 				node_to_del->value = node_to_del->right_child->value;
 
@@ -908,11 +908,11 @@ void RedBlackTree::delete_node(node* node_to_del) {
 
 				child_to_delete = node_to_del->right_child;
 
-				node_to_del->right_child = NULL;
+				node_to_del->right_child = nullptr;
 
 				// delete the right child
 				delete child_to_delete;
-				child_to_delete = NULL;
+				child_to_delete = nullptr;
 			}
 
 			// The node is a Black leaf node
@@ -929,7 +929,7 @@ void RedBlackTree::delete_node(node* node_to_del) {
 	// *** Cases 2 through 6
 	else {
 		// * Case 2: node is a root node, make DB into B, and exit: Base Case
-		if(node_to_del->parent == NULL) {
+		if(node_to_del->parent == nullptr) {
 			// node is a root node
 			node_to_del->is_double_black = false;
 		}
@@ -963,11 +963,11 @@ void RedBlackTree::delete_node(node* node_to_del) {
 			// *** Cases 3, 5, and 6
 			if(sibling->color == BLACK) {
 				// * Case 3: sibling is Black, both children of sibling (far and near) are
-				//		either NULL or Black
-				if((far_child == NULL || far_child->color == BLACK) 
-						&& (near_child == NULL || near_child->color == BLACK)) {
+				//		either nullptr or Black
+				if((far_child == nullptr || far_child->color == BLACK) 
+						&& (near_child == nullptr || near_child->color == BLACK)) {
 					// if node_to_del (the DB node) is a leaf node, delete it
-					if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
+					if(node_to_del->left_child == nullptr && node_to_del->right_child == nullptr) {
 						// dynamically allocate a new pointer to delete the node_to_del
 						node* node_for_deletion = new node;
 
@@ -976,15 +976,15 @@ void RedBlackTree::delete_node(node* node_to_del) {
 						// set the parent's left or right child to null before deleting
 						//		the node
 						if(node_to_del->which_child == RIGHT) {
-							parent->right_child = NULL;
+							parent->right_child = nullptr;
 						}
 						else {
-							parent->left_child = NULL;
+							parent->left_child = nullptr;
 						}
 						
 						// delete the node
 						delete node_for_deletion;
-						node_for_deletion = NULL;
+						node_for_deletion = nullptr;
 
 					}
 					// node_to_del is not a leaf node, so only make the DB into B
@@ -1013,8 +1013,8 @@ void RedBlackTree::delete_node(node* node_to_del) {
 				}
 				// * Case 5: DB's (node_to_del's) sibling is Black, far_child is Black,
 				//		near child is red
-				else if((far_child == NULL || far_child->color == BLACK)
-						&& (near_child != NULL && near_child->color == RED)) {
+				else if((far_child == nullptr || far_child->color == BLACK)
+						&& (near_child != nullptr && near_child->color == RED)) {
 					// swap color of DB's sibling with near child
 					bool temp_color = sibling->color;
 					sibling->color = near_child->color;
@@ -1023,7 +1023,7 @@ void RedBlackTree::delete_node(node* node_to_del) {
 					// !!! rotate sibling in opposite direction from DB
 					if(sibling->which_child == LEFT) {
 						sibling->right_child = near_child->left_child;
-						if(near_child->left_child != NULL) {
+						if(near_child->left_child != nullptr) {
 							near_child->left_child->parent = sibling;
 							near_child->left_child->which_child = RIGHT;
 						}
@@ -1039,7 +1039,7 @@ void RedBlackTree::delete_node(node* node_to_del) {
 					// mirror case of the above rotation
 					else {
 						sibling->left_child = near_child->right_child;
-						if(near_child->right_child != NULL) {
+						if(near_child->right_child != nullptr) {
 							near_child->right_child->parent = sibling;
 							near_child->right_child->which_child = LEFT;
 						}
@@ -1057,7 +1057,7 @@ void RedBlackTree::delete_node(node* node_to_del) {
 				} 
 				// * Case 6: DB's (node_to_del's) sibling is Black, far child is Red,
 				//		near child is Black
-				else if((far_child != NULL && far_child->color == RED)) {
+				else if((far_child != nullptr && far_child->color == RED)) {
 					// swap color of Parent and sibling
 					bool temp_color = sibling->color;
 					sibling->color = parent->color;
@@ -1083,14 +1083,14 @@ void RedBlackTree::delete_node(node* node_to_del) {
 					}
 
 					// change DB to B or delete node_to_del if it is a leaf node
-					if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
+					if(node_to_del->left_child == nullptr && node_to_del->right_child == nullptr) {
 						if(node_to_del->which_child == RIGHT) {
-							parent->right_child = NULL;
+							parent->right_child = nullptr;
 						} else {
-							parent->left_child = NULL;
+							parent->left_child = nullptr;
 						}
 						delete node_to_del;
-						node_to_del = NULL;
+						node_to_del = nullptr;
 					} 
 					// make it Black
 					else {
@@ -1137,16 +1137,16 @@ void RedBlackTree::delete_node(node* node_to_del) {
 //			node_to_del. the parameter will be reused to arrive to the inorder successor
 node* RedBlackTree::find_inorder(node* node_to_del) {
 	// if the given node is not null
-	if(node_to_del != NULL) {
+	if(node_to_del != nullptr) {
 		// node_to_del will be the node that this function will return
 
 		// if the node has a right child
-		if(node_to_del->right_child != NULL ){
+		if(node_to_del->right_child != nullptr ){
 			// first, go to the right, then keep going left
 			node_to_del = node_to_del->right_child;
 
-			// now, keep going left until the left child is NULL
-			while(node_to_del->left_child != NULL) {
+			// now, keep going left until the left child is nullptr
+			while(node_to_del->left_child != nullptr) {
 				node_to_del = node_to_del->left_child;
 			}
 
@@ -1184,10 +1184,10 @@ node* RedBlackTree::binary_search(int value) {
 //		or
 //			a null pointer if value is not found 
 node* RedBlackTree::binary_search(node* root, int value) {
-	// value is not found, return NULL
-	if(root == NULL) {
+	// value is not found, return nullptr
+	if(root == nullptr) {
 		node* null_node;
-		null_node = NULL;
+		null_node = nullptr;
 		return null_node;
 	}
 	else {
@@ -1231,9 +1231,9 @@ int RedBlackTree::to_array(int* flattened_tree) {
 //		the size of the flattened array
 int RedBlackTree::to_array_helper(node* node, int* flattened_tree, int& size_of_array) {
 	// depth first search
-	if(node != NULL) {
+	if(node != nullptr) {
 		// go to the left child
-		if(node->left_child != NULL) {
+		if(node->left_child != nullptr) {
 			to_array_helper(node->left_child, flattened_tree, size_of_array);
 		}
 
@@ -1245,7 +1245,7 @@ int RedBlackTree::to_array_helper(node* node, int* flattened_tree, int& size_of_
 		size_of_array++;
 
 		// go to the right child
-		if(node->right_child != NULL) {
+		if(node->right_child != nullptr) {
 			to_array_helper(node->right_child, flattened_tree, size_of_array);
 		}
 	}

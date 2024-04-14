@@ -10,10 +10,11 @@ using namespace std;
 #define LAST false
 
 // Constructors for linked list
-LinkedList::LinkedList() {
+template<class T>
+LinkedList<T>::LinkedList() {
 	// set the head and tail pointers to null
-	this->head = NULL;
-	this->tail = NULL;
+	this->head = nullptr;
+	this->tail = nullptr;
 
 	// set the number of nodes to 0
 	this->number_of_nodes = 0;
@@ -23,10 +24,11 @@ LinkedList::LinkedList() {
 // @parameters:
 //		array_of_values = an array whose values will be added to the linked list
 //		size = the size of the array
-LinkedList::LinkedList(int* array_of_values, int size) {
+template<class T>
+LinkedList<T>::LinkedList(T* array_of_values, int size) {
 	// set the head and tail pointers to null
-	this->head = NULL;
-	this->tail = NULL;	
+	this->head = nullptr;
+	this->tail = nullptr;	
 
 	// set the number of nodes to 0
 	this->number_of_nodes = 0;
@@ -47,22 +49,18 @@ LinkedList::LinkedList(int* array_of_values, int size) {
 // 		seed = a seed for the random generator
 // 		num_of_nodes = number of nodes to be added to the linked list
 //		max_value = the max integer value to be randomly generated.
-LinkedList::LinkedList(int seed, int num_of_nodes, int max_value) {
+template<class T>
+LinkedList<T>::LinkedList(int seed, int num_of_nodes, T max_value) {
 	// set the head and tail pointers to null
-	this->head = NULL;
-	this->tail = NULL;	
+	this->head = nullptr;
+	this->tail = nullptr;	
 
 	// set the number of nodes to 0
 	this->number_of_nodes = 0;
 
-	// if max_value < 2 * number_of_nodes, reset max_value to be twice num_of_nodes
-	if(max_value < 2 * num_of_nodes) {
-		max_value = 2 * num_of_nodes;
-	}
-
 	// use random seed if seed = -1
 	if(seed == -1) {
-		srand(time(NULL));
+		srand(time(nullptr) + rand());
 	}
 	else {
 		srand(seed);
@@ -76,32 +74,83 @@ LinkedList::LinkedList(int seed, int num_of_nodes, int max_value) {
 		// generate the random value
 		value = rand() % (max_value + 1);
 
+		// for the reverse 2_5 problem only
+		while(i == 0 && value == 0) {
+			// generate the random value
+			value = rand() % (max_value + 1);			
+		}
 		// push the value at the end of the linked list
 		this->add_last(value);
-
-
 	}
 
 	// set the number_of_nodes to size
 	this->number_of_nodes = num_of_nodes;
+}
 
+// override the asignment operator
+// do a deep copy. 
+template<class T>
+LinkedList<T>& LinkedList<T>::operator=(const LinkedList& other_list) {	
+	// first of all, clear this list in case it is not empty
+	this->clear();
+
+	// allocate resources for the pointers of the other_list
+	this->head = new Node<T>;
+	this->tail = new Node<T>;
+
+	// link the nodes to nullptr
+	this->tail->next = nullptr; 
+	this->tail->previous = nullptr; 
+
+	// traverse this list, and append the nodes of this list one by one
+	Node<T>* current_node = other_list.cbegin();
+
+	// add the nodes of this list to the given list one by one
+	while(current_node) {
+		// add the node to the list
+		this->add_last(current_node);
+
+		// move on to the next node
+		current_node = current_node->next;
+	}
+
+	// cout << "************************* = operator **********************" << endl;
+	// this->print();
+
+	return *this;
 }
 
 // destructor
 // delete all the nodes in the linked list one by one, starting from the head node
-LinkedList::~LinkedList() {
+template<class T>
+LinkedList<T>::~LinkedList() {
 	// call the clear function
 	this->clear();
 }
 
 // return a pointer to the first node (as an iterator)
-Node* LinkedList::begin() {
+template<class T>
+Node<T>* LinkedList<T>::begin() {
 	return this->head;
 }
 
 // return a pointer to the last node (as an iterator)
-Node* LinkedList::end() {
+template<class T>
+Node<T>* LinkedList<T>::end() {
 	return this->tail;
+}
+
+
+// return a pointer to the first node (as an iterator)
+template<class T>
+Node<T>* LinkedList<T>::cbegin() const {
+	return this->head;
+}
+
+// return a pointer to the last node (as an iterator)
+template<class T>
+Node<T>* LinkedList<T>::cend() const {
+	return this->head;
 }
 
 // remove the given node pointer (iterator) from the list
@@ -109,27 +158,32 @@ Node* LinkedList::end() {
 //		pointer = a pointer to the node that needs to be deleted
 // @return:
 //		return an pointer (iterator) to the next node
-Node* LinkedList::remove(Node* pointer) {
+template<class T>
+Node<T>* LinkedList<T>::remove(Node<T>* pointer) {
 	// reset the next and previous pointers around the given pointer
-	if(pointer->previous != NULL) {
+	if(pointer->previous != nullptr) {
 		pointer->previous->next = pointer->next;
 	}
 
-	if(pointer->next != NULL) {
+	if(pointer->next != nullptr) {
 		pointer->next->previous = pointer->previous;
 	}
 
 	// next pointer to return
-	Node* next_pointer = pointer->next;
+	Node<T>* next_pointer = pointer->next;
 
-	// if the pointer is the head, set head to NULL
+	// if the pointer is the head, set head to the next node
 	if(pointer == this->head) {
-		this->head = NULL;
+		if(this->head != nullptr) {
+			this->head = this->head->next;
+		}
 	}
 
-	// if the pointer is the tail, set tail to NULL
+	// if the pointer is the tail, set tail to the previous node
 	if(pointer == this->tail) {
-		this->tail = NULL;
+		if(this->tail != nullptr) {
+			this->tail = this->tail->previous;
+		}
 	}
 
 	// delete the given pointer
@@ -146,17 +200,19 @@ Node* LinkedList::remove(Node* pointer) {
 //		value = the value to set the given node to
 // @return:
 //		a node object with the set value, its next and previous links set to null
-Node set(Node* pointer, int value) {
+// template <typename T> 
+template<class T>
+Node<T> set(Node<T>* pointer, T value) {
 	// set the value of the node
 	pointer->value = value;
 
 	// declare a new node to return
-	Node new_node = *pointer;
+	Node<T> new_node = *pointer;
 
 	// reset the links of the node to make it impossible to change the list
 	//		outside of this function
-	new_node.next = NULL;
-	new_node.previous = NULL;
+	new_node.next = nullptr;
+	new_node.previous = nullptr;
 
 	return new_node;
 }
@@ -165,8 +221,9 @@ Node set(Node* pointer, int value) {
 // @return:
 //		true if the linked list is empty
 //		false otherwise
-bool LinkedList::is_empty() {
-	if(this->head == NULL) {
+template<class T>
+bool LinkedList<T>::is_empty() {
+	if(this->head == nullptr) {
 		return true;
 	}
 	else {
@@ -178,7 +235,8 @@ bool LinkedList::is_empty() {
 // count the number of nodes in the linked list and return it
 // @return:
 //		the number of nodes in the linked list
-int LinkedList::length() {
+template<class T>
+int LinkedList<T>::length() {
 	return this->number_of_nodes;
 }
 
@@ -187,34 +245,34 @@ int LinkedList::length() {
 //		value = a value to search for in the 
 // @return:
 //		the node that has the given value, or null, if the value is not in the linked list
-Node LinkedList::find(int value) {
+template<class T>
+Node<T>* LinkedList<T>::find(T value) {
 	// a pointer to a node to traverse, starting from the head
-	Node* current_node = this->head;
+	Node<T>* current_node = this->head;
 
 	// look for the value in the linked list
-	while(current_node != NULL) {
+	while(current_node != nullptr) {
 		// if the current node has the given value, return that node
 		if(current_node->value == value) {
-			return *current_node;
+			return current_node;
 		}
 		// otherwise, go to the next node
 		current_node = current_node->next;
 	}
 
 
-	// return current node, which is NULL if we are here
-	return *current_node;
+	// return current node, which is nullptr if we are here
+	return current_node;
 }
 
 // print the values in the linked list
-void LinkedList::print() {
+template<class T>
+void LinkedList<T>::print() const {
 	// a pointer to a node to traverse, starting from the head
-	Node* current_node = this->head;
-
-	cout << endl;
+	Node<T>* current_node = this->head;
 
 	int index = 0;
-	while(current_node != NULL) {
+	while(current_node != nullptr) {
 		cout << current_node->value << "(" << index << ") --> ";
 		
 		// move on to the next node
@@ -231,8 +289,10 @@ void LinkedList::print() {
 //		value = the value to insert into the linked list
 //		position = the position to insert the value at
 // @return:
-//		the newly inserted node, or NULL if the position is out of range
-Node LinkedList::insert(int value, int position) {
+//		the newly inserted node, or nullptr if the position is out of range
+// template <typename T> 
+template<class T>
+Node<T> LinkedList<T>::insert(T value, int position) {
 	// if position < 0 or > length of linked list, return null
 	if(position < 0 || position > this->length()) {
 		throw std::out_of_range("The position provided is out of range.");
@@ -248,11 +308,11 @@ Node LinkedList::insert(int value, int position) {
 	// position > 0 && position < this->length
 	else {
 		// declare a new node
-		Node* new_node = new Node;
+		Node<T>* new_node = new Node<T>;
 		new_node->value = value;
 
 		// declare the current node
-		Node* current_node;
+		Node<T>* current_node;
 
 		// if closer to the first element, start from the head pointer
 		if(this->length() - position > position) {
@@ -266,13 +326,13 @@ Node LinkedList::insert(int value, int position) {
 		}
 		
 		// if the linked list is not empty
-		if(current_node != NULL) {
+		if(current_node != nullptr) {
 			// if we loop from the front
 			if(this->length() - position > position) {
 				// loop through the linked list, and stop at the given position
 				int current_pos = 0;
 				while(current_pos < position) {
-					if(current_node->next != NULL) {
+					if(current_node->next != nullptr) {
 						current_node = current_node->next;
 						current_pos++;
 					}
@@ -286,7 +346,7 @@ Node LinkedList::insert(int value, int position) {
 				// loop through the linked list, and stop at the given position
 				int current_pos = this->length() - 1;
 				while(current_pos > position) {
-					if(current_node->next != NULL) {
+					if(current_node->next != nullptr) {
 						current_node = current_node->next;
 						// decrement the current position
 						current_pos--;
@@ -305,8 +365,8 @@ Node LinkedList::insert(int value, int position) {
 			current_node->previous = new_node;	
 
 			// when the current node is the head (inserting at position 0), the previous 
-			//		node is NULL.
-			if(new_node->previous != NULL) {
+			//		node is nullptr.
+			if(new_node->previous != nullptr) {
 				new_node->previous->next = new_node;
 			}			
 
@@ -323,19 +383,23 @@ Node LinkedList::insert(int value, int position) {
 //		value = the value to append to the linked list
 // @return:
 //		the newly appended node
-Node LinkedList::add_last(int value) {
+// template <typename T> 
+template<class T>
+Node<T> LinkedList<T>::add_last(T value) {
 	// declare a new node
-	Node* new_node = new Node;
+	Node<T>* new_node = new Node<T>;
 	new_node->value = value;
 
 	// if the list is empty
 	if(this->length() == 0) {
 		this->head = new_node;
 		this->tail = new_node;
+		this->head->previous = nullptr;
+		this->tail->next = nullptr;
 	}
 	else {
 		// appending at the back is the same as inserting as the last element	
-		// same as new_node->next = NULL
+		// same as new_node->next = nullptr
 		new_node->next = this->tail->next;
 
 		this->tail->next = new_node;
@@ -360,21 +424,24 @@ Node LinkedList::add_last(int value) {
 //		value = the value to append to the linked list
 // @return:
 //		the newly appended node
-Node LinkedList::add_first(int value) {
+// template <typename T> 
+template<class T>
+Node<T> LinkedList<T>::add_first(T value) {
 	// declare a new node
-	Node* new_node = new Node;
+	Node<T>* new_node = new Node<T>;
 	new_node->value = value;
 
 	// if the list is empty
 	if(this->length() == 0) {
 		this->head = new_node;
 		this->tail = new_node;
+		this->head->previous = nullptr;
+		this->tail->next = nullptr;
 	}
 	else {
 		// appending at the back is the same as inserting as the last element	
-		// same as new_node->next = NULL
-		new_node->previous = this->head->previous
-		;
+		// same as new_node->next = nullptr
+		new_node->previous = this->head->previous;
 		new_node->next = this->head;
 
 		this->head->previous = new_node;
@@ -391,10 +458,135 @@ Node LinkedList::add_first(int value) {
 }
 
 
+// append at the end (after the last element)
+// append the given node to the linked list at the tail
+// @parameter:
+//		iterator = the node pointer to be appended at the end 
+template<class T>
+void LinkedList<T>::add_last(Node<T>* iterator) {
+	// declare a new node
+	Node<T>* new_node = new Node<T>;
+	new_node->value = iterator->value;
+	new_node->next = nullptr;
+	new_node->previous = nullptr;
+
+	// if the list is not empty
+	if(this->length() > 0) {
+		// link the tail to the next (new) node
+		this->tail->next = new_node;
+
+		// link the new node to the previous node
+		new_node->previous = this->tail;
+
+		// reset the tail
+		this->tail = new_node;
+	}
+	else {
+		this->tail = new_node;
+		this->head = new_node;
+	}
+
+	this->number_of_nodes++;
+}
+
+
+// append at the front (position = 0, before head)
+template<class T>
+void LinkedList<T>::add_first(Node<T>* iterator) {
+	// declare a new node
+	Node<T>* new_node = new Node<T>;
+	new_node->value = iterator->value;
+	new_node->next = nullptr;
+	new_node->previous = nullptr;
+
+	// if the list is not empty
+	if(this->length() > 0) {
+		// link the tail to the next (new) node
+		this->head->previous = new_node;
+
+		// link the new node to the previous node
+		new_node->next = this->head;
+
+		// reset the tail
+		this->head = new_node;
+	}
+	else {
+		this->tail = new_node;
+		this->head = new_node;
+	}
+
+	this->number_of_nodes++;
+}
+
+// append the given linked list at the end (after the last element)
+// @parameters:
+//		linked_list = the linked list to append to this list
+template<class T>
+void LinkedList<T>::add_last(LinkedList linked_list) {
+	// iterate through the given linked list and create new nodes for each
+	//		node in that list, and append it to this list one at a time
+	Node<T>* iterator = linked_list.begin();
+
+	while(iterator != nullptr) {
+		// create a new node
+		Node<T>* new_node = new Node<T>;
+
+		// set its value to the value of the iterator
+		new_node->value = iterator->value;
+		// set the next to nullptr to avoid strange behavior (infinite list)
+		new_node->next = nullptr;
+
+		// append it to this linked list
+		if(this->tail != nullptr) {
+			this->tail->next = new_node;
+		}
+		new_node->previous = this->tail;
+		this->tail = new_node;
+
+		// move on to the next node
+		iterator = iterator->next;
+	}
+}
+
+// append the given linked list at the front (position = 0, before head)
+// @parameters:
+//		linked_list = the linked list to append to this list
+template<class T>
+void LinkedList<T>::add_first(LinkedList linked_list) {
+	// start from the end of the given linked list
+	Node<T>* iterator = linked_list.end();
+
+	while(iterator != nullptr) {
+		// create a new node
+		Node<T>* new_node = new Node<T>;
+
+		// set its value to the value of the iterator
+		new_node->value = iterator->value;
+		// set the previous to nullptr to avoid strange behavior (infinite list)
+		new_node->previous = nullptr;
+
+		// append it to this linked list
+		if(this->head != nullptr) {
+			this->head->previous = new_node;
+		}
+		new_node->next = this->head;
+		this->head = new_node;
+
+		// move on to the previous node
+		iterator = iterator->previous;
+	}
+
+
+	// increment the number_of_nodes by 1
+	this->number_of_nodes++;
+}
+
+
 // remove the first oocurrence a node with the given value
 // @parameter:
 //		value = the value of the node to be deleted
-bool LinkedList::remove_first_occurrence(int value) {
+template<class T>
+bool LinkedList<T>::remove_first_occurrence(T value) {
 	return this->remove_occurrence_helper(value, FIRST);
 }
 
@@ -402,33 +594,34 @@ bool LinkedList::remove_first_occurrence(int value) {
 
 // remove the node at the end
 // return the removed node
-Node LinkedList::remove_last() {
+template<class T>
+Node<T> LinkedList<T>::remove_last() {
 	// declare the node to return
-	Node removed_node_to_return;
+	Node<T> removed_node_to_return;
 
 	// if the list is not empty
 	if(this->length() >= 1) {
 		// store the tail in a variable so we can return it 
-		Node removed_node_to_return = *(this->tail);
+		Node<T> removed_node_to_return = *(this->tail);
 
-		// if there is only 1 element, set both head and tail to NULL after deletion
+		// if there is only 1 element, set both head and tail to nullptr after deletion
 		if(this->length() == 1) {
 			// delete the tail
 			delete this->tail;
 
-			// set both head and tail to NULL
-			this->head = NULL;
-			this->tail = NULL;
+			// set both head and tail to nullptr
+			this->head = nullptr;
+			this->tail = nullptr;
 
 		}
 		// only work with tail
 		else {
 			// temporarily store the second of the last node, so that we can set the tail
 			//		to that node after deleting the tail
-			Node* new_last = this->tail->previous;
+			Node<T>* new_last = this->tail->previous;
 
-			// set the next of the tail's previous node to NULL
-			this->tail->previous->next = NULL;
+			// set the next of the tail's previous node to nullptr
+			this->tail->previous->next = nullptr;
 
 			
 
@@ -447,22 +640,23 @@ Node LinkedList::remove_last() {
 }
 
 // remove the element at the front (the head)
-Node LinkedList::remove_first() {
+template<class T>
+Node<T> LinkedList<T>::remove_first() {
 	// declare the node to return
-	Node removed_node_to_return;
+	Node<T> removed_node_to_return;
 
-	// pop the head as long as it is not NULL
-	if(this->head != NULL) {	
+	// pop the head as long as it is not nullptr
+	if(this->head != nullptr) {	
 		// store the head in a variable so we can return it 
-		Node removed_node_to_return = *(this->tail);
+		removed_node_to_return = *(this->head);
 
-		// set the previous of the next node to NULL
-		if(this->head->next != NULL) {
-			this->head->next->previous = NULL;
+		// set the previous of the next node to nullptr
+		if(this->head->next != nullptr) {
+			this->head->next->previous = nullptr;
 		}
 
 		// temporarily store the head node
-		Node* temp_node = this->head;
+		Node<T>* temp_node = this->head;
 
 		// reset the head to the next node
 		this->head = this->head->next;
@@ -474,21 +668,22 @@ Node LinkedList::remove_first() {
 		this->number_of_nodes--;
 	}
 
-
+	return removed_node_to_return;
 }
 
 
 // removes all elements from the list
-void LinkedList::clear() {
+template<class T>
+void LinkedList<T>::clear() {
 	// start from the head node
-	Node* node_to_remove = this->head;
+	Node<T>* node_to_remove = this->head;
 
 	// use this to keep track of the next node after the node_to_del is deleted
-	Node* next_node;
+	Node<T>* next_node;
 
 	// delete all the node pointers in the list, because they have been allocated 
 	//		dynamically
-	while(node_to_remove != NULL) {
+	while(node_to_remove != nullptr) {
 		next_node = node_to_remove->next;
 
 		// delete the node
@@ -496,15 +691,11 @@ void LinkedList::clear() {
 
 		// move on to the next node
 		node_to_remove = next_node;
-
-
 	}
 
-	cout << endl;
-
 	// set both head and tail node pointers to null
-	this->head = NULL;
-	this->tail = NULL;
+	this->head = nullptr;
+	this->tail = nullptr;
 
 	// set the size of the list to 0
 	this->number_of_nodes = 0;
@@ -516,15 +707,16 @@ void LinkedList::clear() {
 //		value = the value whose index we want to find (from the beginning)
 // @return
 //		the index of the given value in the list
-int LinkedList::index_of(int value) {
+template<class T>
+int LinkedList<T>::index_of(T value) {
 	// begin from the head (first element)
-	Node* current_node = this->head;
+	Node<T>* current_node = this->head;
 
 	// keep track of the index in the following loop
 	int current_index = 0;
 
 	// iterate through the elements in the list
-	while(current_node != NULL) {
+	while(current_node != nullptr) {
 		if(current_node->value == value){
 			// return the index
 			return current_index;
@@ -548,16 +740,17 @@ int LinkedList::index_of(int value) {
 //		value = the value whose index we want to find (from the end)
 // @return
 //		the index of the given value in the list
-int LinkedList::last_index_of(int value) {
+template<class T>
+int LinkedList<T>::last_index_of(T value) {
 	// begin from the tail (last element)
-	Node* current_node = this->tail;
+	Node<T>* current_node = this->tail;
 
 	// keep track of the index in the following loop
 	// begin with the last index
 	int current_index = this->length() - 1;
 
 	// iterate through the elements in the list
-	while(current_node != NULL) {
+	while(current_node != nullptr) {
 		if(current_node->value == value){
 			// return the index
 			return current_index;
@@ -573,19 +766,19 @@ int LinkedList::last_index_of(int value) {
 	return -1;
 }
 
-// !!! implement the ones below
 // return true if this list contains the specified element
 // @parameters:
 //		value = the given value we want to find in the list
 // @return:
 //		true if the value is in the list
 //		false otherwise
-bool LinkedList::contains(int value) {
+template<class T>
+bool LinkedList<T>::contains(T value) {
 		// begin from the head (first element)
-	Node* current_node = this->head;
+	Node<T>* current_node = this->head;
 
 	// iterate through the elements in the list
-	while(current_node != NULL) {
+	while(current_node != nullptr) {
 		if(current_node->value == value){
 			// return true
 			return true;
@@ -599,22 +792,25 @@ bool LinkedList::contains(int value) {
 }
 
 // retrieve (do not remove) the first element in the list
-Node LinkedList::peek_first() {
+template<class T>
+Node<T> LinkedList<T>::peek_first() {
 	return *(this->head);
 }
 
 // retrieve (do not remove) the last element in the list
-Node LinkedList::peek_last() {
+template<class T>
+Node<T> LinkedList<T>::peek_last() {
 	return *(this->tail);
 }	
 
 // removes the element at the specified position in this list 
 // @return:
 //		the removed element
-Node LinkedList::remove_at_index(int index) {
-	if(index > 0 && index < this->length()) {
+template<class T>
+Node<T> LinkedList<T>::remove_at_index(int index) {
+	if(index >= 0 && index < this->length()) {
 		// declare current node
-		Node* current_node;
+		Node<T>* current_node;
 
 		// declare is_next
 		bool is_next;
@@ -625,6 +821,7 @@ Node LinkedList::remove_at_index(int index) {
 
 			// we need to iterate forward
 			is_next = true;
+			cout << "removing " << index << " from the start. " << endl;
 
 		}
 		else {
@@ -635,7 +832,10 @@ Node LinkedList::remove_at_index(int index) {
 
 			// convert the index from starting from the beginning to starting from the end
 			index = this->length() - index - 1;
+	
+			cout << "removing " << index << " from the end. " << endl;
 		}		
+
 
 		// loop until getting to the desired node
 		// iterate over the list, either forward or backward, depending on is_next
@@ -648,15 +848,41 @@ Node LinkedList::remove_at_index(int index) {
 			}
 		}
 
-		// store the node before removing
-		Node node_to_return = *current_node;
+		// store the node in a variable before removing it
+		Node<T> node_to_return = *current_node;
 
+		// relink the nodes around the removed node
+		// if there is a previous node, then relink it
+		if(current_node->previous != nullptr) {
+			current_node->previous->next = current_node->next;
+		}
+		else {
+			// this is the first node, so reset the head node
+			this->head = current_node->next;
+		}
+		// if there is a next node, then relink it
+		if(current_node->next != nullptr) {
+			current_node->next->previous = current_node->previous;
+		}
+		else {
+			// this is the last node, so reset the tail node
+			this->tail = current_node->previous;
+		}
+
+		// decrement the number of nodes
+		this->number_of_nodes--;
+
+		// delete the pointer
 		delete current_node;
+		// set the pointer to the current_node to a nullptr
+		current_node = nullptr;
+
 
 		return node_to_return;
 	}
 	else {
 		throw std::out_of_range("The index provided is out of range.");
+
 	}
 }
 
@@ -666,14 +892,15 @@ Node LinkedList::remove_at_index(int index) {
 //		value = the value to reset at the given position
 // @return:
 //		the set node
-Node LinkedList::set(int value, int position) {
+template<class T>
+Node<T> LinkedList<T>::set(T value, int position) {
 	// if position is out of range, throw out of range error
 	if(position < 0 || position >= this->length()){ 
 		throw std::out_of_range("The position provided is out of range."); 
 	}
 	else {
 		// node pointer to iterate
-		Node* node_to_set = this->head;
+		Node<T>* node_to_set = this->head;
 
 		// keep track of the position
 		int counter = 0;
@@ -689,12 +916,12 @@ Node LinkedList::set(int value, int position) {
 		node_to_set->value = value;
 
 		// declare a new node to return
-		Node new_node = *node_to_set;
+		Node<T> new_node = *node_to_set;
 
 		// reset the links of the node to make it impossible to change the list
 		//		outside of this function
-		new_node.next = NULL;
-		new_node.previous = NULL;
+		new_node.next = nullptr;
+		new_node.previous = nullptr;
 
 		return new_node;
 	}
@@ -707,7 +934,8 @@ Node LinkedList::set(int value, int position) {
 // @return:
 //		true = if the node with the given value was successfully deleted
 //		false = otherwise
-bool LinkedList::remove_last_occurrence(int value) {
+template<class T>
+bool LinkedList<T>::remove_last_occurrence(T value) {
 	// call the helper function to remove the last occurrence
 	return this->remove_occurrence_helper(value, LAST);
 }
@@ -722,9 +950,10 @@ bool LinkedList::remove_last_occurrence(int value) {
 // @return:
 //		true = if the node with the given value was successfully deleted
 //		false = otherwise
-bool LinkedList::remove_occurrence_helper(int value, bool first_or_last) {
+template<class T>
+bool LinkedList<T>::remove_occurrence_helper(T value, bool first_or_last) {
 	// declare node_to_del
-	Node* node_to_del;
+	Node<T>* node_to_del;
 
 	// delete the first occurrence
 	if(first_or_last == FIRST) { 
@@ -737,14 +966,14 @@ bool LinkedList::remove_occurrence_helper(int value, bool first_or_last) {
 	}
 
 	// will store either the head or the tail of the list
-	Node* temp_head_or_tail = NULL;
+	Node<T>* temp_head_or_tail = nullptr;
 
 	// look for the value in the linked list
-	while(node_to_del != NULL) {
+	while(node_to_del != nullptr) {
 		// if the current node has the given value, delete it
 		if(node_to_del->value == value) {
 			// !!! reset next and previous pointers before deleting the node
-			if(node_to_del->previous != NULL) {
+			if(node_to_del->previous != nullptr) {
 				node_to_del->previous->next = node_to_del->next;
 			}
 			// it is the head of the list
@@ -753,7 +982,7 @@ bool LinkedList::remove_occurrence_helper(int value, bool first_or_last) {
 			}
 
 			// if this node is not the tail of the list
-			if(node_to_del->next != NULL) {
+			if(node_to_del->next != nullptr) {
 				node_to_del->next->previous = node_to_del->previous;
 			}
 			// else it's the tail of the list
@@ -764,7 +993,7 @@ bool LinkedList::remove_occurrence_helper(int value, bool first_or_last) {
 			// delete the node
 			delete node_to_del;
 		
-			// // set it to NULL to end the loop
+			// // set it to nullptr to end the loop
 			// node_to_del = temp_head_or_tail;
 
 			// decrement the number_of_nodes by 1
@@ -787,6 +1016,45 @@ bool LinkedList::remove_occurrence_helper(int value, bool first_or_last) {
 	}
 	// node was not found
 	return false;
+}
+
+// swaps the given nodes
+template<class T>
+void LinkedList<T>::swap_nodes(Node<T>* left_it, Node<T>* right_it) {
+	Node<T>* temp_next_of_left = left_it->next;
+	Node<T>* temp_prev_of_left = left_it->previous;
+
+	// adjust the next and previous pointers before swapping
+	if(left_it->next != nullptr) {
+		left_it->next->previous = right_it;
+	}
+	if(left_it->previous != nullptr) {
+		left_it->previous->next = right_it;
+	}
+	if(right_it->next != nullptr) {
+		right_it->next->previous = left_it;
+	}
+	if(right_it->previous != nullptr) {
+		right_it->previous->next = left_it;
+	}
+
+	// swap the left and right iterators
+	left_it->next = right_it->next;
+	left_it->previous = right_it->previous;
+
+	right_it->next = temp_next_of_left;
+	right_it->previous = temp_prev_of_left;
+
+	// make sure the head and tail pointers point to the right node, in case
+	//		either the left or the right iterators are the head/tail of the
+	//		list. 
+	if(this.head == left_it) {
+		this.head = right_it;
+	}
+	if(this.tail == right_it) {
+		this.tail = left_it;
+	}
+
 }
 
 #endif

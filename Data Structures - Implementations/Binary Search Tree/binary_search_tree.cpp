@@ -16,9 +16,9 @@ using namespace std;
 //							Declarations of structure and functions
 // a node structure for a binary search tree.
 struct bst_node {
-	bst_node* parent = NULL;
-	bst_node* left_child = NULL;
-	bst_node* right_child = NULL;
+	bst_node* parent = nullptr;
+	bst_node* left_child = nullptr;
+	bst_node* right_child = nullptr;
 
 	// RIGHT if this node is the right child of its parent
 	// LEFT otherwise
@@ -43,7 +43,7 @@ bst_node* binary_search(bst_node* root, int value);
 
 int main() {
 	int value;
-	bst_node* root = NULL;
+	bst_node* root = nullptr;
 
 	// for(int i = 0; i < 20; i++) {
 	// 	cout << "Enter a value: " << endl;
@@ -63,7 +63,7 @@ int main() {
 	}
 	display_tree(root);
 
-	bst_node* node = NULL;
+	bst_node* node = nullptr;
 
 	// delete an element
 	for(int i = 0; i < 10; i++) {
@@ -93,7 +93,7 @@ void insert(bst_node*& root, int value) {
 	new_node->value = value;
 
 	// if the tree is empty, insert the new node as the root of the tree
-	if(root == NULL) {
+	if(root == nullptr) {
 		root = new_node;
 	}
 	else {
@@ -113,7 +113,7 @@ void insert(bst_node*& root, int value) {
 		bool found = false;
 
 		// while there is a node in the path to traverse, continue with the loop.
-		while(current_node != NULL) {
+		while(current_node != nullptr) {
 			// reset parent_node
 			parent_node = current_node;
 
@@ -132,7 +132,7 @@ void insert(bst_node*& root, int value) {
 				// the node is found
 				found = true;
 
-				current_node = NULL;
+				current_node = nullptr;
 			}
 		}
 
@@ -167,7 +167,7 @@ void display_tree(bst_node* root) {
 
 	int num_of_nodes_on_level = 1;
 
-	if(root != NULL) {
+	if(root != nullptr) {
 		nodes_queue.push(root);
 	}
 
@@ -178,18 +178,18 @@ void display_tree(bst_node* root) {
 		while(num_of_nodes_on_level > 0) {
 			current_node = nodes_queue.front();
 
-			if(current_node != NULL) {
+			if(current_node != nullptr) {
 				cout << current_node->value;
 			}
-			if(current_node->parent != NULL) {
+			if(current_node->parent != nullptr) {
 				cout << "(" << current_node->which_child << "," << current_node->parent->value << ")   ";
 			}
 			
 			// push both children of the current_node into the queue
-			if(current_node->left_child != NULL) {
+			if(current_node->left_child != nullptr) {
 				nodes_queue.push(current_node->left_child);
 			}
-			if(current_node->right_child != NULL) {
+			if(current_node->right_child != nullptr) {
 				nodes_queue.push(current_node->right_child);
 				
 			}
@@ -220,47 +220,47 @@ void display_tree(bst_node* root) {
 void delete_node(bst_node*& root, bst_node* node_to_del) {
 	
 	// Case 0: tree is empty. don't do anything
-	if(root == NULL) {
+	if(root == nullptr) {
 		// don't do anything
 	}
 	// Case 1: the node to be deleted is a leaf node, just delete it, and set it's parent's
 	//		appropriate child to null
-	else if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
+	else if(node_to_del->left_child == nullptr && node_to_del->right_child == nullptr) {
 		// the node is the root with no children
-		if(node_to_del->parent == NULL) {
+		if(node_to_del->parent == nullptr) {
 			delete node_to_del;
-			node_to_del = NULL;
+			node_to_del = nullptr;
 
-			root = NULL;
+			root = nullptr;
 		}
 		// the node is a leaf node
 		else {
 			// if the node to be deleted is the right child of its parent, set the right child
-			// 		of its parent to NULL
+			// 		of its parent to nullptr
 			if(node_to_del->which_child == RIGHT) {
-				node_to_del->parent->right_child = NULL;
+				node_to_del->parent->right_child = nullptr;
 		   		delete node_to_del;			
-				node_to_del = NULL;
+				node_to_del = nullptr;
 			}
 			else {
-				node_to_del->parent->left_child = NULL;
+				node_to_del->parent->left_child = nullptr;
 		   		delete node_to_del;			
-				node_to_del = NULL;
+				node_to_del = nullptr;
 			}
 
 		}
 	}
 	// Case 2a: the node to be deleted has 1 child, left 
-	else if(node_to_del->right_child == NULL && node_to_del->left_child != NULL) {
+	else if(node_to_del->right_child == nullptr && node_to_del->left_child != nullptr) {
 		// if the node is the root node
-		if(node_to_del->parent == NULL) {
+		if(node_to_del->parent == nullptr) {
 			// set the left child of the node to be the root
 			root = node_to_del->left_child;
-			root->parent = NULL;
+			root->parent = nullptr;
 
 			// delete the node
 			delete node_to_del;			
-			node_to_del = NULL;
+			node_to_del = nullptr;
 		} else {
 			// reset the child and parent pointers appropriately before deleting the 
 			//		node_to_del
@@ -274,20 +274,20 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 
 			// delete the node
 			delete node_to_del;
-			node_to_del = NULL;
+			node_to_del = nullptr;
 		}
 	}
 	// Case 2b: the node to be deleted has 1 child, right 
-	else if(node_to_del->right_child != NULL && node_to_del->left_child == NULL) {
+	else if(node_to_del->right_child != nullptr && node_to_del->left_child == nullptr) {
 		// if the node is the root node
-		if(node_to_del->parent == NULL) {
+		if(node_to_del->parent == nullptr) {
 			// set the right child of the node to be the root
 			root = node_to_del->right_child;
-			root->parent = NULL;
+			root->parent = nullptr;
 
 			// delete the node
 			delete node_to_del;
-			node_to_del = NULL;
+			node_to_del = nullptr;
 		} else {
 			// reset the child and parent pointers appropriately before deleting the 
 			//		node_to_del
@@ -300,7 +300,7 @@ void delete_node(bst_node*& root, bst_node* node_to_del) {
 			}
 			// delete the node
 			delete node_to_del;
-			node_to_del = NULL;
+			node_to_del = nullptr;
 		}
 	}
 	// Case 3: the node has 2 children
@@ -335,10 +335,10 @@ bst_node* find_inorder(bst_node* root, int value, bool successor_or_predecessor)
 	
 	bst_node* inorder;
 
-	// if the node has no children, return NULL
-	if(node == NULL || (node->left_child == NULL && node->right_child == NULL)) {
+	// if the node has no children, return nullptr
+	if(node == nullptr || (node->left_child == nullptr && node->right_child == nullptr)) {
 		cout << "Node is null" << endl;
-		inorder = NULL;
+		inorder = nullptr;
 		return inorder;
 	}
 	// find inorder successor
@@ -346,10 +346,10 @@ bst_node* find_inorder(bst_node* root, int value, bool successor_or_predecessor)
 		inorder = node->right_child;
 		
 		// go right, then keep going left
-		if(node->right_child != NULL) {
+		if(node->right_child != nullptr) {
 			bst_node* inorder = node->right_child;
 			// while there is left_child, keep going down the tree
-			while(inorder->left_child != NULL) {
+			while(inorder->left_child != nullptr) {
 				inorder = inorder->left_child;
 			}
 
@@ -364,9 +364,9 @@ bst_node* find_inorder(bst_node* root, int value, bool successor_or_predecessor)
 		inorder = node->left_child;
 
 		// go left, then keep going right
-		if(node->left_child != NULL) {
+		if(node->left_child != nullptr) {
 			// while there is right child, keep going down the tree
-			while(inorder->right_child != NULL) {
+			while(inorder->right_child != nullptr) {
 				inorder = inorder->right_child;
 			}
 
@@ -384,14 +384,14 @@ bst_node* find_inorder(bst_node* root, int value, bool successor_or_predecessor)
 // @return
 //		a reference to a pointer to the node that has the given value
 //		or 
-//		NULL if the value is not found in the bst
+//		nullptr if the value is not found in the bst
 //		it is a reference because we need to be able to delete that node in case this
 //			function is called from delete_node
 bst_node* binary_search(bst_node* root, int value) {
-	if(root == NULL) {
+	if(root == nullptr) {
 		bst_node* node;
 		cout << "Node is not found. " << endl;
-		node = NULL;
+		node = nullptr;
 		return node;
 	} else {
 		// search in the right subtree
@@ -416,7 +416,7 @@ bst_node* binary_search(bst_node* root, int value) {
 // @parameters:
 //		root = a pointer to the root node of the tree.
 // @return
-//		true = if the tree is binary (left child of any node is either NULL or < node)
+//		true = if the tree is binary (left child of any node is either nullptr or < node)
 //		false = if the tree is not binary
 bool is_binary_tree(node* root) { 
 	// stores the nodes of a tree in a breadth-first traversal. Updated throughout the
@@ -426,7 +426,7 @@ bool is_binary_tree(node* root) {
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
 
-	if(root != NULL) {
+	if(root != nullptr) {
 		// push the node on the zeroth level (root) into the queue
 		nodes_on_level.push(root);
 		num_of_nodes_on_level = 1;
@@ -452,7 +452,7 @@ bool is_binary_tree(node* root) {
 
 			// push the children of the given node into the queue. After push, the queue
 			//		has a mix of nodes from the current and next levels.
-			if(nodes_on_level.front()->left_child != NULL) {
+			if(nodes_on_level.front()->left_child != nullptr) {
 				// if the left child is not less than the node, return false
 				if(nodes_on_level.front()->left_child->value >= nodes_on_level.front()->value) {
 					cout << nodes_on_level.front()->value << "has a wrong left child" << endl;
@@ -463,7 +463,7 @@ bool is_binary_tree(node* root) {
 					nodes_on_level.push(nodes_on_level.front()->left_child);
 				}
 			}			
-			if(nodes_on_level.front()->right_child != NULL) {
+			if(nodes_on_level.front()->right_child != nullptr) {
 				// if the right child is not greateer than the node, return false
 				if(nodes_on_level.front()->right_child->value <= nodes_on_level.front()->value) {
 					cout << nodes_on_level.front()->value << "has a wrong right child" << endl;
@@ -481,7 +481,7 @@ bool is_binary_tree(node* root) {
 			//		that is, make sure that the parent has a larger value than the node
 			//		if the node is a left child, and a lower value if the node is a 
 			//		right child
-			if(nodes_on_level.front()->parent != NULL) {
+			if(nodes_on_level.front()->parent != nullptr) {
 				// the node is a right child. it must have a value greater than the value
 				//	of its parent
 				if(nodes_on_level.front()->which_child == RIGHT) {
