@@ -575,6 +575,10 @@ void LinkedList<T>::add_first(LinkedList linked_list) {
 		// move on to the previous node
 		iterator = iterator->previous;
 	}
+
+
+	// increment the number_of_nodes by 1
+	this->number_of_nodes++;
 }
 
 
@@ -804,7 +808,7 @@ Node<T> LinkedList<T>::peek_last() {
 //		the removed element
 template<class T>
 Node<T> LinkedList<T>::remove_at_index(int index) {
-	if(index > 0 && index < this->length()) {
+	if(index >= 0 && index < this->length()) {
 		// declare current node
 		Node<T>* current_node;
 
@@ -817,6 +821,7 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 
 			// we need to iterate forward
 			is_next = true;
+			cout << "removing " << index << " from the start. " << endl;
 
 		}
 		else {
@@ -827,7 +832,10 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 
 			// convert the index from starting from the beginning to starting from the end
 			index = this->length() - index - 1;
+	
+			cout << "removing " << index << " from the end. " << endl;
 		}		
+
 
 		// loop until getting to the desired node
 		// iterate over the list, either forward or backward, depending on is_next
@@ -844,8 +852,25 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 		Node<T> node_to_return = *current_node;
 
 		// relink the nodes around the removed node
-		current_node->previous->next = current_node->next;
-		current_node->next->previous = current_node->previous;
+		// if there is a previous node, then relink it
+		if(current_node->previous != nullptr) {
+			current_node->previous->next = current_node->next;
+		}
+		else {
+			// this is the first node, so reset the head node
+			this->head = current_node->next;
+		}
+		// if there is a next node, then relink it
+		if(current_node->next != nullptr) {
+			current_node->next->previous = current_node->previous;
+		}
+		else {
+			// this is the last node, so reset the tail node
+			this->tail = current_node->previous;
+		}
+
+		// decrement the number of nodes
+		this->number_of_nodes--;
 
 		// delete the pointer
 		delete current_node;
@@ -857,6 +882,7 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 	}
 	else {
 		throw std::out_of_range("The index provided is out of range.");
+
 	}
 }
 
