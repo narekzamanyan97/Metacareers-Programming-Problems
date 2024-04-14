@@ -646,28 +646,22 @@ Node<T> LinkedList<T>::remove_first() {
 		// store the head in a variable so we can return it 
 		removed_node_to_return = *(this->head);
 
-		cout << "1" << endl;
 		// set the previous of the next node to nullptr
 		if(this->head->next != nullptr) {
 			this->head->next->previous = nullptr;
 		}
-		cout << "2" << endl;
 
 		// temporarily store the head node
 		Node<T>* temp_node = this->head;
 
-		cout << "3" << endl;
 		// reset the head to the next node
 		this->head = this->head->next;
-		cout << "4" << endl;
 
 		// delete the address pointed to by the temporary node
 		delete temp_node;
 
-		cout << "5" << endl;
 		// decrement the number_of_nodes by 1
 		this->number_of_nodes--;
-		cout << "6" << endl;
 	}
 
 	return removed_node_to_return;
@@ -846,10 +840,18 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 			}
 		}
 
-		// store the node before removing
+		// store the node in a variable before removing it
 		Node<T> node_to_return = *current_node;
 
+		// relink the nodes around the removed node
+		current_node->previous->next = current_node->next;
+		current_node->next->previous = current_node->previous;
+
+		// delete the pointer
 		delete current_node;
+		// set the pointer to the current_node to a nullptr
+		current_node = nullptr;
+
 
 		return node_to_return;
 	}

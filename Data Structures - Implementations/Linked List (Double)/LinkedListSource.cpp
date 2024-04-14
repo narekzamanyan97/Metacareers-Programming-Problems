@@ -207,10 +207,10 @@ int main() {
 					node = linked_list.peek_last();
 					cout << "value = " << node.value << endl;
 					if(node.previous != nullptr) {
-						cout << "next = " << node.next->value << endl;
+						cout << "previous = " << node.previous->value << endl;
 					}
 					else {
-						cout << "next node is nullptr " << endl;
+						cout << "previous node is nullptr " << endl;
 					}
 				}
 				else {
@@ -222,15 +222,22 @@ int main() {
 				cout << "Enter an index to remove the node at that location: " << endl;
 				cin >> index;
 
-				node = linked_list.remove_at_index(index);
 				
-				try {				
+				try {
+					node = linked_list.remove_at_index(index);
+
 					cout << "removed " << node.value << endl;
 					if(node.next != nullptr) {
 						cout << "next of removed node = " << node.next->value << endl;
 					}
 					else {
 						cout << "the removed node had no next node. " << endl;
+					}
+					if(node.previous != nullptr) {
+						cout << "previous of removed node = " << node.previous->value << endl;
+					}
+					else {
+						cout << "the removed node has no previous node." << endl;
 					}
 				}
 				catch(std::out_of_range ex) {

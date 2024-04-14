@@ -1,14 +1,6 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-// !!! Push the changes to git (04/13/2024)
-//		Commit Message:
-//		Modified the LinkedList class to work with a template, so that the type can be
-//			any class or type.
-//		Added an exception handling in the main method for the insert(), set(), and 
-//			remove_at_index() methods
-//		Fixed the remvoe_at_index() to return the removed node object
-
 template <class T> 
 struct Node {
 	T value;
