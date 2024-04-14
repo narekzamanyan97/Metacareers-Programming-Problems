@@ -14,9 +14,9 @@ private:
 	// a node structure for a binary search tree.
 	struct bst_node {
 		// pointers to the parent and children bst nodes
-		bst_node* parent = NULL;
-		bst_node* left_child = NULL;
-		bst_node* right_child = NULL;
+		bst_node* parent = nullptr;
+		bst_node* left_child = nullptr;
+		bst_node* right_child = nullptr;
 
 		// RIGHT if this node is the right child of its parent
 		// LEFT otherwise

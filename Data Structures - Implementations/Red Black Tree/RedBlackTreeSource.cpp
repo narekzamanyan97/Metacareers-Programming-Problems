@@ -40,7 +40,7 @@ int main() {
 	}
 
 	delete[] flattened_tree;
-	flattened_tree = NULL;
+	flattened_tree = nullptr;
 
 	return 0;
 }
@@ -63,7 +63,7 @@ void demo_delete_node_array(RedBlackTree& tree, int* vals_to_del, int size_of_ar
 	// int vals_to_del[] = {30, 5, 6, 40, 20, 33, 70, 34, 0, 60, 2, 50};
 	for(int i = 0; i < size_of_array; i++) {
 		node_to_del = tree.binary_search(vals_to_del[i]);
-		if(node_to_del != NULL) {
+		if(node_to_del != nullptr) {
 
 			tree.delete_node(node_to_del);
 		}
@@ -139,7 +139,7 @@ void demo_delete_node_input(RedBlackTree& tree) {
 
 		node_to_del = tree.binary_search(value);
 
-		if(node_to_del != NULL) {
+		if(node_to_del != nullptr) {
 
 			tree.delete_node(node_to_del);
 			tree.display_tree();		
@@ -230,7 +230,7 @@ RedBlackTree demo_build_tree_random(int num_of_nodes, int max_value) {
 	RedBlackTree tree = RedBlackTree();
 
 	// initialize random seed
-	srand(time(NULL));
+	srand(time(nullptr));
 	
 	// if max_value < num_of_nodes, then reset max value to be 10 higher
 	if(max_value < num_of_nodes) {

@@ -20,9 +20,9 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////
 //							Function and struct declarations
 struct node {
-	node* left_child = NULL;
-	node* right_child = NULL;
-	node* parent = NULL;
+	node* left_child = nullptr;
+	node* right_child = nullptr;
+	node* parent = nullptr;
 
 	bool which_child;
 
@@ -69,7 +69,7 @@ bool is_integer(string str);
 
 int main() {
 	node* root;
-	root = NULL;
+	root = nullptr;
 
 	int value;
 
@@ -115,7 +115,7 @@ void demo_delete_node_array(node* root, int* vals_to_del, int size_of_array) {
 	// int vals_to_del[] = {30, 5, 6, 40, 20, 33, 70, 34, 0, 60, 2, 50};
 	for(int i = 0; i < size_of_array; i++) {
 		node_to_del = binary_search(root, vals_to_del[i]);
-		if(node_to_del != NULL) {
+		if(node_to_del != nullptr) {
 
 			delete_node(root, node_to_del);
 		}
@@ -134,7 +134,7 @@ void demo_delete_node_array(node* root, int* vals_to_del, int size_of_array) {
 //		num_of_nodes_to_del = the number of nodes to be deleted from the tree
 void demo_delete_node_random(node* root, int num_of_nodes, int num_of_nodes_to_del) {
 	// initialize random seed
-	srand(time(NULL));
+	srand(time(nullptr));
 	
 	// temp variable to store the node to be deleted
 	node* node_to_del;
@@ -147,7 +147,7 @@ void demo_delete_node_random(node* root, int num_of_nodes, int num_of_nodes_to_d
 	for(int i = 0; i < num_of_nodes_to_del; i++) {
 		// if there are no more nodes in the tree (tree is empty), break from the loop
 		//		and exit the function
-		if(root == NULL) {
+		if(root == nullptr) {
 			cout << "Tree is empty." << endl;
 			break;
 		} else {
@@ -158,7 +158,7 @@ void demo_delete_node_random(node* root, int num_of_nodes, int num_of_nodes_to_d
 			node_to_del = binary_search(root, value);
 
 			// if the node is not found, generate another integer
-			while(node_to_del == NULL) {
+			while(node_to_del == nullptr) {
 				// regenerate a random number
 				value = rand() % (num_of_nodes);
 
@@ -206,7 +206,7 @@ void demo_delete_node_input(node* root) {
 
 		node_to_del = binary_search(root, value);
 
-		if(node_to_del != NULL) {
+		if(node_to_del != nullptr) {
 
 			delete_node(root, node_to_del);
 			display_tree(root);		
@@ -239,7 +239,7 @@ void demo_delete_node_input(node* root) {
 //		root = a pointer to the root of the array
 node* demo_build_tree_from_array(int* array_of_values, int size_of_array) {
 	// a pointer holding the root of the tree
-	node* root = NULL;
+	node* root = nullptr;
 
 	// iterate over the array of values, and insert the values into the tree one by one
 	for(int i = 0; i < size_of_array; i++) {
@@ -260,7 +260,7 @@ node* demo_build_tree_from_array(int* array_of_values, int size_of_array) {
 //		root = a pointer to the root node of the newly built tree
 node* demo_build_tree_input() {
 	// a pointer holding the root of the tree
-	node* root = NULL;
+	node* root = nullptr;
 
 	// the variable for the value to be inserted.
 	int value;
@@ -294,10 +294,10 @@ node* demo_build_tree_input() {
 //		root = a pointer to the root node of the newly built tree
 node* demo_build_tree_random(int num_of_nodes) {
 	// a pointer holding the root of the tree
-	node* root = NULL;
+	node* root = nullptr;
 
 	// initialize random seed
-	srand(time(NULL));
+	srand(time(nullptr));
 	
 	// value to add
 	int value; 
@@ -342,7 +342,7 @@ bool is_integer(string str) {
 // @parameters:
 //		root = a pointer to the root node of the tree.
 // @return
-//		true = if the tree is binary (left child of any node is either NULL or < node)
+//		true = if the tree is binary (left child of any node is either nullptr or < node)
 //		false = if the tree is not binary
 bool is_binary_tree(node* root) { 
 	// stores the nodes of a tree in a breadth-first traversal. Updated throughout the
@@ -352,7 +352,7 @@ bool is_binary_tree(node* root) {
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
 
-	if(root != NULL) {
+	if(root != nullptr) {
 		// push the node on the zeroth level (root) into the queue
 		nodes_on_level.push(root);
 		num_of_nodes_on_level = 1;
@@ -378,7 +378,7 @@ bool is_binary_tree(node* root) {
 
 			// push the children of the given node into the queue. After push, the queue
 			//		has a mix of nodes from the current and next levels.
-			if(nodes_on_level.front()->left_child != NULL) {
+			if(nodes_on_level.front()->left_child != nullptr) {
 				// if the left child is not less than the node, return false
 				if(nodes_on_level.front()->left_child->value >= nodes_on_level.front()->value) {
 					cout << nodes_on_level.front()->value << "has a wrong left child" << endl;
@@ -389,7 +389,7 @@ bool is_binary_tree(node* root) {
 					nodes_on_level.push(nodes_on_level.front()->left_child);
 				}
 			}			
-			if(nodes_on_level.front()->right_child != NULL) {
+			if(nodes_on_level.front()->right_child != nullptr) {
 				// if the right child is not greateer than the node, return false
 				if(nodes_on_level.front()->right_child->value <= nodes_on_level.front()->value) {
 					cout << nodes_on_level.front()->value << "has a wrong right child" << endl;
@@ -407,7 +407,7 @@ bool is_binary_tree(node* root) {
 			//		that is, make sure that the parent has a larger value than the node
 			//		if the node is a left child, and a lower value if the node is a 
 			//		right child
-			if(nodes_on_level.front()->parent != NULL) {
+			if(nodes_on_level.front()->parent != nullptr) {
 				// the node is a right child. it must have a value greater than the value
 				//	of its parent
 				if(nodes_on_level.front()->which_child == RIGHT) {
@@ -488,7 +488,7 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 	bool passed_the_test = true;
 	
 	// base case. If the node is NIL node, compare it to the second argument
-	if(root == NULL) {
+	if(root == nullptr) {
 
 		// if the running total (the # of black nodes on the path to this node) is
 		//		the same as the one for the left-most node, return true 
@@ -520,7 +520,7 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 		// if the current node is RED
 		if(root->color == RED) {
 			// if any of its children are RED, set passed_the_test to false
-			if(root->left_child != NULL) {
+			if(root->left_child != nullptr) {
 				if(root->left_child->color == RED) {
 					// cout << "Red node has a red child" << endl;
 					// cout << root->value << " and " << root->left_child->value << endl;
@@ -529,7 +529,7 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 			}
 
 			// if the previous test is not passed, skip the right child
-			if(root->right_child != NULL && passed_the_test) {
+			if(root->right_child != nullptr && passed_the_test) {
 				if(root->right_child->color == RED) {
 					// cout << "Red node has a red child" << endl;
 					// cout << root->value << " and " << root->right_child->value << endl;
@@ -542,7 +542,7 @@ bool is_red_black_tree_helper1(node* root, int running_total, int tot_bl_nodes_o
 		if(root->color == RED) {
 			// if the node has a parent, then check if it is RED. If it is, then set
 			//		passed_the_test to false
-			if(root->parent != NULL) {
+			if(root->parent != nullptr) {
 				if(root->parent->color == RED) {
 					passed_the_test = false;
 				}
@@ -580,7 +580,7 @@ int is_red_black_tree_helper2(node* root) {
 	// keeps track of the black nodes on the way to the left-most node
 	int tot_bl_nodes_on_leftmost_path = 0;
 
-	while(root != NULL) {
+	while(root != nullptr) {
 		// if the current node to the left-most leaf is black
 		if(root->color == BLACK) {
 			// increment the number of black nodes on the path
@@ -597,7 +597,7 @@ int is_red_black_tree_helper2(node* root) {
 // insert a value into a red-black tree that has the given root.
 // @parameters
 //		root = a reference to a pointer for the root of the tree. It is a reference 
-//			to allow us to set it in case root is NULL (the there is empty) and the
+//			to allow us to set it in case root is nullptr (the there is empty) and the
 //			value is the first node in the tree
 //		value = the value of the node to be isnerted
 // @return
@@ -605,12 +605,12 @@ int is_red_black_tree_helper2(node* root) {
 //		false = if it was not (a node with the same value is already in the tree)
 bool insert(node*& root, int value) {
 	// Case 1: Tree is empty. Create a new Black node as the root
-	if(root == NULL) {
+	if(root == nullptr) {
 		root = new node;
 		root->value = value;
-		root->right_child = NULL;
-		root->left_child = NULL;
-		root->parent = NULL;
+		root->right_child = nullptr;
+		root->left_child = nullptr;
+		root->parent = nullptr;
 
 		root->color = BLACK;
 		root->is_double_black = false;
@@ -647,7 +647,7 @@ bool insert(node*& root, int value) {
 		bool right_or_left;
 
 		// find the parent of the new node and whether it is a left or a right child
-		while(current_node != NULL && !found) {
+		while(current_node != nullptr && !found) {
 			// reset parent node
 			parent_node = current_node;
 
@@ -670,7 +670,7 @@ bool insert(node*& root, int value) {
 		// Case 2: Tree is not empty. Create a new Red node
 		// a node with the given value is not found, so insert as a child to the 
 		//		parent_node to its right or left, depending on the value of right_or_left
-		if(current_node == NULL && !found) {
+		if(current_node == nullptr && !found) {
 			if(right_or_left == RIGHT) {
 				parent_node->right_child = new_node;
 				new_node->which_child = RIGHT;
@@ -704,7 +704,7 @@ void insert_helper(node*& root, node* new_node) {
 	node* parent_parent_node = parent_node->parent;
 	node* parent_sibling_node;
 
-	if(parent_parent_node != NULL) {
+	if(parent_parent_node != nullptr) {
 		// store the uncle node as well (parent_sibling_node)
 		if(parent_node->which_child == RIGHT){ 
 			parent_sibling_node = parent_parent_node->left_child;
@@ -717,7 +717,7 @@ void insert_helper(node*& root, node* new_node) {
 	// Case 4: parent of new node is Red
 	if(parent_node->color == RED) {
 		// Case 4a: parent's sibling is Black or Null, then rotate and recolor
-		if(parent_sibling_node == NULL || parent_sibling_node->color == BLACK) {
+		if(parent_sibling_node == nullptr || parent_sibling_node->color == BLACK) {
 			// do suitable rotation (RR, RL, LR, or LL)
 			if(new_node->which_child == RIGHT && parent_node->which_child == RIGHT){
 				RR_rotation(root, new_node->parent, INSERT);
@@ -774,8 +774,8 @@ void RR_rotation(node*& root, node* parent_node, bool del_or_insert) {
 	parent_node->parent = parent_parent_node->parent;
 
 	// step 2
-	// reset parent's parent child (unless it is NULL)
-	if(parent_parent_node->parent != NULL) {
+	// reset parent's parent child (unless it is nullptr)
+	if(parent_parent_node->parent != nullptr) {
 		if(parent_parent_node->which_child == LEFT) {
 			parent_parent_node->parent->left_child = parent_node;
 			// reset which child of parent node
@@ -791,7 +791,7 @@ void RR_rotation(node*& root, node* parent_node, bool del_or_insert) {
 	// cout << "parent_parent_node->parent = parent_node " << parent_parent_node->parent->value << " = " << parent_node->value << endl;
 	parent_parent_node->parent = parent_node;
 	// step 4
-	if(parent_node->left_child != NULL) {
+	if(parent_node->left_child != nullptr) {
 		// cout << "parent_node->left_child->parent = parent_parent_node " << parent_node->left_child->parent->value << " = " << parent_parent_node->value << endl;
 		parent_node->left_child->parent = parent_parent_node;
 		// reset which child of parent_node->left_child
@@ -848,7 +848,7 @@ void RL_rotation(node*& root, node* new_node) {
 	// no need to reset which child of parent node, because it is already RIGHT
 
 	// step 6
-	if(parent_node->left_child != NULL) {
+	if(parent_node->left_child != nullptr) {
 		parent_node->left_child->parent = parent_node;
 	
 		// reset which child of parent_node->left_child child to LEFT
@@ -877,11 +877,11 @@ void LL_rotation(node*& root, node* parent_node, bool del_or_insert) {
 	// step 2
 	parent_parent_node->left_child = parent_node->right_child;
 	// reset which child of parent_node->right_child
-	if(parent_node->right_child != NULL) {
+	if(parent_node->right_child != nullptr) {
 		parent_node->right_child->which_child = LEFT;
 	}
 	// step 3
-	if(parent_parent_node->parent != NULL) {
+	if(parent_parent_node->parent != nullptr) {
 		if(parent_parent_node->which_child == LEFT) {
 			parent_parent_node->parent->left_child = parent_node;
 		} else {
@@ -894,7 +894,7 @@ void LL_rotation(node*& root, node* parent_node, bool del_or_insert) {
 	// step 4
 	parent_parent_node->parent = parent_node;
 	// step 5
-	if(parent_node->right_child != NULL) {
+	if(parent_node->right_child != nullptr) {
 		parent_node->right_child->parent = parent_parent_node;
 	}
 	// step 6
@@ -940,7 +940,7 @@ void LR_rotation(node*& root, node* new_node) {
 	// step 4
 	parent_node->parent = new_node;
 	// step 5
-	if(new_node->left_child != NULL) {
+	if(new_node->left_child != nullptr) {
 		new_node->left_child->parent = parent_node;
 		// reset which_child of new_node->left child
 		new_node->left_child->which_child = RIGHT;
@@ -957,8 +957,8 @@ void LR_rotation(node*& root, node* new_node) {
 	// delete parent_node;
 	// delete parent_parent_node;
 
-	// parent_node = NULL;
-	// parent_parent_node = NULL;
+	// parent_node = nullptr;
+	// parent_parent_node = nullptr;
 }
 
 void display_tree(node* root) {
@@ -969,7 +969,7 @@ void display_tree(node* root) {
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
 
-	if(root != NULL) {
+	if(root != nullptr) {
 		// push the node on the zeroth level (root) into the queue
 		nodes_on_level.push(root);
 		num_of_nodes_on_level = 1;
@@ -1002,7 +1002,7 @@ void display_tree(node* root) {
 				left_or_right = 'R';
 			}
 			// display the which_child and parent's value of the node
-			if(nodes_on_level.front()->parent != NULL) {
+			if(nodes_on_level.front()->parent != nullptr) {
 				cout << "(" << left_or_right << " of " << nodes_on_level.front()->parent->value << ")   ";
 			}
 
@@ -1010,10 +1010,10 @@ void display_tree(node* root) {
 			//		has a mix of nodes from the current and next levels. num_of_nodes_on_level
 			//		helps us stop the printing on the right node and start the iteration
 			//		of the outer loop for the next level
-			if(nodes_on_level.front()->left_child != NULL) {
+			if(nodes_on_level.front()->left_child != nullptr) {
 				nodes_on_level.push(nodes_on_level.front()->left_child);
 			}			
-			if(nodes_on_level.front()->right_child != NULL) {
+			if(nodes_on_level.front()->right_child != nullptr) {
 				nodes_on_level.push(nodes_on_level.front()->right_child);
 			}
 
@@ -1048,17 +1048,17 @@ void display_tree(node* root) {
 //		value = the value of the node to be deleted
 void delete_node(node*& root, node* node_to_del) {
 	// case 0: if the node is the root, and it is the only node in the tree
-	if(node_to_del->parent == NULL && node_to_del->left_child == NULL 
-			&& node_to_del->right_child == NULL) {
+	if(node_to_del->parent == nullptr && node_to_del->left_child == nullptr 
+			&& node_to_del->right_child == nullptr) {
 
-		// delete the root and set it to NULL
+		// delete the root and set it to nullptr
 		delete root;
-		root = NULL;
+		root = nullptr;
 	}
 	// *** Case 1 (a) and (b) (Base Case)
 	else if(!node_to_del->is_double_black) {
 		// Step 1: if the node is an internal node, find the inorder successor
-		if(node_to_del->left_child != NULL && node_to_del->right_child != NULL) {
+		if(node_to_del->left_child != nullptr && node_to_del->right_child != nullptr) {
 			// find the inorder of the node to delete
 			node* inorder = find_inorder(node_to_del);
 
@@ -1075,12 +1075,12 @@ void delete_node(node*& root, node* node_to_del) {
 			// delete the node
 			// delete the left/right child pointer of its parent node
 			if(node_to_del->which_child == RIGHT) { 
-				node_to_del->parent->right_child = NULL;
+				node_to_del->parent->right_child = nullptr;
 			} else {
-				node_to_del->parent->left_child = NULL;
+				node_to_del->parent->left_child = nullptr;
 			}
 			delete node_to_del;
-			node_to_del = NULL;
+			node_to_del = nullptr;
 		}
 		// The node is not internal, and is not Red. So it must be Black and either a leaf
 		//		node or a node with a Red child.
@@ -1088,7 +1088,7 @@ void delete_node(node*& root, node* node_to_del) {
 			// The node must be Black (no need to check).
 			//	 It is a leaf or has 1 Red child (the latter has no children). 
 			// * Case 1 (b) (i): The node has a Red child, left
-			if(node_to_del->left_child != NULL) {
+			if(node_to_del->left_child != nullptr) {
 				// assign the value in the red child to the node, and delete the node
 				node_to_del->value = node_to_del->left_child->value;
 
@@ -1101,16 +1101,16 @@ void delete_node(node*& root, node* node_to_del) {
 				child_to_delete = node_to_del->left_child;
 
 				// disconnect the child node from the parent node
-				node_to_del->left_child = NULL;
+				node_to_del->left_child = nullptr;
 
 				
 				// delete the left child
 				delete child_to_delete;
-				child_to_delete = NULL;
+				child_to_delete = nullptr;
 
 			}
 			// * Case 1 (b) (ii): The node has a Red child, right
-			else if(node_to_del->right_child != NULL) {
+			else if(node_to_del->right_child != nullptr) {
 				// do the same this as above, but for the right child
 				node_to_del->value = node_to_del->right_child->value;
 
@@ -1118,11 +1118,11 @@ void delete_node(node*& root, node* node_to_del) {
 
 				child_to_delete = node_to_del->right_child;
 
-				node_to_del->right_child = NULL;
+				node_to_del->right_child = nullptr;
 
 				// delete the right child
 				delete child_to_delete;
-				child_to_delete = NULL;
+				child_to_delete = nullptr;
 			}
 
 			// The node is a Black leaf node
@@ -1139,7 +1139,7 @@ void delete_node(node*& root, node* node_to_del) {
 	// *** Cases 2 through 6
 	else {
 		// * Case 2: node is a root node, make DB into B, and exit: Base Case
-		if(node_to_del->parent == NULL) {
+		if(node_to_del->parent == nullptr) {
 			// node is a root node
 			node_to_del->is_double_black = false;
 		}
@@ -1173,11 +1173,11 @@ void delete_node(node*& root, node* node_to_del) {
 			// *** Cases 3, 5, and 6
 			if(sibling->color == BLACK) {
 				// * Case 3: sibling is Black, both children of sibling (far and near) are
-				//		either NULL or Black
-				if((far_child == NULL || far_child->color == BLACK) 
-						&& (near_child == NULL || near_child->color == BLACK)) {
+				//		either nullptr or Black
+				if((far_child == nullptr || far_child->color == BLACK) 
+						&& (near_child == nullptr || near_child->color == BLACK)) {
 					// if node_to_del (the DB node) is a leaf node, delete it
-					if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
+					if(node_to_del->left_child == nullptr && node_to_del->right_child == nullptr) {
 						// dynamically allocate a new pointer to delete the node_to_del
 						node* node_for_deletion = new node;
 
@@ -1186,15 +1186,15 @@ void delete_node(node*& root, node* node_to_del) {
 						// set the parent's left or right child to null before deleting
 						//		the node
 						if(node_to_del->which_child == RIGHT) {
-							parent->right_child = NULL;
+							parent->right_child = nullptr;
 						}
 						else {
-							parent->left_child = NULL;
+							parent->left_child = nullptr;
 						}
 						
 						// delete the node
 						delete node_for_deletion;
-						node_for_deletion = NULL;
+						node_for_deletion = nullptr;
 
 					}
 					// node_to_del is not a leaf node, so only make the DB into B
@@ -1223,8 +1223,8 @@ void delete_node(node*& root, node* node_to_del) {
 				}
 				// * Case 5: DB's (node_to_del's) sibling is Black, far_child is Black,
 				//		near child is red
-				else if((far_child == NULL || far_child->color == BLACK)
-						&& (near_child != NULL && near_child->color == RED)) {
+				else if((far_child == nullptr || far_child->color == BLACK)
+						&& (near_child != nullptr && near_child->color == RED)) {
 					// swap color of DB's sibling with near child
 					bool temp_color = sibling->color;
 					sibling->color = near_child->color;
@@ -1233,7 +1233,7 @@ void delete_node(node*& root, node* node_to_del) {
 					// !!! rotate sibling in opposite direction from DB
 					if(sibling->which_child == LEFT) {
 						sibling->right_child = near_child->left_child;
-						if(near_child->left_child != NULL) {
+						if(near_child->left_child != nullptr) {
 							near_child->left_child->parent = sibling;
 							near_child->left_child->which_child = RIGHT;
 						}
@@ -1249,7 +1249,7 @@ void delete_node(node*& root, node* node_to_del) {
 					// mirror case of the above rotation
 					else {
 						sibling->left_child = near_child->right_child;
-						if(near_child->right_child != NULL) {
+						if(near_child->right_child != nullptr) {
 							near_child->right_child->parent = sibling;
 							near_child->right_child->which_child = LEFT;
 						}
@@ -1267,7 +1267,7 @@ void delete_node(node*& root, node* node_to_del) {
 				} 
 				// * Case 6: DB's (node_to_del's) sibling is Black, far child is Red,
 				//		near child is Black
-				else if((far_child != NULL && far_child->color == RED)) {
+				else if((far_child != nullptr && far_child->color == RED)) {
 					// swap color of Parent and sibling
 					bool temp_color = sibling->color;
 					sibling->color = parent->color;
@@ -1293,14 +1293,14 @@ void delete_node(node*& root, node* node_to_del) {
 					}
 
 					// change DB to B or delete node_to_del if it is a leaf node
-					if(node_to_del->left_child == NULL && node_to_del->right_child == NULL) {
+					if(node_to_del->left_child == nullptr && node_to_del->right_child == nullptr) {
 						if(node_to_del->which_child == RIGHT) {
-							parent->right_child = NULL;
+							parent->right_child = nullptr;
 						} else {
-							parent->left_child = NULL;
+							parent->left_child = nullptr;
 						}
 						delete node_to_del;
-						node_to_del = NULL;
+						node_to_del = nullptr;
 					} 
 					// make it Black
 					else {
@@ -1347,16 +1347,16 @@ void delete_node(node*& root, node* node_to_del) {
 //			node_to_del. the parameter will be reused to arrive to the inorder successor
 node* find_inorder(node* node_to_del) {
 	// if the given node is not null
-	if(node_to_del != NULL) {
+	if(node_to_del != nullptr) {
 		// node_to_del will be the node that this function will return
 
 		// if the node has a right child
-		if(node_to_del->right_child != NULL ){
+		if(node_to_del->right_child != nullptr ){
 			// first, go to the right, then keep going left
 			node_to_del = node_to_del->right_child;
 
-			// now, keep going left until the left child is NULL
-			while(node_to_del->left_child != NULL) {
+			// now, keep going left until the left child is nullptr
+			while(node_to_del->left_child != nullptr) {
 				node_to_del = node_to_del->left_child;
 			}
 
@@ -1387,10 +1387,10 @@ node* find_inorder(node* node_to_del) {
 //		or
 //			a null pointer if value is not found 
 node* binary_search(node* root, int value) {
-	// value is not found, return NULL
-	if(root == NULL) {
+	// value is not found, return nullptr
+	if(root == nullptr) {
 		node* null_node;
-		null_node = NULL;
+		null_node = nullptr;
 		return null_node;
 	}
 	else {
