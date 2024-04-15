@@ -486,6 +486,7 @@ void LinkedList<T>::add_last(Node<T>* iterator) {
 		this->head = new_node;
 	}
 
+	// increment the number_of_nodes by 1
 	this->number_of_nodes++;
 }
 
@@ -545,6 +546,9 @@ void LinkedList<T>::add_last(LinkedList linked_list) {
 
 		// move on to the next node
 		iterator = iterator->next;
+
+		// increment the number_of_nodes by 1
+		this->number_of_nodes++;
 	}
 }
 
@@ -574,11 +578,13 @@ void LinkedList<T>::add_first(LinkedList linked_list) {
 
 		// move on to the previous node
 		iterator = iterator->previous;
+
+		// increment the number_of_nodes by 1
+		this->number_of_nodes++;
 	}
 
 
-	// increment the number_of_nodes by 1
-	this->number_of_nodes++;
+	
 }
 
 
