@@ -681,7 +681,6 @@ void RR_rotation(line_node*& root, line_node* new_node) {
 	
 	parent_node->left_child = parents_parent_node;	
 
-
 	// After the rotation, the parent's parent node becomes a left child
 	parents_parent_node->which_child = LEFT;
 
