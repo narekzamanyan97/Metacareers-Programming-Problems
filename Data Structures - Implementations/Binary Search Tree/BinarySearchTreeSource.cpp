@@ -1,6 +1,7 @@
 #include "binarySearchTree.cpp"
 
-void demo_delete_node_input(BinarySearchTree* tree);
+template<class T>
+void demo_delete_node_input(BinarySearchTree<T>* tree);
 
 int main() {
 	// // an array of values
@@ -10,7 +11,7 @@ int main() {
 	// 				13, 9};
 
 	// BinarySearchTree bst_tree = BinarySearchTree(values, 31);
-	BinarySearchTree bst_tree = BinarySearchTree(-1, 5, 100);
+	BinarySearchTree<int> bst_tree = BinarySearchTree<int>(-1, 25, 100);
 
 	bst_tree.display_tree();
 	demo_delete_node_input(&bst_tree);
@@ -23,8 +24,9 @@ int main() {
 // asks the user for the values to delete from the tree that was built.
 // @parameters:
 //		tree = a pointer to the BinarySearchTree object
-void demo_delete_node_input(BinarySearchTree* tree) {
-	int val_to_del = 0;
+template<class T>
+void demo_delete_node_input(BinarySearchTree<T>* tree) {
+	T val_to_del = 0;
 	
 	// delete an element
 	while(val_to_del != -1 && !tree->is_empty()) {
