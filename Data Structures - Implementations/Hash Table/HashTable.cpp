@@ -12,15 +12,14 @@ template<class T>
 HashTable<T>::HashTable() {
 	this->storage = new LinkedList<T>[SIZE];
 
-	cout << "round(10.3333) = " << round(10.3333, 2) << endl;
 
 	// set all the values in the storage to null
 	for(int i = 0; i < SIZE; i++) {
-		cout << "*************************************************" << endl;
-		// this->storage[i] = LinkedList<T>();
-		cout << "address in Hash = " << &(this->storage[i]) << endl;
-		// cout << i << ": ";
-		cout << this->storage[i].length() << endl;
+		// cout << "*************************************************" << endl;
+		this->storage[i] = LinkedList<T>();
+		// cout << "address in Hash = " << &(this->storage[i]) << endl;
+		// // cout << i << ": ";
+		// cout << this->storage[i].length() << endl;
 
 	}
 }
@@ -71,7 +70,7 @@ int HashTable<T>::string_to_int(string value) {
 
 	// add up all the int values of the characters in the string
 	for(int i = 0; i < value.size(); i++) {
-		cout << value[i] << " = " << int(value[i]) << endl;
+		// cout << value[i] << " = " << int(value[i]) << endl;
 		total += int(value[i]);
 	}
 
@@ -81,18 +80,17 @@ int HashTable<T>::string_to_int(string value) {
 	return total;
 }
 
+// since all the other types are being specialized, this is in turn becomes a 
+//		specialization for classes
 // return the key for a given value
 // the means of calculating the hash depends on the type of T
 // Since we have specialization for every other type, the only one left is a 
-//		class
-// for classes
 template<class T>
 int HashTable<T>::hashFunction(const T& value) {
-	cout << "&value = " << &value << endl;
-	cout << "&value = " << uintptr_t(&value) << endl;
+	// cout << "&value = " << &value << endl;
+	// cout << "&value = " << uintptr_t(&value) << endl;
 	// use the address itself to find the hash of an object
-	// return int(&value) % SIZE;
-	return 0;
+	return uintptr_t(&value) % SIZE;
 }
 
 // !!! use math epsilon f to find the epsilon value

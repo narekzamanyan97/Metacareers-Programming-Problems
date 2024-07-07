@@ -7,7 +7,7 @@
 #include <type_traits>
 #include "../Linked List (Double)/LinkedList.cpp"
 
-#define SIZE 100
+#define SIZE 10
 #define ROUND 3
 #define FUND 0
 #define STR 1
