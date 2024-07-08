@@ -22,26 +22,40 @@ private:
 
 
 	// returns the index of the left child
-	int getLeftChildIndex(T element) const;
+	int getLeftChildIndex(int index) const;
 
 	// returns the index of the right child
-	int getRightChildIndex(T element) const;
+	int getRightChildIndex(int index) const;
 
 	// returns the index of the parent
-	int getParentIndex(T element) const;
+	int getParentIndex(int index) const;
 
 	// Tests whether this node is a leaf
 	bool isLeaf(int nodeIndex) const;
+
+	// if the node has a right child
+	bool hasRightChild(int nodeIndex) const;
 
 	// balances the heap. e.g. for max-heap, the maximum element is the root after 
 	// removing or adding a new element
 	// NOTE: this assumes the left and right heaps with the roots being the
 	//		left and right child of the given note are heaps
-	void heapRebuild(int subTreeRootIndex);
+	void heapRebuild(int subTreeRootIndex, bool min_or_max=MAX);
 
+	// helper method for max heaps
+	void heapRebuildMax(int subTreeRootIndex);
+
+	// helper method for min heaps
+	void heapRebuildMin(int subTreeRootIndex);
+
+	// get the value of the node at the given index
+	T getValue(int index) const;
+
+	// set the value of a given node
+	void setValue(int index, T newItem);
 
 	// creates a heap from an unordered array
-	void heapCreate();
+	void heapCreate(bool min_or_max);
 
 
 public:
@@ -50,7 +64,7 @@ public:
 	Heap(int size, bool min_or_max=MAX);
 
 	// create a heap from an array of T
-	Heap(const T* array_of_values, min_or_max=MAX);
+	Heap(const T* array_of_values, int array_size, min_or_max=MAX);
 
 	// destructor
 	~Heap();
@@ -68,7 +82,7 @@ public:
 	T peekTop() const throw(std::PrecondViolatedExcep);
 
 	// insert a new element
-	bool add();
+	bool add(T value);
 
 	// removes the root (either max or min) of the heap, and returns the value
 	//		of the root
