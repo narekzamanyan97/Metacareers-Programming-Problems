@@ -102,6 +102,8 @@ T Heap<T>::getValue(int nodeIndex) const {
 template<class T>
 void Heap<T>::setValue(int nodeIndex, T newValue) {
 	this->heap[nodeIndex] = newValue;
+
+	this->heapRebuild(nodeIndex);
 }
 
 // balances the heap. e.g. for max-heap, the maximum element is the root after 
@@ -147,11 +149,21 @@ void Heap<T>::heapRebuildMax(int subTreeRootIndex) {
 		//		swap items
 		if(this->getValue(subTreeRootIndex) < this->getValue(largerChildIndex)) {
 			T tempValue = this->getValue(subTreeRootIndex);
-			this->setValue(subTreeRootIndex, this->getValue(largerChildIndex));
-			this->setValue(largerChildIndex, tempValue);
+			this->heap[subTreeRootIndex] = this->getValue(largerChildIndex);
+			this->heap[largerChildIndex] = tempValue;
+
 
 			// transform the semiheap rooted at largerChildIndex into a heap
 			this->heapRebuildMax(largerChildIndex);
+		}
+		// else, move up
+		else{
+			if(subTreeRootIndex != 0) {
+				int parentIndex = this->getParentIndex(subTreeRootIndex);
+				
+				// transform the semiheap rooted at the parent index
+				this->heapRebuildMax(parentIndex);
+			}
 		}
 	}
 	// else, root is a leaf, so we are done, as it is already a heap
@@ -184,11 +196,20 @@ void Heap<T>::heapRebuildMin(int subTreeRootIndex) {
 		//		swap items
 		if(this->getValue(subTreeRootIndex) > this->getValue(smallerChildIndex)) {
 			T tempItem = this->getValue(subTreeRootIndex);
-			this->setValue(subTreeRootIndex, this->getValue(smallerChildIndex));
-			this->setValue(smallerChildIndex, tempItem);
+			this->heap[subTreeRootIndex] = this->getValue(smallerChildIndex);
+			this->heap[smallerChildIndex] = tempItem;
 
 			// transform the semiheap rooted at smallerChildIndex into a heap
-			this->heapRebuildMax(smallerChildIndex);
+			this->heapRebuildMin(smallerChildIndex);
+		}
+		// else, move up
+		else{
+			if(subTreeRootIndex != 0) {
+				int parentIndex = this->getParentIndex(subTreeRootIndex);
+				
+				// transform the semiheap rooted at the parent index
+				this->heapRebuildMin(parentIndex);
+			}
 		}
 	}
 	// else, root is a leaf, so we are done, as it is already a heap
@@ -239,6 +260,8 @@ Heap<T>::Heap(int size, bool min_or_max) {
 // create a heap from an array of T
 template<class T>
 Heap<T>::Heap(const T* array_of_values, int array_size, bool min_or_max) {
+	this->heapType = min_or_max;
+	cout << "heapType = " << this->heapType << endl;
 
 	// allocate the array
 	if(array_size <= MAX_CAPACITY/2) {
@@ -329,8 +352,8 @@ void Heap<T>::add(T newValue) {
 		if(inPlace == false) {
 			// swap the values of the parent and new node
 			T tempValue = this->getValue(newDataIndex);
-			this->setValue(newDataIndex, this->getValue(parentIndex));
-			this->setValue(parentIndex, tempValue);
+			this->heap[newDataIndex] = this->getValue(parentIndex);
+			this->heap[parentIndex] = tempValue;
 
 			// update the loop variable
 			newDataIndex = parentIndex;
@@ -348,7 +371,7 @@ void Heap<T>::remove(int nodeIndex) {
 	T lastItem = this->getValue(this->itemCount - 1);
 
 	// copy the item from the last node into the root
-	this->setValue(nodeIndex, lastItem);
+	this->heap[nodeIndex] = lastItem;
 
 	// remove the last node
 	this->itemCount--;
@@ -372,7 +395,7 @@ void Heap<T>::print() {
 	int end_index = 0;
 
 	// first, print the root
-	cout << " -- " << this->getValue(start_index) << "(" << start_index << ") -- " << endl;
+	cout << " -- " << this->getValue(start_index) << "(" << start_index << ") -- ";
 
 
 	// loop through the levels
@@ -380,15 +403,17 @@ void Heap<T>::print() {
 	// start index = 2^n - 1
 	// end index = 2^(n+1) - 2
 	for(int n = 1; n <= this->getHeight(); n++) {
-		cout << "----------------------------------------" << endl;
+		cout << "\n----------------------------------------" << endl;
 	
 		start_index = pow(2, n) - 1;
 		end_index = pow(2, n+1) - 2;
 
+
+
 		// if the end_index > the length of the heap, set it to be the length of the heap
 		//		so we don't have to check for out of range index in the following loop.
 		if(end_index > this->getNumberOfNodes()) {
-			end_index = this->getNumberOfNodes();
+			end_index = this->getNumberOfNodes() - 1;
 		}		
 
 		// loop throug the start and end indices and print

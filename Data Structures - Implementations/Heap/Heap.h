@@ -87,6 +87,14 @@ public:
 	// return the height (number of levels) in the heap.
 	int getHeight() const;
 
+	// joining two heaps to form a valid new heap containing all the elements of 
+	// 		both, preserving the original heap
+	Heap<T> merge();
+
+	// joining two heaps to form a valid new heap containing all the elements of 
+	// 		both, destroying the original heaps
+	Heap<T> meld();
+
 	// get the root element of the heap.
 	T peekTop() const;// throw(std::out_of_range);
 

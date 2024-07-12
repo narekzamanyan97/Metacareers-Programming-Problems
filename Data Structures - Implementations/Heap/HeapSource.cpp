@@ -26,6 +26,8 @@ int main() {
 		cout << "11 - add(newValue)" << endl;
 		cout << "12 - remove(index)" << endl;
 		cout << "13 - clear()" << endl;
+		cout << "14 - merge()" << endl;
+		cout << "15 - meld()" << endl;
 		cout << "-1 - exit" << endl;
 		
 		cin >> selection;
@@ -83,7 +85,7 @@ int main() {
 
 				cin >> index;
 
-				cout << "Value at " << index << " is " << heap.getValue(index);
+				cout << "Value at " << index << " is " << heap.getValue(index) << endl;
 
 				break;
 			case 7:
@@ -97,7 +99,7 @@ int main() {
 
 				heap.setValue(index, value);
 
-				cout << "Value at " << index << " is now " << heap.getValue(index);
+				cout << "Value at " << index << " is now " << heap.getValue(index) << endl;
 
 				break;
 			case 8:
@@ -126,6 +128,10 @@ int main() {
 				break;
 			case 13:
 				heap.clear();
+				break;
+			case 14:
+				break;
+			case 15:
 				break;
 			case -1:
 				cout << "Bye! Thaaank you!" << endl;
