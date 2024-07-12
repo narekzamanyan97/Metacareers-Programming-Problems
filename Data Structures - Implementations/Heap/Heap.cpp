@@ -87,14 +87,19 @@ bool Heap<T>::hasRightChild(int nodeIndex) const {
 // get the value of the node at the given index
 template<class T>
 T Heap<T>::getValue(int nodeIndex) const {
-	if(nodeIndex >= 0 && nodeIndex < this->itemCount) {
-		return this->heap[nodeIndex];	
-	}
-	else if(nodeIndex >= this->getNumberOfNodes()) {
-		throw std::out_of_range("Please enter an index less than the size of " + to_string(this->itemCount) + ".");
+	if(this->itemCount != 0) {
+		if(nodeIndex >= 0 && nodeIndex < this->itemCount) {
+			return this->heap[nodeIndex];	
+		}
+		else if(nodeIndex >= this->getNumberOfNodes()) {
+			throw std::out_of_range("Please enter an index less than the size of " + to_string(this->itemCount) + ".");
+		}
+		else {
+			throw std::out_of_range("Please enter a positive index. ");
+		}
 	}
 	else {
-		throw std::out_of_range("Please enter a positive index. ");
+		throw std::out_of_range("Please enter a positive index.");
 	}
 }
 
@@ -352,7 +357,7 @@ void Heap<T>::add(T newValue) {
 
 
 	this->heapRebuild(newDataIndex);
-	
+
 	// // wheter the new node is in its appropriate place. So far, assume it's false
 	// bool inPlace = false;
 
@@ -420,7 +425,11 @@ void Heap<T>::print() {
 	int end_index = 0;
 
 	// first, print the root
-	cout << " -- " << this->getValue(start_index) << "(" << start_index << ") -- ";
+	if(this->itemCount > 0) {
+		cout << " -- " << this->getValue(start_index) << "(" << start_index << ") -- ";
+	} else {
+		cout << "EMPTY HEAP." << endl;
+	}
 
 
 	// loop through the levels
