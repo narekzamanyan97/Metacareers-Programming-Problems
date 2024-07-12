@@ -347,38 +347,45 @@ void Heap<T>::add(T newValue) {
 	// Trickle new item up to the appropriate spot in the tree
 	int newDataIndex = this->itemCount;
 
-	// wheter the new node is in its appropriate place. So far, assume it's false
-	bool inPlace = false;
-
-	while((newDataIndex >= 0) and !inPlace) {
-		// get the parent of the new node
-		int parentIndex = this->getParentIndex(newDataIndex);
-		
-		// for max heap
-		if(this->heapType == MAX) {
-			if(this->getValue(newDataIndex) < this->getValue(parentIndex)) {
-				inPlace = true;
-			}
-		}
-		// for min heap
-		else {
-			if(this->getValue(newDataIndex) > this->getValue(parentIndex)) {
-				inPlace = true;
-			}
-		}
-
-		if(inPlace == false) {
-			// swap the values of the parent and new node
-			T tempValue = this->getValue(newDataIndex);
-			this->heap[newDataIndex] = this->getValue(parentIndex);
-			this->heap[parentIndex] = tempValue;
-
-			// update the loop variable
-			newDataIndex = parentIndex;
-		}
-	}
-
+	// increment the item count
 	this->itemCount++;
+
+
+	this->heapRebuild(newDataIndex);
+	
+	// // wheter the new node is in its appropriate place. So far, assume it's false
+	// bool inPlace = false;
+
+	// while((newDataIndex >= 0) and !inPlace) {
+	// 	// get the parent of the new node
+	// 	int parentIndex = this->getParentIndex(newDataIndex);
+		
+	// 	cout << "size = " << this->itemCount;
+
+	// 	// for max heap
+	// 	if(this->heapType == MAX) {
+	// 		if(this->getValue(newDataIndex) < this->getValue(parentIndex)) {
+	// 			inPlace = true;
+	// 		}
+	// 	}
+	// 	// for min heap
+	// 	else {
+	// 		if(this->getValue(newDataIndex) > this->getValue(parentIndex)) {
+	// 			inPlace = true;
+	// 		}
+	// 	}
+
+	// 	if(inPlace == false) {
+	// 		// swap the values of the parent and new node
+	// 		T tempValue = this->getValue(newDataIndex);
+	// 		this->heap[newDataIndex] = this->getValue(parentIndex);
+	// 		this->heap[parentIndex] = tempValue;
+
+	// 		// update the loop variable
+	// 		newDataIndex = parentIndex;
+	// 	}
+	// }
+
 }
 
 // removes the root (either max or min) of the heap, and returns the value

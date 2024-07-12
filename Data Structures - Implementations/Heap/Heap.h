@@ -42,6 +42,9 @@ private:
 	// creates a heap from an unordered array
 	void heapCreate();
 
+	// extend the size of the array to accomodate new values
+	void extend();
+
 
 public:
 	// returns the index of the left child
@@ -87,13 +90,16 @@ public:
 	// return the height (number of levels) in the heap.
 	int getHeight() const;
 
+	// !!! implement
 	// joining two heaps to form a valid new heap containing all the elements of 
 	// 		both, preserving the original heap
 	Heap<T> merge();
 
+	// !!! implement
 	// joining two heaps to form a valid new heap containing all the elements of 
 	// 		both, destroying the original heaps
 	Heap<T> meld();
+
 
 	// get the root element of the heap.
 	T peekTop() const;// throw(std::out_of_range);
