@@ -167,6 +167,15 @@ void Heap<T>::heapRebuildMax(int subTreeRootIndex) {
 		}
 	}
 	// else, root is a leaf, so we are done, as it is already a heap
+	// use the parent index to recursively call heapRebuildMax
+	else{
+		if(subTreeRootIndex != 0) {
+			int parentIndex = this->getParentIndex(subTreeRootIndex);
+			
+			// transform the semiheap rooted at the parent index
+			this->heapRebuildMax(parentIndex);
+		}
+	}
 }
 
 // helper method for min heaps
@@ -213,6 +222,15 @@ void Heap<T>::heapRebuildMin(int subTreeRootIndex) {
 		}
 	}
 	// else, root is a leaf, so we are done, as it is already a heap
+	// use the parent index to recursively call heapRebuildMax
+	else{
+		if(subTreeRootIndex != 0) {
+			int parentIndex = this->getParentIndex(subTreeRootIndex);
+			
+			// transform the semiheap rooted at the parent index
+			this->heapRebuildMin(parentIndex);
+		}
+	}
 }
 
 
