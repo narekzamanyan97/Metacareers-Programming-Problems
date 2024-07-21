@@ -6,11 +6,27 @@ int main() {
 	int index;
 	int value;
 
+	cout << 1 << endl;
+
 	int arrayInt[15] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+	int arrayInt2[15] = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 110, 111, 112, 113, 114};
 
 	Heap<int> heap = Heap<int>(arrayInt, 15);
+	Heap<int> heap2 = Heap<int>(arrayInt2, 15);
+	cout << 2 << endl;
 
+	for (int i = 0; i < 15; i++) {
+		cout << arrayInt[i] << "--";
+	}
+	cout << 3 << endl;
+	cout << endl;
+	for (int i = 0; i < 15; i++) {
+		cout << arrayInt2[i] << "--";
+	}
+	cout << 4 << endl;
 
+	cout << endl;
+	
 	do {
 		cout << "0 - print()" << endl;
 		cout << "1 - getLeftChildIndex(index)" << endl;
@@ -27,7 +43,6 @@ int main() {
 		cout << "12 - remove(index)" << endl;
 		cout << "13 - clear()" << endl;
 		cout << "14 - merge()" << endl;
-		cout << "15 - meld()" << endl;
 		cout << "-1 - exit" << endl;
 		
 		cin >> selection;
@@ -35,6 +50,8 @@ int main() {
 		switch(selection) {
 			case 0:
 				heap.print();
+
+				heap2.print();
 				break;
 			case 1:
 				cout << "Enter an index: " << endl;
@@ -130,8 +147,11 @@ int main() {
 				heap.clear();
 				break;
 			case 14:
-				break;
-			case 15:
+				cout << "heap2 before merge: " << endl;
+				heap2.print();
+				heap.merge(heap2);
+				cout << "heap2 after merge: " << endl;
+				heap2.print();
 				break;
 			case -1:
 				cout << "Bye! Thaaank you!" << endl;

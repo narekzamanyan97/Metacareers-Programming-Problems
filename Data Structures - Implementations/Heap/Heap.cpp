@@ -8,11 +8,97 @@
 #include <iostream>
 
 
+
+template<typename T>
+struct array_deleter {
+	void operator() (T const * p) {
+		delete[] p;
+	}
+};
+
 // Formulas for left/right child and parent (assuming we start from 0)
 // left(i) = 2 * i + 1
 // right(i) = 2*i + 2
 // parent(i) = floor(i-1/2)
 // height = ceiling(log2(n + 1))
+
+// default constructor
+// make it a max heap by default
+// constructor for a heap of a given size (must be less than MAX_SIZE)
+// make it a max heap by default
+template<class T>
+Heap<T>::Heap(int size, bool min_or_max) {
+	if(size > 0) {		
+		// set the type of the heap
+		this->heapType = min_or_max;
+
+		// this->heap = new T[2*size];
+		shared_ptr<T[]> heap(new T[2*size], array_deleter<T>());
+		// this->heap(new T[2 * array_size])
+		this->heap = heap;
+
+		
+		this->itemCount = 0;
+		this->capacity = 2 * size;
+	}
+	else {
+		throw std::length_error("Please enter a positive size.");
+	}
+}
+
+// create a heap from an array of T
+template<class T>
+Heap<T>::Heap(const T* array_of_values, int array_size, bool min_or_max) {
+	this->heapType = min_or_max;
+
+	cout << 1.1 << endl;
+	// allocate the array
+	// this->heap = new T[2*array_size];
+	// this->heap = make_shared<T[]>(2*array_size);
+	// shared_ptr<T[]> heap(new T[2*size]);
+	// this->heap = heap(new T[2*size]);
+	shared_ptr<T[]> heap(new T[2*array_size], array_deleter<T>());
+
+	this->heap = heap;
+	cout << 1.2 << endl;
+		
+	// this->heap(new T[2 * array_size])
+	
+	// copy given values into the array
+	for(int i = 0; i < array_size; i++) {
+		this->heap[i] = array_of_values[i];
+	} 
+	cout << 1.3 << endl;
+
+	// update the size and capacity of the heap
+	this->itemCount = array_size;	
+	this->capacity = 2 * array_size;
+	cout << 1.4 << endl;
+
+	// reorganize the copied array into a heap
+	heapCreate();
+}
+
+// destructor
+template<class T>
+Heap<T>::~Heap() {
+	cout << "heap before destructor." << endl;
+	this->print();
+	// for(int i = 0; i < this->getNumberOfNodes(); i++) {
+	// 	cout << "setting " << this->getValue(i) << " to " << 1110 << endl;
+	// 	this->setValue(i, 1110);
+	// }
+
+	// when passing a heap object to a method, after the method returns, the
+	//		object's pointers get deleted. So the object in the caller will
+	//		have pointers that just got deleted in the function. Use shared_ptr 
+	//		to fix the issue.
+	// https://stackoverflow.com/questions/1881681/using-delete-on-pointers-passed-as-function-arguments
+	// delete[] this->heap;
+
+	cout << "heap after destructor." << endl;
+	this->print();
+}
 
 // returns the index of the left child
 // return -1 if the given node is a leaf
@@ -110,6 +196,20 @@ void Heap<T>::setValue(int nodeIndex, T newValue) {
 
 	this->heapRebuild(nodeIndex);
 }
+
+
+// joining two heaps to form a valid new heap containing all the elements of 
+// 		both
+template<class T>
+void Heap<T>::merge(Heap<T> heap) {
+	for(int i = 0; i < heap.getNumberOfNodes(); i++) {
+		this->add(heap.getValue(i));
+	}
+
+	cout << "heap at the end of merge." << endl;
+	heap.print();
+}
+
 
 // balances the heap. e.g. for max-heap, the maximum element is the root after 
 // removing or adding a new element
@@ -256,59 +356,6 @@ void Heap<T>::heapCreate() {
 	}
 }
 
-// default constructor
-// make it a max heap by default
-// constructor for a heap of a given size (must be less than MAX_SIZE)
-// make it a max heap by default
-template<class T>
-Heap<T>::Heap(int size, bool min_or_max) {
-	// set the type of the heap
-	this->heapType = min_or_max;
-
-	if(size <= MAX_CAPACITY/2) {
-		this->heap = new T[2*size];
-		this->itemCount = 0;
-		this->maxItems = 2 * size;
-	}
-	else if(size > MAX_CAPACITY){
-		this->heap = new T[MAX_CAPACITY];
-		this->itemCount = 0;
-		this->maxItems = MAX_CAPACITY;
-	}
-	else {
-		throw std::length_error("Please enter a positive size.");
-	}
-}
-
-// create a heap from an array of T
-template<class T>
-Heap<T>::Heap(const T* array_of_values, int array_size, bool min_or_max) {
-	this->heapType = min_or_max;
-	cout << "heapType = " << this->heapType << endl;
-
-	// allocate the array
-	if(array_size <= MAX_CAPACITY/2) {
-		this->heap = new T[2*array_size];
-	}
-	
-	// copy given values into the array
-	for(int i = 0; i < array_size; i++) {
-		this->heap[i] = array_of_values[i];
-	} 
-
-	// update the size and capacity of the heap
-	this->itemCount = array_size;	
-	this->maxItems = 2 * array_size;
-
-	// reorganize the copied array into a heap
-	heapCreate();
-}
-
-// destructor
-template<class T>
-Heap<T>::~Heap() {
-	delete[] this->heap;
-}
 
 // determines if the heap is has items or not
 template<class T>
@@ -446,7 +493,7 @@ void Heap<T>::print() {
 
 		// if the end_index > the length of the heap, set it to be the length of the heap
 		//		so we don't have to check for out of range index in the following loop.
-		if(end_index > this->getNumberOfNodes()) {
+		if(end_index >= this->getNumberOfNodes()) {
 			end_index = this->getNumberOfNodes() - 1;
 		}		
 

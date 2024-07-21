@@ -1,11 +1,12 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-#define MAX_CAPACITY 100
+// #define MAX_CAPACITY 100
 #define MAX false
 #define MIN true
 
 #include <stdexcept>
+#include <memory>
 using namespace std;
 
 // https://www.youtube.com/watch?v=0wPlzMU-k00
@@ -15,13 +16,15 @@ template<class T>
 class Heap {
 private:
 	// an array that will store the heap
-	T* heap;
+	shared_ptr<T[]> heap;//(new T[2*size]);
 
 	// the number of elements currently in the heap
 	int itemCount;
 
-	// an integer equal to the maximum capacity of the heap
-	int maxItems;
+	// have a capacity variable. When the new size is greater than the existing
+	//		itemCount, then reallocate more space
+	// should always be at most 2 times the size of the heap
+	int capacity;
 
 	// min or max heap
 	bool heapType;
@@ -44,6 +47,7 @@ private:
 
 	// extend the size of the array to accomodate new values
 	void extend();
+
 
 
 public:
@@ -90,15 +94,9 @@ public:
 	// return the height (number of levels) in the heap.
 	int getHeight() const;
 
-	// !!! implement
 	// joining two heaps to form a valid new heap containing all the elements of 
-	// 		both, preserving the original heap
-	Heap<T> merge();
-
-	// !!! implement
-	// joining two heaps to form a valid new heap containing all the elements of 
-	// 		both, destroying the original heaps
-	Heap<T> meld();
+	// 		both
+	void merge(Heap<T> heap);
 
 
 	// get the root element of the heap.
