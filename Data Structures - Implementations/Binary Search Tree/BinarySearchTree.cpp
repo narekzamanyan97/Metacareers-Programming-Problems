@@ -16,7 +16,8 @@
 
 
 // a constructor that creates an empty binary tree
-BinarySearchTree::BinarySearchTree() {
+template<class T>
+BinarySearchTree<T>::BinarySearchTree() {
 	// create a nullptr root pointer
 	this->root = nullptr;
 }
@@ -25,7 +26,8 @@ BinarySearchTree::BinarySearchTree() {
 // @parameters:
 //		array_of_values = an array of integers to construct the tree
 //		size_of_array = the size of the given array
-BinarySearchTree::BinarySearchTree(int* array_of_values, int size_of_array) {
+template<class T>
+BinarySearchTree<T>::BinarySearchTree(T* array_of_values, int size_of_array) {
 	// create a nullptr root pointer
 	this->root = nullptr;
 
@@ -39,7 +41,8 @@ BinarySearchTree::BinarySearchTree(int* array_of_values, int size_of_array) {
 // @parameters:
 //		seed = a seed for the random generator. Enter -1 for random seed
 //		num_of_nodes = an int specifing how many nodes we want for the tree
-BinarySearchTree::BinarySearchTree(int seed, int num_of_nodes, int max_value) {
+template<class T>
+BinarySearchTree<T>::BinarySearchTree(int seed, int num_of_nodes, T max_value) {
 	// create a nullptr root pointer
 	this->root = nullptr;
 	
@@ -75,14 +78,15 @@ BinarySearchTree::BinarySearchTree(int seed, int num_of_nodes, int max_value) {
 
 
 // a destructor to delete the root pointer
-BinarySearchTree::~BinarySearchTree() {
+template<class T>
+BinarySearchTree<T>::~BinarySearchTree() {
 	// delete all the pointers (nodes) from the tree, as they have all been allocated
 	//		dynamically in the insert funciton
 		// a queue of bst_node pointers to help traverse the tree in breadth first approach
-	queue<bst_node*> nodes_queue;
+	queue<bst_node<T>*> nodes_queue;
 	
 	// will store the front of the queue in the while loop
-	bst_node* current_node;
+	bst_node<T>* current_node;
 
 	int num_of_nodes_on_level = 1;
 
@@ -133,9 +137,10 @@ BinarySearchTree::~BinarySearchTree() {
 // @return
 //		true = if the value was successfully inserted
 //		false = otherwise. e.g. the value is already in the tree.
-bool BinarySearchTree::insert(int value) {
+template<class T>
+bool BinarySearchTree<T>::insert(T value) {
 	// create a new node
-	bst_node* new_node = new bst_node;
+	bst_node<T>* new_node = new bst_node<T>;
 	
 	// set the given value to the new node, later to be inserted into the tree. 
 	new_node->value = value;
@@ -149,10 +154,10 @@ bool BinarySearchTree::insert(int value) {
 	else {
 		// use current_node to traverse the root and find the proper place to insert the
 		//		new node
-		bst_node* current_node = this->root;
+		bst_node<T>* current_node = this->root;
 
 		// will be used as the parent of the new node.
-		bst_node* parent_node = current_node;
+		bst_node<T>* parent_node = current_node;
 
 		// LEFT if the new node should be inserted as the left child of the parent_node
 		//		(after the following while loop terminates)
@@ -219,12 +224,13 @@ bool BinarySearchTree::insert(int value) {
 // displays the tree with breadth_first traversal
 //	@parameters:
 //		root = the root of the tree to be displayed
-void BinarySearchTree::display_tree() {
+template<class T>
+void BinarySearchTree<T>::display_tree() {
 	// a queue of bst_node pointers to help traverse the tree in breadth first approach
-	queue<bst_node*> nodes_queue;
+	queue<bst_node<T>*> nodes_queue;
 	
 	// will store the front of the queue in the while loop
-	bst_node* current_node;
+	bst_node<T>* current_node;
 
 	int num_of_nodes_on_level = 1;
 
@@ -289,8 +295,9 @@ void BinarySearchTree::display_tree() {
 // @return:
 //		true = if the deletion is successful
 //		false otherwise
-bool BinarySearchTree::delete_node(int value) {
-	bst_node* node_to_del = this->binary_search(value);
+template<class T>
+bool BinarySearchTree<T>::delete_node(T value) {
+	bst_node<T>* node_to_del = this->binary_search(value);
 	if(node_to_del == nullptr) {
 		return false;
 	}
@@ -304,7 +311,8 @@ bool BinarySearchTree::delete_node(int value) {
 // keeps the binary search tree nature of the tree after deletion
 // @parameters
 //		node_to_del = a pointer to the node to be deleted
-void BinarySearchTree::delete_node(bst_node* node_to_del) {
+template<class T>
+void BinarySearchTree<T>::delete_node(bst_node<T>* node_to_del) {
 	// Case 0: tree is empty. don't do anything
 	if(this->root == nullptr) {
 		// don't do anything
@@ -395,7 +403,7 @@ void BinarySearchTree::delete_node(bst_node* node_to_del) {
 		// the node to be deleted has a right child
 		// find its inorder successor
 		// find the inorder of the node to be deleted
-		bst_node* inorder = find_inorder(node_to_del->value, SUCCESSOR);
+		bst_node<T>* inorder = find_inorder(node_to_del->value, SUCCESSOR);
 
 		
 		// change the value of node_to_delete with the value of inorder successor
@@ -415,10 +423,11 @@ void BinarySearchTree::delete_node(bst_node* node_to_del) {
 // 		successor_or_predecessor = true or false
 //			true if it finds successor
 //			false if it finds predecessor
-BinarySearchTree::bst_node* BinarySearchTree::find_inorder(int value, bool successor_or_predecessor) {
-	bst_node* node = binary_search(value);
+template<class T>
+bst_node<T>* BinarySearchTree<T>::find_inorder(T value, bool successor_or_predecessor) {
+	bst_node<T>* node = binary_search(value);
 	
-	bst_node* inorder;
+	bst_node<T>* inorder;
 
 	// if the node has no children, return nullptr
 	if(node == nullptr || (node->left_child == nullptr && node->right_child == nullptr)) {
@@ -432,7 +441,7 @@ BinarySearchTree::bst_node* BinarySearchTree::find_inorder(int value, bool succe
 		
 		// go right, then keep going left
 		if(node->right_child != nullptr) {
-			bst_node* inorder = node->right_child;
+			bst_node<T>* inorder = node->right_child;
 			// while there is left_child, keep going down the tree
 			while(inorder->left_child != nullptr) {
 				inorder = inorder->left_child;
@@ -464,8 +473,9 @@ BinarySearchTree::bst_node* BinarySearchTree::find_inorder(int value, bool succe
 // binary search that uses another recursive function to do the actual search.
 // @parameters
 //		value = the value to be searched for
-BinarySearchTree::bst_node* BinarySearchTree::binary_search(int value) {
-	this->binary_search(this->root, value);
+template<class T>
+bst_node<T>* BinarySearchTree<T>::binary_search(T value) {
+	return this->binary_search(this->root, value);
 }
 
 // search for the node with the given value
@@ -478,9 +488,10 @@ BinarySearchTree::bst_node* BinarySearchTree::binary_search(int value) {
 //		nullptr if the value is not found in the bst
 //		it is a reference because we need to be able to delete that node in case this
 //			function is called from delete_node
-BinarySearchTree::bst_node* BinarySearchTree::binary_search(BinarySearchTree::bst_node* root, int value) {
+template<class T>
+bst_node<T>* BinarySearchTree<T>::binary_search(bst_node<T>* root, T value) {
 	if(root == nullptr) {
-		bst_node* node;
+		bst_node<T>* node;
 		node = nullptr;
 		return node;
 	} else {
@@ -506,10 +517,11 @@ BinarySearchTree::bst_node* BinarySearchTree::binary_search(BinarySearchTree::bs
 // @return
 //		true = if the tree is binary (left child of any node is either nullptr or < node)
 //		false = if the tree is not binary
-bool BinarySearchTree::is_binary_tree() { 
+template<class T>
+bool BinarySearchTree<T>::is_binary_tree() { 
 	// stores the nodes of a tree in a breadth-first traversal. Updated throughout the
 	//		inner while loop
-	queue<BinarySearchTree::bst_node*> nodes_on_level;
+	queue<bst_node<T>*> nodes_on_level;
 	
 	// stores the number of nodes on a given level.
 	int num_of_nodes_on_level;
@@ -604,7 +616,8 @@ bool BinarySearchTree::is_binary_tree() {
 
 
 // determine if the tree is empty
-bool BinarySearchTree::is_empty() {
+template<class T>
+bool BinarySearchTree<T>::is_empty() {
 	if(this->root == nullptr) {
 		return true;
 	}
