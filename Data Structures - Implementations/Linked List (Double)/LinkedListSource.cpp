@@ -5,8 +5,21 @@ int main() {
 	LinkedList<int> linked_list = LinkedList<int>(2, 22, 25);
 	LinkedList<int> linked_list2 = LinkedList<int>(74, 22, 25);
 
+	// int array_1[11] = {1, 2};
+	// int array_2[11] = {3, 4};
+
+	// LinkedList<int> linked_list = LinkedList<int>(array_1, 2);
+	// LinkedList<int> linked_list = LinkedList<int>(array_1, 2);
+	// LinkedList<int> linked_list2 = LinkedList<int>(array_2, 2);
+	LinkedList<int>* linked_list3 = new LinkedList<int>[5];
+
+	for(int i = 0; i < 5; i++) {
+		cout << i << ": " << linked_list3[i].length() << endl;
+		cout << i << " address: " << &linked_list3[i] << endl;
+	}
+
 	Node<int> node;
-	Node<int>* node_ptr;
+	shared_ptr<Node<int>> node_ptr;
 
 	int selection;
 	int value;
@@ -253,17 +266,17 @@ int main() {
 
 				try {
 
-					node = linked_list.set(value, position);
+					linked_list.set(value, position);
 
-					cout << "The value set = " << node.value << endl;
-					cout << "The position is " << position << endl;
-					if(node.next != nullptr) {
-						// !!! how to know if a function returned an empty object 
-						cout << "next of newly set node is " << node.next->value << endl;
-					}
-					else {
-						cout << "next of newly set node is nullptr" << endl;
-					}
+					// cout << "The value set = " << node.value << endl;
+					// cout << "The position is " << position << endl;
+					// if(node.next != nullptr) {
+					// 	// !!! how to know if a function returned an empty object 
+					// 	cout << "next of newly set node is " << node.next->value << endl;
+					// }
+					// else {
+					// 	cout << "next of newly set node is nullptr" << endl;
+					// }
 				}
 				catch(std::out_of_range ex) {
 					cout << ex.what() << endl;
@@ -281,6 +294,7 @@ int main() {
 				linked_list.add_last(linked_list2);
 				cout << "after add_last" << endl;
 
+				
 				linked_list.print();
 				break;
 			case 20:

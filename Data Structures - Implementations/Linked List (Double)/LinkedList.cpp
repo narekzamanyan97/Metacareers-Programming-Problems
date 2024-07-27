@@ -13,8 +13,11 @@ using namespace std;
 template<class T>
 LinkedList<T>::LinkedList() {
 	// set the head and tail pointers to null
-	this->head = nullptr;
-	this->tail = nullptr;
+	this->head = make_shared<Node<T>>();
+	this->tail = make_shared<Node<T>>();
+	// this->head = nullptr;
+	// this->tail = nullptr;
+
 
 	// set the number of nodes to 0
 	this->number_of_nodes = 0;
@@ -27,8 +30,10 @@ LinkedList<T>::LinkedList() {
 template<class T>
 LinkedList<T>::LinkedList(T* array_of_values, int size) {
 	// set the head and tail pointers to null
-	this->head = nullptr;
-	this->tail = nullptr;	
+	this->head = make_shared<Node<T>>();
+	this->tail = make_shared<Node<T>>();
+	// this->head = nullptr;
+	// this->tail = nullptr;
 
 	// set the number of nodes to 0
 	this->number_of_nodes = 0;
@@ -52,8 +57,10 @@ LinkedList<T>::LinkedList(T* array_of_values, int size) {
 template<class T>
 LinkedList<T>::LinkedList(int seed, int num_of_nodes, T max_value) {
 	// set the head and tail pointers to null
-	this->head = nullptr;
-	this->tail = nullptr;	
+	this->head = make_shared<Node<T>>();
+	this->tail = make_shared<Node<T>>();
+	// this->head = nullptr;
+	// this->tail = nullptr;	
 
 	// set the number of nodes to 0
 	this->number_of_nodes = 0;
@@ -91,32 +98,37 @@ LinkedList<T>::LinkedList(int seed, int num_of_nodes, T max_value) {
 // do a deep copy. 
 template<class T>
 LinkedList<T>& LinkedList<T>::operator=(const LinkedList& other_list) {	
-	// first of all, clear this list in case it is not empty
-	this->clear();
+	// only run the logic if the other list (the list on the right hand side of =) is
+	//		not empty.
+	if(other_list.is_empty() == false) {
+		// first of all, clear this list in case it is not empty
+		this->clear();
 
-	// allocate resources for the pointers of the other_list
-	this->head = new Node<T>;
-	this->tail = new Node<T>;
+		// allocate resources for the pointers of the other_list
+		// set the head and tail pointers to null
+		this->head = make_shared<Node<T>>(nullptr);
+		this->tail = make_shared<Node<T>>(nullptr);
 
-	// link the nodes to nullptr
-	this->tail->next = nullptr; 
-	this->tail->previous = nullptr; 
+		// link the nodes to nullptr
+		this->tail->next = nullptr; 
+		this->tail->previous = nullptr; 
 
-	// traverse this list, and append the nodes of this list one by one
-	Node<T>* current_node = other_list.cbegin();
+		// traverse this list, and append the nodes of this list one by one
+		shared_ptr<Node<T>> current_node = other_list.cbegin();
 
-	// add the nodes of this list to the given list one by one
-	while(current_node) {
-		// add the node to the list
-		this->add_last(current_node);
+		// add the nodes of this list to the given list one by one
+		while(current_node) {
+			// add the node to the list
+			this->add_last(current_node);
 
-		// move on to the next node
-		current_node = current_node->next;
-	}
+			// move on to the next node
+			current_node = current_node->next;
+		}
 
-	// cout << "************************* = operator **********************" << endl;
-	// this->print();
+		// cout << "************************* = operator **********************" << endl;
+		// this->print();
 
+	} 
 	return *this;
 }
 
@@ -130,26 +142,26 @@ LinkedList<T>::~LinkedList() {
 
 // return a pointer to the first node (as an iterator)
 template<class T>
-Node<T>* LinkedList<T>::begin() {
+shared_ptr<Node<T>> LinkedList<T>::begin() {
 	return this->head;
 }
 
 // return a pointer to the last node (as an iterator)
 template<class T>
-Node<T>* LinkedList<T>::end() {
+shared_ptr<Node<T>> LinkedList<T>::end() {
 	return this->tail;
 }
 
 
 // return a pointer to the first node (as an iterator)
 template<class T>
-Node<T>* LinkedList<T>::cbegin() const {
+shared_ptr<Node<T>> LinkedList<T>::cbegin() const {
 	return this->head;
 }
 
 // return a pointer to the last node (as an iterator)
 template<class T>
-Node<T>* LinkedList<T>::cend() const {
+shared_ptr<Node<T>> LinkedList<T>::cend() const {
 	return this->head;
 }
 
@@ -159,7 +171,7 @@ Node<T>* LinkedList<T>::cend() const {
 // @return:
 //		return an pointer (iterator) to the next node
 template<class T>
-Node<T>* LinkedList<T>::remove(Node<T>* pointer) {
+shared_ptr<Node<T>> LinkedList<T>::remove(shared_ptr<Node<T>> pointer) {
 	// reset the next and previous pointers around the given pointer
 	if(pointer->previous != nullptr) {
 		pointer->previous->next = pointer->next;
@@ -170,7 +182,7 @@ Node<T>* LinkedList<T>::remove(Node<T>* pointer) {
 	}
 
 	// next pointer to return
-	Node<T>* next_pointer = pointer->next;
+	shared_ptr<Node<T>> next_pointer = pointer->next;
 
 	// if the pointer is the head, set head to the next node
 	if(pointer == this->head) {
@@ -187,7 +199,7 @@ Node<T>* LinkedList<T>::remove(Node<T>* pointer) {
 	}
 
 	// delete the given pointer
-	delete pointer;
+	pointer.reset();
 
 	return next_pointer;
 }
@@ -196,25 +208,26 @@ Node<T>* LinkedList<T>::remove(Node<T>* pointer) {
 //		iterator) so that we don't need to traverse the list. Time complexity
 //		is O(1)
 // @parameter:
-//		pointer = a pointer to the node that needs to be deleted
+//		pointer = a pointer to the node that needs to be set
 //		value = the value to set the given node to
 // @return:
 //		a node object with the set value, its next and previous links set to null
 // template <typename T> 
 template<class T>
-Node<T> set(Node<T>* pointer, T value) {
+void set(shared_ptr<Node<T>> pointer, T value) {
 	// set the value of the node
 	pointer->value = value;
 
-	// declare a new node to return
-	Node<T> new_node = *pointer;
+	// !!! unnecessary
+	// // declare a new node to return
+	// Node<T> new_node = *pointer;
 
-	// reset the links of the node to make it impossible to change the list
-	//		outside of this function
-	new_node.next = nullptr;
-	new_node.previous = nullptr;
+	// // reset the links of the node to make it impossible to change the list
+	// //		outside of this function
+	// new_node.next = nullptr;
+	// new_node.previous = nullptr;
 
-	return new_node;
+	// return new_node;
 }
 
 // determine if the linked list is empty
@@ -222,7 +235,7 @@ Node<T> set(Node<T>* pointer, T value) {
 //		true if the linked list is empty
 //		false otherwise
 template<class T>
-bool LinkedList<T>::is_empty() {
+bool LinkedList<T>::is_empty() const {
 	if(this->head == nullptr) {
 		return true;
 	}
@@ -236,7 +249,7 @@ bool LinkedList<T>::is_empty() {
 // @return:
 //		the number of nodes in the linked list
 template<class T>
-int LinkedList<T>::length() {
+int LinkedList<T>::length() const {
 	return this->number_of_nodes;
 }
 
@@ -246,9 +259,9 @@ int LinkedList<T>::length() {
 // @return:
 //		the node that has the given value, or null, if the value is not in the linked list
 template<class T>
-Node<T>* LinkedList<T>::find(T value) {
+shared_ptr<Node<T>> LinkedList<T>::find(T value) {
 	// a pointer to a node to traverse, starting from the head
-	Node<T>* current_node = this->head;
+	shared_ptr<Node<T>> current_node = this->head;
 
 	// look for the value in the linked list
 	while(current_node != nullptr) {
@@ -269,10 +282,16 @@ Node<T>* LinkedList<T>::find(T value) {
 template<class T>
 void LinkedList<T>::print() const {
 	// a pointer to a node to traverse, starting from the head
-	Node<T>* current_node = this->head;
+	shared_ptr<Node<T>> current_node = this->head;
 
 	int index = 0;
+
+	if(current_node == nullptr) {
+		cout << "EMPTY LINKED LIST." << endl;
+	}
 	while(current_node != nullptr) {
+		// cout << "in the while of print." << endl;
+		// cout << current_node << "(" << index << ") --> ";
 		cout << current_node->value << "(" << index << ") --> ";
 		
 		// move on to the next node
@@ -308,11 +327,11 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 	// position > 0 && position < this->length
 	else {
 		// declare a new node
-		Node<T>* new_node = new Node<T>;
+		shared_ptr<Node<T>> new_node;
 		new_node->value = value;
 
 		// declare the current node
-		Node<T>* current_node;
+		shared_ptr<Node<T>> current_node;
 
 		// if closer to the first element, start from the head pointer
 		if(this->length() - position > position) {
@@ -387,7 +406,7 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 template<class T>
 Node<T> LinkedList<T>::add_last(T value) {
 	// declare a new node
-	Node<T>* new_node = new Node<T>;
+	shared_ptr<Node<T>> new_node;
 	new_node->value = value;
 
 	// if the list is empty
@@ -428,7 +447,7 @@ Node<T> LinkedList<T>::add_last(T value) {
 template<class T>
 Node<T> LinkedList<T>::add_first(T value) {
 	// declare a new node
-	Node<T>* new_node = new Node<T>;
+	shared_ptr<Node<T>> new_node;
 	new_node->value = value;
 
 	// if the list is empty
@@ -463,9 +482,9 @@ Node<T> LinkedList<T>::add_first(T value) {
 // @parameter:
 //		iterator = the node pointer to be appended at the end 
 template<class T>
-void LinkedList<T>::add_last(Node<T>* iterator) {
+void LinkedList<T>::add_last(shared_ptr<Node<T>> iterator) {
 	// declare a new node
-	Node<T>* new_node = new Node<T>;
+	auto new_node = make_shared<Node<T>>;
 	new_node->value = iterator->value;
 	new_node->next = nullptr;
 	new_node->previous = nullptr;
@@ -493,9 +512,9 @@ void LinkedList<T>::add_last(Node<T>* iterator) {
 
 // append at the front (position = 0, before head)
 template<class T>
-void LinkedList<T>::add_first(Node<T>* iterator) {
+void LinkedList<T>::add_first(shared_ptr<Node<T>> iterator) {
 	// declare a new node
-	Node<T>* new_node = new Node<T>;
+	auto new_node = make_shared<Node<T>>;
 	new_node->value = iterator->value;
 	new_node->next = nullptr;
 	new_node->previous = nullptr;
@@ -520,36 +539,69 @@ void LinkedList<T>::add_first(Node<T>* iterator) {
 }
 
 // append the given linked list at the end (after the last element)
+// append the values in the nodes, not the nodes themselves. Otherwise,
+//		trying to append the same linked list or the same node twice will
+//		result in a closed linked list (infinite loop)
 // @parameters:
 //		linked_list = the linked list to append to this list
 template<class T>
 void LinkedList<T>::add_last(LinkedList linked_list) {
 	// iterate through the given linked list and create new nodes for each
 	//		node in that list, and append it to this list one at a time
-	Node<T>* iterator = linked_list.begin();
+	shared_ptr<Node<T>> iterator = linked_list.begin();
 
-	while(iterator != nullptr) {
-		// create a new node
-		Node<T>* new_node = new Node<T>;
+	linked_list.print();
 
-		// set its value to the value of the iterator
-		new_node->value = iterator->value;
-		// set the next to nullptr to avoid strange behavior (infinite list)
-		new_node->next = nullptr;
+	while(iterator != NULL) {
+		// cout << "iterator.value = " << iterator->value << endl;
+		// // create a new node
+		// Node<T>* new_node = new Node<T>;
+		// cout << "new_node.value = " << new_node->value << endl;
 
-		// append it to this linked list
-		if(this->tail != nullptr) {
-			this->tail->next = new_node;
-		}
-		new_node->previous = this->tail;
-		this->tail = new_node;
+		// // set its value to the value of the iterator
+		// new_node->value = iterator->value;
+		
+		// // set the next to nullptr to avoid strange behavior (infinite list)
+		// new_node->next = nullptr;
 
+		// // append it to this linked list
+		// // if(this->tail != nullptr) {
+		// // 	this->tail->next = new_node;
+		// // }
+
+		// new_node->previous = this->tail;
+		// this->tail = new_node;
+		// // this->tail->next = nullptr;
+
+		// this->print();
+
+		// // move on to the next node
+		// iterator = iterator->next;
+
+		// // increment the number_of_nodes by 1
+		// this->number_of_nodes++;
+
+		// cout << "***********************************" << endl;
+		// linked_list.print();
+		// cout << "***********************************" << endl;
+
+		this->add_last(iterator->value);
+		
 		// move on to the next node
 		iterator = iterator->next;
 
-		// increment the number_of_nodes by 1
-		this->number_of_nodes++;
+		// // increment the number_of_nodes by 1
+		// this->number_of_nodes++;
+
+
+		this->print();
+
+		cout << "***********************************" << endl;
+		linked_list.print();
+		cout << "***********************************" << endl;
 	}
+		
+	cout << "Return from the loop." << endl;
 }
 
 // append the given linked list at the front (position = 0, before head)
@@ -558,11 +610,11 @@ void LinkedList<T>::add_last(LinkedList linked_list) {
 template<class T>
 void LinkedList<T>::add_first(LinkedList linked_list) {
 	// start from the end of the given linked list
-	Node<T>* iterator = linked_list.end();
+	shared_ptr<Node<T>> iterator = linked_list.end();
 
 	while(iterator != nullptr) {
 		// create a new node
-		Node<T>* new_node = new Node<T>;
+		shared_ptr<Node<T>> new_node;
 
 		// set its value to the value of the iterator
 		new_node->value = iterator->value;
@@ -613,7 +665,7 @@ Node<T> LinkedList<T>::remove_last() {
 		// if there is only 1 element, set both head and tail to nullptr after deletion
 		if(this->length() == 1) {
 			// delete the tail
-			delete this->tail;
+			this->tail.reset();
 
 			// set both head and tail to nullptr
 			this->head = nullptr;
@@ -624,14 +676,14 @@ Node<T> LinkedList<T>::remove_last() {
 		else {
 			// temporarily store the second of the last node, so that we can set the tail
 			//		to that node after deleting the tail
-			Node<T>* new_last = this->tail->previous;
+			shared_ptr<Node<T>> new_last = this->tail->previous;
 
 			// set the next of the tail's previous node to nullptr
 			this->tail->previous->next = nullptr;
 
 			
 
-			delete this->tail;
+			this->tail.reset();
 
 			// set the tail to its previous node
 			this->tail = new_last;
@@ -662,13 +714,13 @@ Node<T> LinkedList<T>::remove_first() {
 		}
 
 		// temporarily store the head node
-		Node<T>* temp_node = this->head;
+		shared_ptr<Node<T>> temp_node = this->head;
 
 		// reset the head to the next node
 		this->head = this->head->next;
 
 		// delete the address pointed to by the temporary node
-		delete temp_node;
+		temp_node.reset();
 
 		// decrement the number_of_nodes by 1
 		this->number_of_nodes--;
@@ -682,10 +734,10 @@ Node<T> LinkedList<T>::remove_first() {
 template<class T>
 void LinkedList<T>::clear() {
 	// start from the head node
-	Node<T>* node_to_remove = this->head;
+	shared_ptr<Node<T>> node_to_remove = this->head;
 
 	// use this to keep track of the next node after the node_to_del is deleted
-	Node<T>* next_node;
+	shared_ptr<Node<T>> next_node;
 
 	// delete all the node pointers in the list, because they have been allocated 
 	//		dynamically
@@ -693,7 +745,7 @@ void LinkedList<T>::clear() {
 		next_node = node_to_remove->next;
 
 		// delete the node
-		delete node_to_remove;
+		node_to_remove.reset();
 
 		// move on to the next node
 		node_to_remove = next_node;
@@ -716,7 +768,7 @@ void LinkedList<T>::clear() {
 template<class T>
 int LinkedList<T>::index_of(T value) {
 	// begin from the head (first element)
-	Node<T>* current_node = this->head;
+	shared_ptr<Node<T>> current_node = this->head;
 
 	// keep track of the index in the following loop
 	int current_index = 0;
@@ -749,7 +801,7 @@ int LinkedList<T>::index_of(T value) {
 template<class T>
 int LinkedList<T>::last_index_of(T value) {
 	// begin from the tail (last element)
-	Node<T>* current_node = this->tail;
+	shared_ptr<Node<T>> current_node = this->tail;
 
 	// keep track of the index in the following loop
 	// begin with the last index
@@ -781,7 +833,7 @@ int LinkedList<T>::last_index_of(T value) {
 template<class T>
 bool LinkedList<T>::contains(T value) {
 		// begin from the head (first element)
-	Node<T>* current_node = this->head;
+	shared_ptr<Node<T>> current_node = this->head;
 
 	// iterate through the elements in the list
 	while(current_node != nullptr) {
@@ -816,7 +868,7 @@ template<class T>
 Node<T> LinkedList<T>::remove_at_index(int index) {
 	if(index >= 0 && index < this->length()) {
 		// declare current node
-		Node<T>* current_node;
+		shared_ptr<Node<T>> current_node;
 
 		// declare is_next
 		bool is_next;
@@ -879,7 +931,7 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 		this->number_of_nodes--;
 
 		// delete the pointer
-		delete current_node;
+		current_node.reset();
 		// set the pointer to the current_node to a nullptr
 		current_node = nullptr;
 
@@ -899,14 +951,14 @@ Node<T> LinkedList<T>::remove_at_index(int index) {
 // @return:
 //		the set node
 template<class T>
-Node<T> LinkedList<T>::set(T value, int position) {
+void LinkedList<T>::set(T value, int position) {
 	// if position is out of range, throw out of range error
 	if(position < 0 || position >= this->length()){ 
 		throw std::out_of_range("The position provided is out of range."); 
 	}
 	else {
 		// node pointer to iterate
-		Node<T>* node_to_set = this->head;
+		shared_ptr<Node<T>> node_to_set = this->head;
 
 		// keep track of the position
 		int counter = 0;
@@ -921,15 +973,16 @@ Node<T> LinkedList<T>::set(T value, int position) {
 		// set the value of the node at the given position
 		node_to_set->value = value;
 
-		// declare a new node to return
-		Node<T> new_node = *node_to_set;
+		// !!! unnecessary.
+		// // declare a new node to return
+		// Node<T> new_node = *node_to_set;
 
-		// reset the links of the node to make it impossible to change the list
-		//		outside of this function
-		new_node.next = nullptr;
-		new_node.previous = nullptr;
+		// // reset the links of the node to make it impossible to change the list
+		// //		outside of this function
+		// new_node.next = nullptr;
+		// new_node.previous = nullptr;
 
-		return new_node;
+		// return new_node;
 	}
 }
 
@@ -959,7 +1012,7 @@ bool LinkedList<T>::remove_last_occurrence(T value) {
 template<class T>
 bool LinkedList<T>::remove_occurrence_helper(T value, bool first_or_last) {
 	// declare node_to_del
-	Node<T>* node_to_del;
+	shared_ptr<Node<T>> node_to_del;
 
 	// delete the first occurrence
 	if(first_or_last == FIRST) { 
@@ -972,7 +1025,7 @@ bool LinkedList<T>::remove_occurrence_helper(T value, bool first_or_last) {
 	}
 
 	// will store either the head or the tail of the list
-	Node<T>* temp_head_or_tail = nullptr;
+	shared_ptr<Node<T>> temp_head_or_tail = nullptr;
 
 	// look for the value in the linked list
 	while(node_to_del != nullptr) {
@@ -997,7 +1050,7 @@ bool LinkedList<T>::remove_occurrence_helper(T value, bool first_or_last) {
 			}
 
 			// delete the node
-			delete node_to_del;
+			node_to_del.reset();
 		
 			// // set it to nullptr to end the loop
 			// node_to_del = temp_head_or_tail;
@@ -1026,9 +1079,9 @@ bool LinkedList<T>::remove_occurrence_helper(T value, bool first_or_last) {
 
 // swaps the given nodes
 template<class T>
-void LinkedList<T>::swap_nodes(Node<T>* left_it, Node<T>* right_it) {
-	Node<T>* temp_next_of_left = left_it->next;
-	Node<T>* temp_prev_of_left = left_it->previous;
+void LinkedList<T>::swap_nodes(shared_ptr<Node<T>> left_it, shared_ptr<Node<T>> right_it) {
+	shared_ptr<Node<T>> temp_next_of_left = left_it->next;
+	shared_ptr<Node<T>> temp_prev_of_left = left_it->previous;
 
 	// adjust the next and previous pointers before swapping
 	if(left_it->next != nullptr) {

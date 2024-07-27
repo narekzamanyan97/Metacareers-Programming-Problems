@@ -1,22 +1,30 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include <memory>
+using namespace std;
+
 template <class T> 
 struct Node {
 	T value;
-	Node* next = nullptr;
-	Node* previous = nullptr;
+	shared_ptr<Node<T>> next;
+	shared_ptr<Node<T>> previous;
+	// Node* next = nullptr;
+	// Node* previous = nullptr;
 };
+
 
 // duplicates are allowed
 template <class T> 
 class LinkedList {
 private:
 	// a pointer to the front of the linked list (the first element)
-	Node<T>* head;
+	shared_ptr<Node<T>> head;
+	// Node<T>* head;
 
 	// a pointer to the back of the linked list (the last element)
-	Node<T>* tail;
+	shared_ptr<Node<T>> tail;
+	// Node<T>* tail;
 
 	// keep track of the number of nodes in the linked list
 	int number_of_nodes;
@@ -45,35 +53,35 @@ public:
 	~LinkedList();
 
 	// return a pointer to the first node (as an iterator)
-	Node<T>* begin();
+	shared_ptr<Node<T>> begin();
 
 	// return a pointer to the last node (as an iterator)
-	Node<T>* end();
+	shared_ptr<Node<T>> end();
 
 
 	// return a pointer to the first node (as an iterator)
-	Node<T>* cbegin() const;
+	shared_ptr<Node<T>> cbegin() const;
 
 	// return a pointer to the last node (as an iterator)
-	Node<T>* cend() const;
+	shared_ptr<Node<T>> cend() const;
 
 	// remove the given node pointer (iterator) from the list
-	Node<T>* remove(Node<T>* pointer);
+	shared_ptr<Node<T>> remove(shared_ptr<Node<T>> pointer);
 
 	// set the given node's value
 	// template <typename T> 
-	Node<T> set(Node<T>* pointer, T value);
+	void set(shared_ptr<Node<T>> pointer, T value);
 
 	// determine if the linked list is empty
-	bool is_empty();
+	bool is_empty() const;
 
 	// returns the number of elements in the linked list
-	int length();
+	int length() const;
 
 	// traverse the linked list and return that node object
 	// find a node with the given value
 	// template <typename T> 
-	Node<T>* find(T value);
+	shared_ptr<Node<T>> find(T value);
 
 	// print the values in the linked list
 	void print() const;
@@ -89,18 +97,6 @@ public:
 	// append at the front (position = 0, before head)
 	// template <typename T> 
 	Node<T> add_first(T value);
-
-	// append at the end (after the last element)
-	void add_last(Node<T>* iterator);
-
-	// append at the front (position = 0, before head)
-	void add_first(Node<T>* iterator);
-
-	// append the given linked list at the end (after the last element)
-	void add_last(LinkedList linked_list);
-
-	// append the given linked list at the front (position = 0, before head)
-	void add_first(LinkedList linked_list);
 
 	// remove the first oocurrence a node with the given value
 	// template <typename T> 
@@ -144,13 +140,34 @@ public:
 
 	// sets the given value at the given position in the list
 	// template <typename T> 
-	Node<T> set(T value, int position);
+	// !!! this has to be private
+	void set(T value, int position);
 
 	// removes all the elements from this list
 	void clear();
 
 	// swaps the given nodes
-	void swap_nodes(Node<T>* left_it, Node<T>* right_it);
+	void swap_nodes(shared_ptr<Node<T>> left_it, shared_ptr<Node<T>> right_it);
+
+	// Don't allow the user to add a pointer or a linked list. Hence, these
+	//		methods are private. Otherwise, adding the same node or linked list
+	//		twice creates an infinite loop (closed linked list)
+	// Only append the value(s) of the node (linked list), not the node itself
+	// append at the end (after the last element)
+	void add_last(shared_ptr<Node<T>> iterator);
+
+	// append at the front (position = 0, before head)
+	void add_first(shared_ptr<Node<T>> iterator);
+
+	// !!! The problem with the add_last and add_first methods is that if you try
+	//		adding the same linked list using the add_last method twice (or the
+	//		add_first method), you will end up with an infinite loop
+	// append the given linked list at the end (after the last element)
+	void add_last(LinkedList linked_list);
+
+	// append the given linked list at the front (position = 0, before head)
+	void add_first(LinkedList linked_list);
+
 
 };
 
