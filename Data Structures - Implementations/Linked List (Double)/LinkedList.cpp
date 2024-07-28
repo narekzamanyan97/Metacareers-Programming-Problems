@@ -565,55 +565,31 @@ void LinkedList<T>::add_last(LinkedList linked_list) {
 	linked_list.print();
 
 	while(iterator != NULL) {
-		// cout << "iterator.value = " << iterator->value << endl;
-		// // create a new node
-		// Node<T>* new_node = new Node<T>;
-		// cout << "new_node.value = " << new_node->value << endl;
+		// create a new node
+		shared_ptr<Node<T>> new_node = make_shared<Node<T>>();
 
-		// // set its value to the value of the iterator
-		// new_node->value = iterator->value;
+		// set its value to the value of the iterator
+		new_node->value = iterator->value;
 		
-		// // set the next to nullptr to avoid strange behavior (infinite list)
-		// new_node->next = nullptr;
+		// set the next to nullptr to avoid strange behavior (infinite list)
+		new_node->next = nullptr;
 
-		// // append it to this linked list
-		// // if(this->tail != nullptr) {
-		// // 	this->tail->next = new_node;
-		// // }
+		// append it to this linked list
+		if(this->tail != nullptr) {
+			this->tail->next = new_node;
+		}
 
-		// new_node->previous = this->tail;
-		// this->tail = new_node;
-		// // this->tail->next = nullptr;
+		new_node->previous = this->tail;
+		this->tail = new_node;
+		// this->tail->next = nullptr;
 
-		// this->print();
 
-		// // move on to the next node
-		// iterator = iterator->next;
-
-		// // increment the number_of_nodes by 1
-		// this->number_of_nodes++;
-
-		// cout << "***********************************" << endl;
-		// linked_list.print();
-		// cout << "***********************************" << endl;
-
-		this->add_last(iterator->value);
-		
 		// move on to the next node
 		iterator = iterator->next;
 
-		// // increment the number_of_nodes by 1
-		// this->number_of_nodes++;
-
-
-		this->print();
-
-		cout << "***********************************" << endl;
-		linked_list.print();
-		cout << "***********************************" << endl;
+		// increment the number_of_nodes by 1
+		this->number_of_nodes++;
 	}
-		
-	cout << "Return from the loop." << endl;
 }
 
 // append the given linked list at the front (position = 0, before head)
