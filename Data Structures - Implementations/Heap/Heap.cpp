@@ -40,6 +40,7 @@ Heap<T>::Heap(int size, bool min_or_max) {
 		
 		this->itemCount = 0;
 		this->capacity = 2 * size;
+
 	}
 	else {
 		throw std::length_error("Please enter a positive size.");
@@ -60,7 +61,6 @@ Heap<T>::Heap(const T* array_of_values, int array_size, bool min_or_max) {
 	shared_ptr<T[]> heap(new T[2*array_size], array_deleter<T>());
 
 	this->heap = heap;
-	cout << 1.2 << endl;
 		
 	// this->heap(new T[2 * array_size])
 	
@@ -68,12 +68,10 @@ Heap<T>::Heap(const T* array_of_values, int array_size, bool min_or_max) {
 	for(int i = 0; i < array_size; i++) {
 		this->heap[i] = array_of_values[i];
 	} 
-	cout << 1.3 << endl;
 
 	// update the size and capacity of the heap
 	this->itemCount = array_size;	
 	this->capacity = 2 * array_size;
-	cout << 1.4 << endl;
 
 	// reorganize the copied array into a heap
 	heapCreate();
@@ -82,22 +80,42 @@ Heap<T>::Heap(const T* array_of_values, int array_size, bool min_or_max) {
 // destructor
 template<class T>
 Heap<T>::~Heap() {
-	cout << "heap before destructor." << endl;
-	this->print();
-	// for(int i = 0; i < this->getNumberOfNodes(); i++) {
-	// 	cout << "setting " << this->getValue(i) << " to " << 1110 << endl;
-	// 	this->setValue(i, 1110);
-	// }
+	// no need to delete the smart pointer. 
+	// It will take care of deleting itself
+}
 
-	// when passing a heap object to a method, after the method returns, the
-	//		object's pointers get deleted. So the object in the caller will
-	//		have pointers that just got deleted in the function. Use shared_ptr 
-	//		to fix the issue.
-	// https://stackoverflow.com/questions/1881681/using-delete-on-pointers-passed-as-function-arguments
-	// delete[] this->heap;
 
-	cout << "heap after destructor." << endl;
-	this->print();
+// extend the size of the array to accomodate new values
+// double the capacity of the array
+template<class T>
+void Heap<T>::extend() {
+	cout << "extending the heap" << endl;
+	cout << "before extending" << endl;
+	for(int i = 0; i < this->capacity; i++) {
+		cout << this->heap[i] << " (" << i << "), ";
+	}
+	cout << endl;
+	
+	// create a new heap twice the size of this heap
+	shared_ptr<T[]> new_heap(new T[2*this->capacity], array_deleter<T>());
+
+	// copy the values from this heap to the new_heap
+	for(int i = 0; i < this->getNumberOfNodes(); i++) {
+		new_heap[i] = this->heap[i];
+	}
+
+	// set this heap to the new heap
+	this->heap = new_heap;
+
+	// update the capacity
+	this->capacity *= 2;
+
+
+	cout << "after extending" << endl;
+	for(int i = 0; i < this->capacity; i++) {
+		cout << this->heap[i] << " (" << i << "), ";
+	}
+	cout << endl;
 }
 
 // returns the index of the left child
@@ -394,7 +412,13 @@ template<class T>
 void Heap<T>::add(T newValue) {
 	// !!! need to extend the size of the heap if we keep adding new values
 	// insert new data into the bottom of the tree
-	this->heap[itemCount] = newValue;
+	if(this->getNumberOfNodes() < this->capacity) {
+		this->heap[itemCount] = newValue;
+	}
+	else {
+		this->extend();
+		this->heap[itemCount] = newValue;
+	}
 
 	// Trickle new item up to the appropriate spot in the tree
 	int newDataIndex = this->itemCount;
@@ -404,40 +428,6 @@ void Heap<T>::add(T newValue) {
 
 
 	this->heapRebuild(newDataIndex);
-
-	// // wheter the new node is in its appropriate place. So far, assume it's false
-	// bool inPlace = false;
-
-	// while((newDataIndex >= 0) and !inPlace) {
-	// 	// get the parent of the new node
-	// 	int parentIndex = this->getParentIndex(newDataIndex);
-		
-	// 	cout << "size = " << this->itemCount;
-
-	// 	// for max heap
-	// 	if(this->heapType == MAX) {
-	// 		if(this->getValue(newDataIndex) < this->getValue(parentIndex)) {
-	// 			inPlace = true;
-	// 		}
-	// 	}
-	// 	// for min heap
-	// 	else {
-	// 		if(this->getValue(newDataIndex) > this->getValue(parentIndex)) {
-	// 			inPlace = true;
-	// 		}
-	// 	}
-
-	// 	if(inPlace == false) {
-	// 		// swap the values of the parent and new node
-	// 		T tempValue = this->getValue(newDataIndex);
-	// 		this->heap[newDataIndex] = this->getValue(parentIndex);
-	// 		this->heap[parentIndex] = tempValue;
-
-	// 		// update the loop variable
-	// 		newDataIndex = parentIndex;
-	// 	}
-	// }
-
 }
 
 // removes the root (either max or min) of the heap, and returns the value

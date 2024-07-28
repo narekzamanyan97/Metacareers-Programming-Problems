@@ -23,7 +23,7 @@ private:
 
 	// have a capacity variable. When the new size is greater than the existing
 	//		itemCount, then reallocate more space
-	// should always be at most 2 times the size of the heap
+	// should be at most 2 times the size of the heap
 	int capacity;
 
 	// min or max heap
@@ -45,12 +45,10 @@ private:
 	// creates a heap from an unordered array
 	void heapCreate();
 
+public:
 	// extend the size of the array to accomodate new values
 	void extend();
 
-
-
-public:
 	// returns the index of the left child
 	int getLeftChildIndex(int nodeIndex) const;
 
