@@ -59,6 +59,7 @@ LinkedList<T>::LinkedList(int seed, int num_of_nodes, T max_value) {
 	// set the head and tail pointers to null
 	this->head = make_shared<Node<T>>();
 	this->tail = make_shared<Node<T>>();
+
 	// this->head = nullptr;
 	// this->tail = nullptr;	
 
@@ -309,7 +310,6 @@ void LinkedList<T>::print() const {
 //		position = the position to insert the value at
 // @return:
 //		the newly inserted node, or nullptr if the position is out of range
-// template <typename T> 
 template<class T>
 Node<T> LinkedList<T>::insert(T value, int position) {
 	// if position < 0 or > length of linked list, return null
@@ -327,7 +327,7 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 	// position > 0 && position < this->length
 	else {
 		// declare a new node
-		shared_ptr<Node<T>> new_node;
+		shared_ptr<Node<T>> new_node = make_shared<Node<T>>();
 		new_node->value = value;
 
 		// declare the current node
@@ -351,22 +351,29 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 				// loop through the linked list, and stop at the given position
 				int current_pos = 0;
 				while(current_pos < position) {
+					// the if-else is to handle the case of inserting at the
+					//		last position (position = length - 1)
 					if(current_node->next != nullptr) {
+						// move to the next node
 						current_node = current_node->next;
+						// increment the position
 						current_pos++;
 					}
 					else {
 						current_pos = position;
 					}
-				}						
+				}
 			}
 			// if we loop from the back, then current position = length - 1
 			else {
 				// loop through the linked list, and stop at the given position
 				int current_pos = this->length() - 1;
 				while(current_pos > position) {
-					if(current_node->next != nullptr) {
-						current_node = current_node->next;
+					// the if-else is to handle the case of inserting at the
+					//		first position (position = 0)
+					if(current_node->previous != nullptr) {
+						// move to the previous node
+						current_node = current_node->previous;
 						// decrement the current position
 						current_pos--;
 					}
@@ -375,6 +382,7 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 					}
 				}	
 			}
+
 
 			// reset the next and previous pointers
 			new_node->next = current_node;
@@ -394,7 +402,11 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 
 			return *new_node;			
 		}
+		else {
+			return *(this->head);
+		}
 	}
+
 }
 
 // append at the end (after the last element)
@@ -406,7 +418,7 @@ Node<T> LinkedList<T>::insert(T value, int position) {
 template<class T>
 Node<T> LinkedList<T>::add_last(T value) {
 	// declare a new node
-	shared_ptr<Node<T>> new_node;
+	shared_ptr<Node<T>> new_node = make_shared<Node<T>>();
 	new_node->value = value;
 
 	// if the list is empty
@@ -447,7 +459,7 @@ Node<T> LinkedList<T>::add_last(T value) {
 template<class T>
 Node<T> LinkedList<T>::add_first(T value) {
 	// declare a new node
-	shared_ptr<Node<T>> new_node;
+	shared_ptr<Node<T>> new_node = make_shared<Node<T>>();
 	new_node->value = value;
 
 	// if the list is empty
@@ -614,7 +626,7 @@ void LinkedList<T>::add_first(LinkedList linked_list) {
 
 	while(iterator != nullptr) {
 		// create a new node
-		shared_ptr<Node<T>> new_node;
+		shared_ptr<Node<T>> new_node = make_shared<Node<T>>();
 
 		// set its value to the value of the iterator
 		new_node->value = iterator->value;

@@ -2,21 +2,23 @@
 
 int main() {
 
-	LinkedList<int> linked_list = LinkedList<int>(2, 22, 25);
-	LinkedList<int> linked_list2 = LinkedList<int>(74, 22, 25);
+	// LinkedList<int> linked_list = LinkedList<int>(2, 22, 25);
+	// LinkedList<int> linked_list2 = LinkedList<int>(74, 22, 25);
 
-	// int array_1[11] = {1, 2};
-	// int array_2[11] = {3, 4};
+	// linked_list.print();
+	// linked_list2.print();
+	int array_1[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	int array_2[10] = {11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
 
 	// LinkedList<int> linked_list = LinkedList<int>(array_1, 2);
-	// LinkedList<int> linked_list = LinkedList<int>(array_1, 2);
-	// LinkedList<int> linked_list2 = LinkedList<int>(array_2, 2);
-	LinkedList<int>* linked_list3 = new LinkedList<int>[5];
+	LinkedList<int> linked_list = LinkedList<int>(array_1, 10);
+	LinkedList<int> linked_list2 = LinkedList<int>(array_2, 10);
+	// LinkedList<int>* linked_list3 = new LinkedList<int>[5];
 
-	for(int i = 0; i < 5; i++) {
-		cout << i << ": " << linked_list3[i].length() << endl;
-		cout << i << " address: " << &linked_list3[i] << endl;
-	}
+	// for(int i = 0; i < 5; i++) {
+	// 	cout << i << ": " << linked_list3[i].length() << endl;
+	// 	cout << i << " address: " << &linked_list3[i] << endl;
+	// }
 
 	Node<int> node;
 	shared_ptr<Node<int>> node_ptr;
