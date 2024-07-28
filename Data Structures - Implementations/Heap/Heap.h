@@ -47,7 +47,7 @@ private:
 
 public:
 	// extend the size of the array to accomodate new values
-	void extend();
+	void extend(int given_size=-1);
 
 	// returns the index of the left child
 	int getLeftChildIndex(int nodeIndex) const;

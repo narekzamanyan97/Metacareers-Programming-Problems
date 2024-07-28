@@ -86,16 +86,29 @@ Heap<T>::~Heap() {
 
 
 // extend the size of the array to accomodate new values
+// @parameters:
+//		given_size
+//		if -1, then double the current item count
+//		if <> -1, then double the given size
 // double the capacity of the array
 template<class T>
-void Heap<T>::extend() {
+void Heap<T>::extend(int given_size) {
 	cout << "extending the heap" << endl;
+	int size_to_use;
+
+	if (given_size == -1) {
+		size_to_use = 2*this->capacity;
+	}
+	else {
+		size_to_use = 2*given_size;
+	}
+
 	cout << "before extending" << endl;
 	for(int i = 0; i < this->capacity; i++) {
 		cout << this->heap[i] << " (" << i << "), ";
 	}
 	cout << endl;
-	
+
 	// create a new heap twice the size of this heap
 	shared_ptr<T[]> new_heap(new T[2*this->capacity], array_deleter<T>());
 
