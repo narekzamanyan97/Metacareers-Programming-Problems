@@ -178,13 +178,15 @@ const shared_ptr<Node<T>> LinkedList<T>::cend() const {
 
 
 // return a reverse iterator (pointer) to the last node
-shared_ptr<Node<T>> rbegin() {
+template<class T>
+shared_ptr<Node<T>> LinkedList<T>::rbegin() {
 	return this->tail;
 }
 
 // returns a reverse iterator pointing to the theoretical node preceding
 //		the first node
-shared_ptr<Node<T>> rend() {
+template<class T>
+shared_ptr<Node<T>> LinkedList<T>::rend() {
 	if(this->head != nullptr) {
 		return this->head->previous;
 	}
@@ -195,13 +197,15 @@ shared_ptr<Node<T>> rend() {
 
 // returns a constant reverse iterator pointing to the last node in
 //		(reverse beginning)
-const shared_ptr<Node<T>> crbegin() const {
+template<class T>
+const shared_ptr<Node<T>> LinkedList<T>::crbegin() const {
 	return this->tail;
 }
 
 // returns a constant reverse iterator pointing to the theoretical node
 //		preceding the first node (reverse end)
-const shared_ptr<Node<T>> crend() const {
+template<class T>
+const shared_ptr<Node<T>> LinkedList<T>::crend() const {
 	if(this->head->previous != nullptr) {
 		return this->head->previous;
 	}
