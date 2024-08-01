@@ -59,11 +59,26 @@ public:
 	shared_ptr<Node<T>> end();
 
 
-	// return a pointer to the first node (as an iterator)
-	shared_ptr<Node<T>> cbegin() const;
+	// return a constant pointer to the first node (as an iterator)
+	const shared_ptr<Node<T>> cbegin() const;
 
-	// return a pointer to the last node (as an iterator)
-	shared_ptr<Node<T>> cend() const;
+	// return a constant pointer to the last node (as an iterator)
+	const shared_ptr<Node<T>> cend() const;
+
+	// return a reverse iterator (pointer) to the last node
+	shared_ptr<Node<T>> rbegin();
+
+	// returns a reverse iterator pointing to the theoretical node preceding
+	//		the first node
+	shared_ptr<Node<T>> rend();
+
+	// returns a constant reverse iterator pointing to the last node in
+	//		(reverse beginning)
+	const shared_ptr<Node<T>> crbegin() const;
+
+	// returns a constant reverse iterator pointing to the theoretical node
+	//		preceding the first node (reverse end)
+	const shared_ptr<Node<T>> crend() const;
 
 	// remove the given node pointer (iterator) from the list
 	shared_ptr<Node<T>> remove(shared_ptr<Node<T>> pointer);

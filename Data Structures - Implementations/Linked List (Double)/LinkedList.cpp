@@ -147,23 +147,67 @@ shared_ptr<Node<T>> LinkedList<T>::begin() {
 	return this->head;
 }
 
-// return a pointer to the last node (as an iterator)
+// return a pointer to the theoretical element that follows the last node
 template<class T>
 shared_ptr<Node<T>> LinkedList<T>::end() {
-	return this->tail;
+	if(this->tail != nullptr) {
+		return this->tail->next;
+	}
+	else {
+		return this->tail;
+	}
 }
 
 
 // return a pointer to the first node (as an iterator)
 template<class T>
-shared_ptr<Node<T>> LinkedList<T>::cbegin() const {
+const shared_ptr<Node<T>> LinkedList<T>::cbegin() const {
 	return this->head;
 }
 
 // return a pointer to the last node (as an iterator)
 template<class T>
-shared_ptr<Node<T>> LinkedList<T>::cend() const {
-	return this->head;
+const shared_ptr<Node<T>> LinkedList<T>::cend() const {
+	if(this->tail != nullptr) {
+		return this->tail->next;
+	}
+	else {
+		return this->tail;
+	}
+}
+
+
+// return a reverse iterator (pointer) to the last node
+shared_ptr<Node<T>> rbegin() {
+	return this->tail;
+}
+
+// returns a reverse iterator pointing to the theoretical node preceding
+//		the first node
+shared_ptr<Node<T>> rend() {
+	if(this->head != nullptr) {
+		return this->head->previous;
+	}
+	else {
+		this->head->previous;
+	}
+}
+
+// returns a constant reverse iterator pointing to the last node in
+//		(reverse beginning)
+const shared_ptr<Node<T>> crbegin() const {
+	return this->tail;
+}
+
+// returns a constant reverse iterator pointing to the theoretical node
+//		preceding the first node (reverse end)
+const shared_ptr<Node<T>> crend() const {
+	if(this->head->previous != nullptr) {
+		return this->head->previous;
+	}
+	else {
+		return this->head;
+	}
 }
 
 // remove the given node pointer (iterator) from the list
